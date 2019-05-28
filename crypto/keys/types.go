@@ -66,6 +66,7 @@ const (
 	TypeLedger  KeyType = 1
 	TypeOffline KeyType = 2
 	TypeMulti   KeyType = 3
+	//TypeSubKey  KeyType = 4
 )
 
 var keyTypes = map[KeyType]string{
@@ -73,6 +74,7 @@ var keyTypes = map[KeyType]string{
 	TypeLedger:  "ledger",
 	TypeOffline: "offline",
 	TypeMulti:   "multi",
+	//TypeSubKey:  "subkey",
 }
 
 // String implements the stringer interface for KeyType.
@@ -263,3 +265,35 @@ func readInfo(bz []byte) (info Info, err error) {
 	err = cdc.UnmarshalBinaryLengthPrefixed(bz, &info)
 	return
 }
+
+//type subKeyInfo struct {
+//	Name                  string           `json:"name"`
+//	SubKeyAccountAddress  types.AccAddress `json:"subkey_account_address"`
+//	SubKeyNumber          uint64           `json:"subkey_number"`
+//	PubKey                crypto.PubKey    `json:"pubkey"`
+//	PrivKeyArmor          string           `json:"privkey.armor"`
+//}
+//
+//func (i subKeyInfo) GetType() KeyType {
+//	return TypeSubKey
+//}
+//
+//func (i subKeyInfo) GetName() string {
+//	return i.Name
+//}
+//
+//func (i subKeyInfo) GetPubKey() crypto.PubKey {
+//	return i.PubKey
+//}
+//
+//func (i subKeyInfo) GetAddress() types.AccAddress {
+//	return i.PubKey.Address().Bytes()
+//}
+//
+//func (i subKeyInfo) GetPath() (*hd.BIP44Params, error) {
+//	return nil, fmt.Errorf("BIP44 Paths are not available for this type")
+//}
+//
+//func (i subKeyInfo) GetSubKeyNumber() uint64 {
+//	return i.SubKeyNumber
+//}

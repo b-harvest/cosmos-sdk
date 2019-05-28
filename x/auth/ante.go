@@ -34,7 +34,7 @@ func NewAnteHandler(ak AccountKeeper, fck FeeCollectionKeeper) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
 	) (newCtx sdk.Context, res sdk.Result, abort bool) {
-
+		//ctx.WithTxBytes()
 		// all transactions must be of type auth.StdTx
 		stdTx, ok := tx.(StdTx)
 		if !ok {
@@ -115,7 +115,9 @@ func NewAnteHandler(ak AccountKeeper, fck FeeCollectionKeeper) sdk.AnteHandler {
 		// stdSigs contains the sequence number, account number, and signatures.
 		// When simulating, this would just be a 0-length slice.
 		stdSigs := stdTx.GetSignatures()
-
+		// flag for checking only one subKey in one tx,
+		// because ctx need one subKeyNumber for checking Allowance
+		subKeyFlag := false
 		for i := 0; i < len(stdSigs); i++ {
 			// skip the fee payer, account is cached and fees were deducted already
 			if i != 0 {
@@ -124,14 +126,24 @@ func NewAnteHandler(ak AccountKeeper, fck FeeCollectionKeeper) sdk.AnteHandler {
 					return newCtx, res, true
 				}
 			}
-
+			sacc, ok := signerAccs[i].(SubKeyAccount)
+			if ok {
+				if subKeyFlag {
+					return newCtx, sdk.ErrInvalidPubKey("Allowed Only one subKey in one tx").Result(), true
+				}
+				subKey := sacc.SubKey(stdSigs[i].PubKey)
+				if subKey == nil {
+					return newCtx, sdk.ErrInvalidPubKey("Invalid subKey").Result(), true
+				}
+				subKeyFlag = true
+				newCtx.WithSubKey(subKey.SubKeyNumber)
+			}
 			// check signature, return account with incremented nonce
 			signBytes := GetSignBytes(newCtx.ChainID(), stdTx, signerAccs[i], isGenesis)
 			signerAccs[i], res = processSig(newCtx, signerAccs[i], stdSigs[i], signBytes, simulate, params)
 			if !res.IsOK() {
 				return newCtx, res, true
 			}
-
 			ak.SetAccount(newCtx, signerAccs[i])
 		}
 
@@ -164,22 +176,27 @@ func ValidateMemo(stdTx StdTx, params Params) sdk.Result {
 	return sdk.Result{}
 }
 
+// TODO: subKeyAcc
 // verify the signature and increment the sequence. If the account doesn't have
 // a pubkey, set it.
 func processSig(
 	ctx sdk.Context, acc Account, sig StdSignature, signBytes []byte, simulate bool, params Params,
 ) (updatedAcc Account, res sdk.Result) {
+	// TODO: subKeyAcc: check acc type, branch processPubKey
+	var pubKey crypto.PubKey
+	if ctx.SubKeyNumber() != NoSubKey{ // already checked subKeyNumber in AnteHandler, NoSubKey = uint64(0)
+		pubKey = sig.PubKey
+	} else {
+		pubKey, res := ProcessPubKey(acc, sig, simulate)
+		if !res.IsOK() {
+			return nil, res
+		}
 
-	pubKey, res := ProcessPubKey(acc, sig, simulate)
-	if !res.IsOK() {
-		return nil, res
+		err := acc.SetPubKey(pubKey)
+		if err != nil {
+			return nil, sdk.ErrInternal("setting PubKey on signer's account").Result()
+		}
 	}
-
-	err := acc.SetPubKey(pubKey)
-	if err != nil {
-		return nil, sdk.ErrInternal("setting PubKey on signer's account").Result()
-	}
-
 	if simulate {
 		// Simulated txs should not contain a signature and are not required to
 		// contain a pubkey, so we must account for tx size of including a
@@ -220,7 +237,7 @@ func consumeSimSigGas(gasmeter sdk.GasMeter, pubkey crypto.PubKey, sig StdSignat
 
 	gasmeter.ConsumeGas(params.TxSizeCostPerByte*cost, "txSize")
 }
-
+// TODO: subKeyAcc
 // ProcessPubKey verifies that the given account address matches that of the
 // StdSignature. In addition, it will set the public key of the account if it
 // has not been set.
@@ -323,7 +340,7 @@ func DeductFees(blockTime time.Time, acc Account, fee StdFee) (Account, sdk.Resu
 
 	// Validate the account has enough "spendable" coins as this will cover cases
 	// such as vesting accounts.
-	spendableCoins := acc.SpendableCoins(blockTime)
+	spendableCoins := acc.SpendableCoins(blockTime, NoSubKey)
 	if _, hasNeg := spendableCoins.SafeSub(feeAmount); hasNeg {
 		return nil, sdk.ErrInsufficientFunds(
 			fmt.Sprintf("insufficient funds to pay for fees; %s < %s", spendableCoins, feeAmount),
@@ -391,3 +408,4 @@ func GetSignBytes(chainID string, stdTx StdTx, acc Account, genesis bool) []byte
 		chainID, accNum, acc.GetSequence(), stdTx.Fee, stdTx.Msgs, stdTx.Memo,
 	)
 }
+// TODO: subKeyAcc

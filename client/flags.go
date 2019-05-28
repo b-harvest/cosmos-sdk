@@ -38,6 +38,7 @@ const (
 	FlagName               = "name"
 	FlagAccountNumber      = "account-number"
 	FlagSequence           = "sequence"
+	FlagSubKeyNumber       = "subkey-number"
 	FlagMemo               = "memo"
 	FlagFees               = "fees"
 	FlagGasPrices          = "gas-prices"
@@ -83,6 +84,7 @@ func PostCommands(cmds ...*cobra.Command) []*cobra.Command {
 		c.Flags().String(FlagFrom, "", "Name or address of private key with which to sign")
 		c.Flags().Uint64P(FlagAccountNumber, "a", 0, "The account number of the signing account (offline mode only)")
 		c.Flags().Uint64P(FlagSequence, "s", 0, "The sequence number of the signing account (offline mode only)")
+		c.Flags().Uint64P(FlagSubKeyNumber, "sk", 0, "The subKey number of the signing subKey of subKey account (offline mode only)")
 		c.Flags().String(FlagMemo, "", "Memo to send along with transaction")
 		c.Flags().String(FlagFees, "", "Fees to pay along with transaction; eg: 10uatom")
 		c.Flags().String(FlagGasPrices, "", "Gas prices to determine the transaction fee (e.g. 10uatom)")

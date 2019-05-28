@@ -10,7 +10,6 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
-
 	"github.com/cosmos/cosmos-sdk/store/gaskv"
 	stypes "github.com/cosmos/cosmos-sdk/store/types"
 )
@@ -140,6 +139,7 @@ const (
 	contextKeyChainID
 	contextKeyIsCheckTx
 	contextKeyTxBytes
+	contextKeySubKey
 	contextKeyLogger
 	contextKeyVoteInfos
 	contextKeyGasMeter
@@ -178,6 +178,8 @@ func (c Context) ConsensusParams() *abci.ConsensusParams {
 	return c.Value(contextKeyConsensusParams).(*abci.ConsensusParams)
 }
 
+func (c Context) SubKeyNumber() uint64 { return c.Value(contextKeySubKey).(uint64) }
+
 func (c Context) WithMultiStore(ms MultiStore) Context {
 	return c.withValue(contextKeyMultiStore, ms)
 }
@@ -208,6 +210,8 @@ func (c Context) WithBlockHeight(height int64) Context {
 func (c Context) WithChainID(chainID string) Context { return c.withValue(contextKeyChainID, chainID) }
 
 func (c Context) WithTxBytes(txBytes []byte) Context { return c.withValue(contextKeyTxBytes, txBytes) }
+
+func (c Context) WithSubKey(subKeyNumber uint64) Context { return c.withValue(contextKeySubKey, subKeyNumber) }
 
 func (c Context) WithLogger(logger log.Logger) Context { return c.withValue(contextKeyLogger, logger) }
 

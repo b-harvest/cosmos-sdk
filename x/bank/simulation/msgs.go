@@ -48,7 +48,7 @@ func createMsgSend(r *rand.Rand, ctx sdk.Context, accs []simulation.Account, map
 		}
 		toAcc = simulation.RandomAcc(r, accs)
 	}
-	initFromCoins := mapper.GetAccount(ctx, fromAcc.Address).SpendableCoins(ctx.BlockHeader().Time)
+	initFromCoins := mapper.GetAccount(ctx, fromAcc.Address).SpendableCoins(ctx.BlockHeader().Time, auth.NoSubKey)
 
 	if len(initFromCoins) == 0 {
 		return fromAcc, "skipping, no coins at all", msg, false
@@ -143,7 +143,7 @@ func createSingleInputMsgMultiSend(r *rand.Rand, ctx sdk.Context, accs []simulat
 		toAcc = simulation.RandomAcc(r, accs)
 	}
 	toAddr := toAcc.Address
-	initFromCoins := mapper.GetAccount(ctx, fromAcc.Address).SpendableCoins(ctx.BlockHeader().Time)
+	initFromCoins := mapper.GetAccount(ctx, fromAcc.Address).SpendableCoins(ctx.BlockHeader().Time, auth.NoSubKey)
 
 	if len(initFromCoins) == 0 {
 		return fromAcc, "skipping, no coins at all", msg, false

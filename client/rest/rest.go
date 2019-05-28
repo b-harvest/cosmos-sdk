@@ -33,7 +33,7 @@ func WriteGenerateStdTxResponse(w http.ResponseWriter, cdc *codec.Codec,
 	}
 
 	txBldr := authtxb.NewTxBuilder(
-		utils.GetTxEncoder(cdc), br.AccountNumber, br.Sequence, gas, gasAdj,
+		utils.GetTxEncoder(cdc), br.AccountNumber, br.Sequence, br.SubKeyNumber, gas, gasAdj,
 		br.Simulate, br.ChainID, br.Memo, br.Fees, br.GasPrices,
 	)
 

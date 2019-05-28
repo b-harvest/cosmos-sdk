@@ -773,7 +773,7 @@ func (app *BaseApp) runTx(mode runTxMode, txBytes []byte, tx sdk.Tx) (result sdk
 	if mode == runTxModeDeliver {
 		startingGas = ctx.BlockGasMeter().GasConsumed()
 	}
-
+	tx.ValidateBasic()
 	defer func() {
 		if r := recover(); r != nil {
 			switch rType := r.(type) {

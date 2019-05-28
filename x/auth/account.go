@@ -34,7 +34,8 @@ type Account interface {
 
 	// Calculates the amount of coins that can be sent to other accounts given
 	// the current time.
-	SpendableCoins(blockTime time.Time) sdk.Coins
+	//SpendableCoins(blockTime time.Time) sdk.Coins
+	SpendableCoins(blockTime time.Time, subKeyNumber uint64) sdk.Coins
 
 	// Ensure that account implements stringer
 	String() string
@@ -171,7 +172,7 @@ func (acc *BaseAccount) SetSequence(seq uint64) error {
 
 // SpendableCoins returns the total set of spendable coins. For a base account,
 // this is simply the base coins.
-func (acc *BaseAccount) SpendableCoins(_ time.Time) sdk.Coins {
+func (acc *BaseAccount) SpendableCoins(_ time.Time, subKeyNumber uint64) sdk.Coins {
 	return acc.GetCoins()
 }
 
@@ -428,7 +429,7 @@ func (cva ContinuousVestingAccount) GetVestingCoins(blockTime time.Time) sdk.Coi
 
 // SpendableCoins returns the total number of spendable coins per denom for a
 // continuous vesting account.
-func (cva ContinuousVestingAccount) SpendableCoins(blockTime time.Time) sdk.Coins {
+func (cva ContinuousVestingAccount) SpendableCoins(blockTime time.Time, subKeyNumber uint64) sdk.Coins {
 	return cva.spendableCoins(cva.GetVestingCoins(blockTime))
 }
 
@@ -491,7 +492,7 @@ func (dva DelayedVestingAccount) GetVestingCoins(blockTime time.Time) sdk.Coins 
 
 // SpendableCoins returns the total number of spendable coins for a delayed
 // vesting account.
-func (dva DelayedVestingAccount) SpendableCoins(blockTime time.Time) sdk.Coins {
+func (dva DelayedVestingAccount) SpendableCoins(blockTime time.Time, subKeyNumber uint64) sdk.Coins {
 	return dva.spendableCoins(dva.GetVestingCoins(blockTime))
 }
 
@@ -511,3 +512,112 @@ func (dva *DelayedVestingAccount) GetStartTime() int64 {
 func (dva *DelayedVestingAccount) GetEndTime() int64 {
 	return dva.EndTime
 }
+
+//-----------------------------------------------------------------------------
+// SubKey Account
+
+//type SubKeyWithMetadata struct {
+//	ParentAccount        Account
+//	SubKey               SubKey
+//}
+
+type SubKey struct {
+	PubKey                     crypto.PubKey
+	//SubKeyAccount   		   *SubKeyAccount
+	//SubKeyAccountAddress       sdk.AccAddress
+	//SubKeyAccountNumber        uint64
+	SubKeyNumber 			   uint64
+	PermissionedRoutes         []string
+	DailySpendableAllowance    sdk.Coins
+	DailySpent                 sdk.Coins
+	//Master      			   bool  // no limit PermissionedRoutes, DailySpendableAllowance
+}
+
+type SubKeyAccount struct {
+	*BaseAccount
+	SubKeys       []SubKey
+	Deposit       sdk.Coins
+}
+
+// TODO: Interface, Get, Set function for SubKey, SubKeyAccount
+
+const (
+	NoSubKey = uint64(0)
+	NoLimitAllowance = int64(-1)
+)
+
+func (sa SubKeyAccount) SpendableCoins(blockTime time.Time, subKeyNumber uint64) sdk.Coins {
+	var spendableCoins sdk.Coins
+
+	for _, subKey:= range sa.SubKeys {
+		if subKey.SubKeyNumber == subKeyNumber {
+			saCoins := sa.GetCoins().Sub(sa.Deposit)  // exclude Deposited coins
+			dailyRemainingCoins := subKey.DailySpendableAllowance.Sub(subKey.DailySpent)
+
+			for _, coin := range saCoins {
+				baseAmt := coin.Amount
+
+				remainingAmt := dailyRemainingCoins.AmountOf(coin.Denom)
+
+				min := sdk.MinInt(remainingAmt, baseAmt)
+				spendableCoin := sdk.NewCoin(coin.Denom, min)
+
+				if !spendableCoin.IsZero() {
+					spendableCoins = spendableCoins.Add(sdk.Coins{spendableCoin})
+				}
+			}
+			return spendableCoins
+		}
+	}
+	return spendableCoins
+}
+
+func (sa SubKeyAccount) CheckSubKeyNumber(subKeyNumber uint64) bool {
+	for _, subKey:= range sa.SubKeys {
+		if subKey.SubKeyNumber == subKeyNumber {
+			return true
+		}
+	}
+	return false
+}
+
+
+func (sa SubKeyAccount) SubKey(subKeyPubKey crypto.PubKey) *SubKey {
+	for _, subKey:= range sa.SubKeys {
+		if subKey.PubKey == subKeyPubKey {
+			return &subKey
+		}
+	}
+	return nil
+}
+
+func (sa SubKeyAccount) SubKeyWithNumber(subKeyNumber uint64) *SubKey {
+	for _, subKey:= range sa.SubKeys {
+		if subKey.SubKeyNumber == subKeyNumber {
+			return &subKey
+		}
+	}
+	return nil
+}
+
+//func (sa SubKeyAccount) CheckSubKeyPubKey(subKeyPubKey crypto.PubKey) bool {
+//	for _, subKey:= range sa.SubKeys {
+//		if subKey.PubKey == subKeyPubKey {
+//			return true
+//		}
+//	}
+//	return false
+//}
+//
+////, sdk.Result
+//func (sa SubKeyAccount) SubKey(subKeyPubKey crypto.PubKey) (*SubKey, bool) {
+//	for _, subKey:= range sa.SubKeys {
+//		if subKey.PubKey == subKeyPubKey {
+//			return &subKey, true
+//		}
+//	}
+//	return nil, false
+//	//panic("not exist subKey")
+//}
+
+

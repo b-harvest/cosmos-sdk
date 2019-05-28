@@ -245,7 +245,7 @@ func getAccount(ctx sdk.Context, ak auth.AccountKeeper, addr sdk.AccAddress) aut
 func setAccount(ctx sdk.Context, ak auth.AccountKeeper, acc auth.Account) {
 	ak.SetAccount(ctx, acc)
 }
-
+// TODO: subKeyAcc:
 // subtractCoins subtracts amt coins from an account with the given address addr.
 //
 // CONTRACT: If the account is a vesting account, the amount has to be spendable.
@@ -260,7 +260,7 @@ func subtractCoins(ctx sdk.Context, ak auth.AccountKeeper, addr sdk.AccAddress, 
 	acc := getAccount(ctx, ak, addr)
 	if acc != nil {
 		oldCoins = acc.GetCoins()
-		spendableCoins = acc.SpendableCoins(ctx.BlockHeader().Time)
+		spendableCoins = acc.SpendableCoins(ctx.BlockHeader().Time, auth.NoSubKey)
 	}
 
 	// For non-vesting accounts, spendable coins will simply be the original coins.

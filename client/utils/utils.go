@@ -314,6 +314,7 @@ func PrepareTxBuilder(txBldr authtxb.TxBuilder, cliCtx context.CLIContext) (auth
 		}
 		txBldr = txBldr.WithAccountNumber(accNum)
 	}
+	// TODO: subKeyAcc, GetSubKeyNumber, GetSubkey for cli logic
 
 	// TODO: (ref #1903) Allow for user supplied account sequence without
 	// automatically doing a manual lookup.

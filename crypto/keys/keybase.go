@@ -15,7 +15,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/mintkey"
 	"github.com/cosmos/cosmos-sdk/types"
 
-	bip39 "github.com/cosmos/go-bip39"
+	"github.com/cosmos/go-bip39"
 
 	tmcrypto "github.com/tendermint/tendermint/crypto"
 	cryptoAmino "github.com/tendermint/tendermint/crypto/encoding/amino"
@@ -221,7 +221,7 @@ func (kb dbKeybase) GetByAddress(address types.AccAddress) (Info, error) {
 	bs := kb.db.Get(ik)
 	return readInfo(bs)
 }
-
+// TODO: SubKeyAcc
 // Sign signs the msg with the named key.
 // It returns an error if the key doesn't exist or the decryption fails.
 func (kb dbKeybase) Sign(name, passphrase string, msg []byte) (sig []byte, pub tmcrypto.PubKey, err error) {
@@ -231,6 +231,7 @@ func (kb dbKeybase) Sign(name, passphrase string, msg []byte) (sig []byte, pub t
 	}
 
 	var priv tmcrypto.PrivKey
+	//subKeyNumber := uint64(0) //auth.NoSubKey
 
 	switch info.(type) {
 	case localInfo:
@@ -275,6 +276,18 @@ func (kb dbKeybase) Sign(name, passphrase string, msg []byte) (sig []byte, pub t
 		}
 
 		return sig, info.GetPubKey(), nil
+	// TODO: subKeyAcc
+	//case subKeyInfo:
+	//	sinfo := info.(subKeyInfo)
+	//	if sinfo.PrivKeyArmor == "" {
+	//		err = fmt.Errorf("private key not available")
+	//		return
+	//	}
+	//	subKeyNumber = sinfo.SubKeyNumber
+	//	priv, err = mintkey.UnarmorDecryptPrivKey(sinfo.PrivKeyArmor, passphrase)
+	//	if err != nil {
+	//		return nil, nil, subKeyNumber, err
+	//	}
 	}
 
 	sig, err = priv.Sign(msg)

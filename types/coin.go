@@ -513,6 +513,22 @@ func removeZeroCoins(coins Coins) Coins {
 	return coins[:i]
 }
 
+func removeNegativeCoins(coins Coins) Coins {
+	i, l := 0, len(coins)
+	for i < l {
+		if coins[i].IsNegative() {
+			// remove coin
+			coins = append(coins[:i], coins[i+1:]...)
+			l--
+		} else {
+			i++
+		}
+	}
+
+	return coins[:i]
+}
+
+
 func copyCoins(coins Coins) Coins {
 	copyCoins := make(Coins, len(coins))
 	copy(copyCoins, coins)

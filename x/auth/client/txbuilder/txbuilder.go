@@ -22,6 +22,7 @@ type TxBuilder struct {
 	keybase            crkeys.Keybase
 	accountNumber      uint64
 	sequence           uint64
+	subKeyNumber       uint64
 	gas                uint64
 	gasAdjustment      float64
 	simulateAndExecute bool
@@ -33,7 +34,7 @@ type TxBuilder struct {
 
 // NewTxBuilder returns a new initialized TxBuilder.
 func NewTxBuilder(
-	txEncoder sdk.TxEncoder, accNumber, seq, gas uint64, gasAdj float64,
+	txEncoder sdk.TxEncoder, accNumber, seq, subKeyNumber, gas uint64, gasAdj float64,
 	simulateAndExecute bool, chainID, memo string, fees sdk.Coins, gasPrices sdk.DecCoins,
 ) TxBuilder {
 
@@ -42,6 +43,7 @@ func NewTxBuilder(
 		keybase:            nil,
 		accountNumber:      accNumber,
 		sequence:           seq,
+		subKeyNumber:       subKeyNumber,
 		gas:                gas,
 		gasAdjustment:      gasAdj,
 		simulateAndExecute: simulateAndExecute,
@@ -63,6 +65,7 @@ func NewTxBuilderFromCLI() TxBuilder {
 		keybase:            kb,
 		accountNumber:      uint64(viper.GetInt64(client.FlagAccountNumber)),
 		sequence:           uint64(viper.GetInt64(client.FlagSequence)),
+		subKeyNumber:       uint64(viper.GetInt64(client.FlagSubKeyNumber)),
 		gas:                client.GasFlagVar.Gas,
 		gasAdjustment:      viper.GetFloat64(client.FlagGasAdjustment),
 		simulateAndExecute: client.GasFlagVar.Simulate,
@@ -84,6 +87,9 @@ func (bldr TxBuilder) AccountNumber() uint64 { return bldr.accountNumber }
 
 // Sequence returns the transaction sequence
 func (bldr TxBuilder) Sequence() uint64 { return bldr.sequence }
+
+// SubKeyNumber returns the subKey number
+func (bldr TxBuilder) SubKeyNumber() uint64 { return bldr.subKeyNumber }
 
 // Gas returns the gas for the transaction
 func (bldr TxBuilder) Gas() uint64 { return bldr.gas }
@@ -171,6 +177,12 @@ func (bldr TxBuilder) WithMemo(memo string) TxBuilder {
 // WithAccountNumber returns a copy of the context with an account number.
 func (bldr TxBuilder) WithAccountNumber(accnum uint64) TxBuilder {
 	bldr.accountNumber = accnum
+	return bldr
+}
+
+// WithSubKeyNumber returns a copy of the context with an subKey number.
+func (bldr TxBuilder) WithSubKeyNumber(subnum uint64) TxBuilder {
+	bldr.subKeyNumber = subnum
 	return bldr
 }
 
@@ -273,7 +285,7 @@ func (bldr TxBuilder) SignStdTx(name, passphrase string, stdTx auth.StdTx, appen
 	signedStdTx = auth.NewStdTx(stdTx.GetMsgs(), stdTx.Fee, sigs, stdTx.GetMemo())
 	return
 }
-
+// TODO: subKeyAcc
 // MakeSignature builds a StdSignature given keybase, key name, passphrase, and a StdSignMsg.
 func MakeSignature(keybase crkeys.Keybase, name, passphrase string,
 	msg StdSignMsg) (sig auth.StdSignature, err error) {
@@ -283,7 +295,7 @@ func MakeSignature(keybase crkeys.Keybase, name, passphrase string,
 			return
 		}
 	}
-
+	//sigBytes, pubkey, subNum, err := keybase.Sign(name, passphrase, msg.Bytes())
 	sigBytes, pubkey, err := keybase.Sign(name, passphrase, msg.Bytes())
 	if err != nil {
 		return
@@ -291,5 +303,6 @@ func MakeSignature(keybase crkeys.Keybase, name, passphrase string,
 	return auth.StdSignature{
 		PubKey:    pubkey,
 		Signature: sigBytes,
+		//SubKeyNumber: subNum,
 	}, nil
 }

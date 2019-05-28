@@ -88,7 +88,7 @@ func preSignCmd(cmd *cobra.Command, _ []string) {
 		cmd.MarkFlagRequired(client.FlagSequence)
 	}
 }
-
+// TODO: subKeyAcc, subkey number
 func makeSignCmd(cdc *amino.Codec) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) (err error) {
 		stdTx, err := utils.ReadStdTxFromFile(cdc, args[0])
@@ -225,7 +225,7 @@ func printAndValidateSigs(
 				fmt.Printf("failed to get account: %s\n", sigAddr)
 				return false
 			}
-
+			// TODO: subKeyAccount
 			sigBytes := auth.StdSignBytes(
 				chainID, acc.GetAccountNumber(), acc.GetSequence(),
 				stdTx.Fee, stdTx.GetMsgs(), stdTx.GetMemo(),

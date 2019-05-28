@@ -37,7 +37,7 @@ func SimulateDeductFee(m auth.AccountKeeper, f auth.FeeCollectionKeeper) simulat
 		// Create a random fee and verify the fees are within the account's spendable
 		// balance.
 		fees := sdk.Coins{sdk.NewCoin(randCoin.Denom, amt)}
-		spendableCoins := stored.SpendableCoins(ctx.BlockHeader().Time)
+		spendableCoins := stored.SpendableCoins(ctx.BlockHeader().Time, auth.NoSubKey)
 		if _, hasNeg := spendableCoins.SafeSub(fees); hasNeg {
 			return opMsg, nil, nil
 		}

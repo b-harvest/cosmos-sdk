@@ -167,16 +167,16 @@ func TestSpendableCoinsContVestingAcc(t *testing.T) {
 
 	// require that there exist no spendable coins in the beginning of the
 	// vesting schedule
-	spendableCoins := cva.SpendableCoins(now)
+	spendableCoins := cva.SpendableCoins(now, NoSubKey)
 	require.Nil(t, spendableCoins)
 
 	// require that all original coins are spendable at the end of the vesting
 	// schedule
-	spendableCoins = cva.SpendableCoins(endTime)
+	spendableCoins = cva.SpendableCoins(endTime, NoSubKey)
 	require.Equal(t, origCoins, spendableCoins)
 
 	// require that all vested coins (50%) are spendable
-	spendableCoins = cva.SpendableCoins(now.Add(12 * time.Hour))
+	spendableCoins = cva.SpendableCoins(now.Add(12 * time.Hour), NoSubKey)
 	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 500), sdk.NewInt64Coin(stakeDenom, 50)}, spendableCoins)
 
 	// receive some coins
@@ -184,14 +184,14 @@ func TestSpendableCoinsContVestingAcc(t *testing.T) {
 	cva.SetCoins(cva.GetCoins().Add(recvAmt))
 
 	// require that all vested coins (50%) are spendable plus any received
-	spendableCoins = cva.SpendableCoins(now.Add(12 * time.Hour))
+	spendableCoins = cva.SpendableCoins(now.Add(12 * time.Hour), NoSubKey)
 	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 500), sdk.NewInt64Coin(stakeDenom, 100)}, spendableCoins)
 
 	// spend all spendable coins
 	cva.SetCoins(cva.GetCoins().Sub(spendableCoins))
 
 	// require that no more coins are spendable
-	spendableCoins = cva.SpendableCoins(now.Add(12 * time.Hour))
+	spendableCoins = cva.SpendableCoins(now.Add(12 * time.Hour), NoSubKey)
 	require.Nil(t, spendableCoins)
 }
 
@@ -348,16 +348,16 @@ func TestSpendableCoinsDelVestingAcc(t *testing.T) {
 	// require that no coins are spendable in the beginning of the vesting
 	// schedule
 	dva := NewDelayedVestingAccount(&bacc, endTime.Unix())
-	spendableCoins := dva.SpendableCoins(now)
+	spendableCoins := dva.SpendableCoins(now, NoSubKey)
 	require.Nil(t, spendableCoins)
 
 	// require that all coins are spendable after the maturation of the vesting
 	// schedule
-	spendableCoins = dva.SpendableCoins(endTime)
+	spendableCoins = dva.SpendableCoins(endTime, NoSubKey)
 	require.Equal(t, origCoins, spendableCoins)
 
 	// require that all coins are still vesting after some time
-	spendableCoins = dva.SpendableCoins(now.Add(12 * time.Hour))
+	spendableCoins = dva.SpendableCoins(now.Add(12 * time.Hour), NoSubKey)
 	require.Nil(t, spendableCoins)
 
 	// receive some coins
@@ -366,14 +366,14 @@ func TestSpendableCoinsDelVestingAcc(t *testing.T) {
 
 	// require that only received coins are spendable since the account is still
 	// vesting
-	spendableCoins = dva.SpendableCoins(now.Add(12 * time.Hour))
+	spendableCoins = dva.SpendableCoins(now.Add(12 * time.Hour), NoSubKey)
 	require.Equal(t, recvAmt, spendableCoins)
 
 	// spend all spendable coins
 	dva.SetCoins(dva.GetCoins().Sub(spendableCoins))
 
 	// require that no more coins are spendable
-	spendableCoins = dva.SpendableCoins(now.Add(12 * time.Hour))
+	spendableCoins = dva.SpendableCoins(now.Add(12 * time.Hour), NoSubKey)
 	require.Nil(t, spendableCoins)
 }
 
@@ -480,3 +480,5 @@ func TestTrackUndelegationDelVestingAcc(t *testing.T) {
 	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(stakeDenom, 25)}, dva.DelegatedVesting)
 	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 1000), sdk.NewInt64Coin(stakeDenom, 75)}, dva.GetCoins())
 }
+
+// TODO: Add Test for SubKeyAccount

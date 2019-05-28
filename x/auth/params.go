@@ -18,7 +18,14 @@ const (
 	DefaultTxSizeCostPerByte      uint64 = 10
 	DefaultSigVerifyCostED25519   uint64 = 590
 	DefaultSigVerifyCostSecp256k1 uint64 = 1000
+	DefaultSubKeyLimit            uint64 = 30
+	DefaultMinDepositAmount       uint64 = 1000000 // NewCoin(sdk.DefaultBondDenom, sdk.NewInt(DefaultMinDepositAmount))
 )
+
+type SubKeyAccountParams struct {
+	SubKeyLimit          uint64
+	MinDepositAmount     uint64
+}
 
 // Parameter keys
 var (
@@ -27,6 +34,8 @@ var (
 	KeyTxSizeCostPerByte      = []byte("TxSizeCostPerByte")
 	KeySigVerifyCostED25519   = []byte("SigVerifyCostED25519")
 	KeySigVerifyCostSecp256k1 = []byte("SigVerifyCostSecp256k1")
+	KeySubKeyLimit            = []byte("SubKeyLimit")
+	KeyMinDepositAmount       = []byte("MinDepositAmount")
 )
 
 var _ params.ParamSet = &Params{}
@@ -38,6 +47,8 @@ type Params struct {
 	TxSizeCostPerByte      uint64 `json:"tx_size_cost_per_byte"`
 	SigVerifyCostED25519   uint64 `json:"sig_verify_cost_ed25519"`
 	SigVerifyCostSecp256k1 uint64 `json:"sig_verify_cost_secp256k1"`
+	SubKeyLimit            uint64 `json:"subkey_limit"`
+	MinDepositAmount       uint64 `json:"min_deposit_amount"`
 }
 
 // ParamKeyTable for auth module
@@ -73,6 +84,8 @@ func DefaultParams() Params {
 		TxSizeCostPerByte:      DefaultTxSizeCostPerByte,
 		SigVerifyCostED25519:   DefaultSigVerifyCostED25519,
 		SigVerifyCostSecp256k1: DefaultSigVerifyCostSecp256k1,
+		SubKeyLimit:            DefaultSubKeyLimit,
+		MinDepositAmount:       DefaultMinDepositAmount,
 	}
 }
 

@@ -83,7 +83,7 @@ func countSubKeys(pub crypto.PubKey) int {
 
 	return numKeys
 }
-
+// TODO: subKeyAcc
 // GetSigners returns the addresses that must sign the transaction.
 // Addresses are returned in a deterministic order.
 // They are accumulated from the GetSigners method for each Msg
@@ -199,6 +199,7 @@ func StdSignBytes(chainID string, accnum uint64, sequence uint64, fee StdFee, ms
 type StdSignature struct {
 	crypto.PubKey `json:"pub_key"` // optional
 	Signature     []byte           `json:"signature"`
+	//SubKeyNumber  uint64           `json:"subkey_number"` // default NoSubKey == 0
 }
 
 // DefaultTxDecoder logic for standard transaction decoding

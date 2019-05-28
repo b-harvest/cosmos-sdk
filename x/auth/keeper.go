@@ -2,10 +2,9 @@ package auth
 
 import (
 	"fmt"
-
 	"github.com/tendermint/tendermint/crypto"
 
-	codec "github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 )
@@ -26,6 +25,10 @@ var (
 	AddressStoreKeyPrefix = []byte{0x01}
 
 	globalAccountNumberKey = []byte("globalAccountNumber")
+
+	globalSubKeyNumberKey = []byte("globalSubKeyNumber")
+
+	RouterKeyList = []string{"bank", "crisis", "distr", "gov", "slashing", "staking", "auth"}
 )
 
 // AccountKeeper encodes/decodes accounts using the go-amino (binary)
@@ -196,6 +199,103 @@ func (ak AccountKeeper) GetNextAccountNumber(ctx sdk.Context) uint64 {
 	store.Set(globalAccountNumberKey, bz)
 
 	return accNumber
+}
+
+// GetNextSubKeyNumber Returns and increments the global subKey number counter
+func (ak AccountKeeper) GetNextSubKeyNumber(ctx sdk.Context) uint64 {
+	var subKeyNumber uint64
+	store := ctx.KVStore(ak.key)
+	bz := store.Get(globalSubKeyNumberKey)
+	if bz == nil {
+		subKeyNumber = 1  // 0 is reserved for NoSubKey
+	} else {
+		err := ak.cdc.UnmarshalBinaryLengthPrefixed(bz, &subKeyNumber)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	bz = ak.cdc.MustMarshalBinaryLengthPrefixed(subKeyNumber + 1)
+	store.Set(globalSubKeyNumberKey, bz)
+
+	return subKeyNumber
+}
+
+func (ak AccountKeeper) NewSubKey(ctx sdk.Context, pubKey crypto.PubKey, permissionedRoutes []string, dailySpendableAllowance sdk.Coins) SubKey {
+	subKey := SubKey{
+		PubKey:                  pubKey,
+		SubKeyNumber:            ak.GetNextSubKeyNumber(ctx),
+		PermissionedRoutes:      permissionedRoutes,
+		DailySpendableAllowance: dailySpendableAllowance,
+	}
+	return subKey
+}
+
+// CreateSubKeyAccount
+func (ak AccountKeeper) MigrateSubKeyAccount(ctx sdk.Context, acc Account) Account {
+	vacc, ok := acc.(VestingAccount)
+	if ok {
+		panic(sdk.ErrUnknownAddress(fmt.Sprintf("Vesting Account %s can't be SubKey Account", vacc.GetAddress())))
+	}
+
+	params := ak.GetParams(ctx)
+
+	dailySpendableAllowance := acc.GetCoins()
+	for i := range dailySpendableAllowance {
+		dailySpendableAllowance[i].Amount = sdk.NewInt(NoLimitAllowance) // // -1, nolimit dailySpendableAllowance
+	}
+
+	masterSubKey := ak.NewSubKey(ctx, acc.GetPubKey(), RouterKeyList, dailySpendableAllowance)
+
+	// Deduct MinDepositAmount
+	deposit := sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(int64(params.MinDepositAmount)))}
+	err := acc.SetCoins(acc.GetCoins().Sub(deposit))
+	if err != nil {
+		panic(err)
+	}
+
+	newSubKeyAcc := &SubKeyAccount{
+		BaseAccount:     &BaseAccount{Address: acc.GetAddress()},
+		Deposit:         deposit,
+	}
+	newSubKeyAcc.SubKeys = append(newSubKeyAcc.SubKeys, masterSubKey)
+	ak.SetAccount(ctx, acc)
+
+	return acc
+}
+
+// CreateSubKeyAccountWithoutPrivateKey
+func (ak AccountKeeper) NewSubKeyAccount(ctx sdk.Context, acc Account, pubKey crypto.PubKey) Account {
+	newSubKeyAccAddress := sdk.AccAddress(crypto.AddressHash([]byte(fmt.Sprintf("%s %d", acc.GetAddress(), acc.GetSequence()))))
+	newBaseAcc := NewBaseAccountWithAddress(newSubKeyAccAddress)
+	err := newBaseAcc.SetAccountNumber(ak.GetNextAccountNumber(ctx))
+	if err != nil {
+		panic(err)
+	}
+	params := ak.GetParams(ctx)
+
+	dailySpendableAllowance := acc.GetCoins()
+	for i := range dailySpendableAllowance {
+		dailySpendableAllowance[i].Amount = sdk.NewInt(NoLimitAllowance) // // -1, nolimit dailySpendableAllowance
+	}
+
+	masterSubKey := ak.NewSubKey(ctx, pubKey, RouterKeyList, dailySpendableAllowance)
+
+	// Deduct MinDepositAmount
+	deposit := sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(int64(params.MinDepositAmount)))}
+	err = acc.SetCoins(acc.GetCoins().Sub(deposit))
+	if err != nil {
+		panic(err)
+	}
+
+	newSubKeyAcc := &SubKeyAccount{
+		BaseAccount:     &newBaseAcc,
+		Deposit:         deposit,
+	}
+	newSubKeyAcc.SubKeys = append(newSubKeyAcc.SubKeys, masterSubKey)
+	ak.SetAccount(ctx, acc)
+
+	return newSubKeyAcc
 }
 
 // -----------------------------------------------------------------------------
