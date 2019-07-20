@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	ModuleName            = types.ModuleName
-	DefaultParamspace     = types.DefaultParamspace
-	StoreKey              = types.StoreKey
-	QuerierRoute          = types.QuerierRoute
+	ModuleName        = types.ModuleName
+	DefaultParamspace = types.DefaultParamspace
+	StoreKey          = types.StoreKey
+	QuerierRoute      = types.QuerierRoute
 	//QueryParameters       = types.QueryParameters
 	//QueryInflation        = types.QueryInflation
 	//QueryAnnualProvisions = types.QueryAnnualProvisions
@@ -35,7 +35,7 @@ var (
 
 	// variable aliases
 	ModuleCdc              = types.ModuleCdc
-	FundKey                = types.FundKey
+	FundKey                = types.FundKeyPrefix
 	KeyMintDenom           = types.KeyMintDenom
 	KeyInflationRateChange = types.KeyInflationRateChange
 	KeyInflationMax        = types.KeyInflationMax

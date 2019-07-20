@@ -13,9 +13,9 @@ import (
 
 // Keeper of the mint store
 type Keeper struct {
-	cdc              *codec.Codec
-	storeKey         sdk.StoreKey
-	paramSpace       params.Subspace
+	cdc        *codec.Codec
+	storeKey   sdk.StoreKey
+	paramSpace params.Subspace
 	//sk               types.StakingKeeper
 	supplyKeeper     types.SupplyKeeper
 	feeCollectorName string
@@ -27,14 +27,14 @@ func NewKeeper(
 	feeCollectorName string) Keeper {
 
 	// ensure mint module account is set
-	if addr := supplyKeeper.GetModuleAddress(types.ModuleName); addr == nil {
-		panic("the mint module account has not been set")
-	}
+	//if addr := supplyKeeper.GetModuleAddress(types.ModuleName); addr == nil {
+	//	panic("the fund module account has not been set")
+	//}
 
 	return Keeper{
-		cdc:              cdc,
-		storeKey:         key,
-		paramSpace:       paramSpace.WithKeyTable(types.ParamKeyTable()),
+		cdc:        cdc,
+		storeKey:   key,
+		paramSpace: paramSpace.WithKeyTable(types.ParamKeyTable()),
 		//sk:               sk,
 		supplyKeeper:     supplyKeeper,
 		feeCollectorName: feeCollectorName,
