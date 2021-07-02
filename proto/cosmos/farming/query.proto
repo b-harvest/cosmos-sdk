@@ -1,0 +1,11 @@
+syntax = "proto3";
+package cosmos.farming.v1beta1;
+
+option go_package = "github.com/cosmos/cosmos-sdk/x/farming";
+
+// Query defines the gRPC query service for the farming module.
+service Query {
+    // TODO
+    // Get specific farming plan
+    // Get existing farming plans
+}
