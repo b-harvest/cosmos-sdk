@@ -8,48 +8,48 @@ import "cosmos/base/v1beta1/coin.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 
-option go_package = "github.com/cosmos/cosmos-sdk/x/farming";
+option go_package = "github.com/cosmos/cosmos-sdk/x/farming/types";
 
 // BasePlan defines a base plan type. It contains all the necessary fields
 // for basic farming plan functionality. Any custom farming plan type should extend this
 // type for additional functionality (e.g. fixed amount plan, ratio plan).
 message BasePlan {
-  option (gogoproto.goproto_getters)  = true;
-  option (gogoproto.goproto_stringer) = true;
-  
+  option (gogoproto.goproto_getters)  = false;
+  option (gogoproto.goproto_stringer) = false;
+
   option (cosmos_proto.implements_interface) = "PlanI";
 
   // id specifies index of the farming plan
   uint64 id = 1;
-  
+
   // type specifies the plan type; type 0 is public and 1 is private
   // public plan must be created through governance proposal and private plan is created by account
   uint32 type = 2;
-  
+
   // farming_pool_address defines the bech32-encoded address of the farming pool
-  string farming_pool_address = 3; 
-  
+  string farming_pool_address = 3;
+
   // distribution_pool_address defines the bech32-encoded address that distributes amount of coins to farmers
-  string distribution_pool_address = 4; 
-  
+  string distribution_pool_address = 4;
+
   // termination_address defines the bech32-encoded address that terminates plan
   // when the plan ends after the end time, the balance of farming pool address is transfered to the termination address
   string termination_address = 5;
-  
+
   // staking_reserve_address defines the bech32-encoded address that stores staking reserves
   string staking_reserve_address = 6;
-  
+
   // staking_coins_weight specifies coins weight for the plan
   repeated cosmos.base.v1beta1.DecCoin staking_coins_weight = 7 [
-      (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", 
+      (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins",
       (gogoproto.nullable) = false
   ];
 
   // start_time specifies the start time of the plan
-  google.protobuf.Timestamp start_time = 8 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp start_time = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 
   // end_time specifis the end time of the plan
-  google.protobuf.Timestamp end_time = 9 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp end_time = 9 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 
   // epoch_days specifis a period of time that triggers the distribution plan; it is measured in days
   uint32 epoch_days = 10;
@@ -57,25 +57,27 @@ message BasePlan {
 
 // FixedAmountPlan defines a fixed amount plan that fixed amount of coins are distributed for every epoch day.
 message FixedAmountPlan {
-  option (cosmos_proto.implements_interface) = "PlanI";
+  option (gogoproto.goproto_getters)  = false;
+  option (gogoproto.goproto_stringer) = false;
 
   // fixed_amount_plan specifies a struct of `BasePlan`
-  BasePlan fixed_amount_plan = 1 [(gogoproto.nullable) = false];
+  BasePlan fixed_amount_plan = 1 [(gogoproto.embed) = true];
 
   // epoch_amount specifies the distributing amount for each epoch
   repeated cosmos.base.v1beta1.Coin epoch_amount = 2 [
-      (gogoproto.moretags)   = "yaml:\"epoch_amount\"",
-      (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
-      (gogoproto.nullable) = false
+    (gogoproto.moretags)     = "yaml:\"epoch_amount\"",
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (gogoproto.nullable)     = false
   ];
 }
 
-// RatioPlan defines a ratio plan that ratio of total coins in farming pool address is distributed for every epoch day. 
+// RatioPlan defines a ratio plan that ratio of total coins in farming pool address is distributed for every epoch day.
 message RatioPlan {
-  option (cosmos_proto.implements_interface) = "PlanI";
-  
+  option (gogoproto.goproto_getters)  = false;
+  option (gogoproto.goproto_stringer) = false;
+
   // ratio_plan specifies a struct of `BasePlan`
-  BasePlan ratio_plan = 1 [(gogoproto.nullable) = false];
+  BasePlan fixed_amount_plan = 1 [(gogoproto.embed) = true];
 
   // epoch_ratio specifies the distributing amount by ratio
   string epoch_ratio = 2 [

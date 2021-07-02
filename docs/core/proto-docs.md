@@ -307,6 +307,11 @@
   
     - [Msg](#cosmos.evidence.v1beta1.Msg)
   
+- [cosmos/farming/v1beta1/farming.proto](#cosmos/farming/v1beta1/farming.proto)
+    - [BasePlan](#cosmos.farming.v1beta1.BasePlan)
+    - [FixedAmountPlan](#cosmos.farming.v1beta1.FixedAmountPlan)
+    - [RatioPlan](#cosmos.farming.v1beta1.RatioPlan)
+  
 - [cosmos/feegrant/v1beta1/feegrant.proto](#cosmos/feegrant/v1beta1/feegrant.proto)
     - [AllowedMsgAllowance](#cosmos.feegrant.v1beta1.AllowedMsgAllowance)
     - [BasicAllowance](#cosmos.feegrant.v1beta1.BasicAllowance)
@@ -4536,6 +4541,80 @@ Msg defines the evidence Msg service.
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
 | `SubmitEvidence` | [MsgSubmitEvidence](#cosmos.evidence.v1beta1.MsgSubmitEvidence) | [MsgSubmitEvidenceResponse](#cosmos.evidence.v1beta1.MsgSubmitEvidenceResponse) | SubmitEvidence submits an arbitrary Evidence of misbehavior such as equivocation or counterfactual signing. | |
+
+ <!-- end services -->
+
+
+
+<a name="cosmos/farming/v1beta1/farming.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## cosmos/farming/v1beta1/farming.proto
+
+
+
+<a name="cosmos.farming.v1beta1.BasePlan"></a>
+
+### BasePlan
+BasePlan defines a base plan type. It contains all the necessary fields
+for basic farming plan functionality. Any custom farming plan type should extend this
+type for additional functionality (e.g. fixed amount plan, ratio plan).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [uint64](#uint64) |  | id specifies index of the farming plan |
+| `type` | [uint32](#uint32) |  | type specifies the plan type; type 0 is public and 1 is private public plan must be created through governance proposal and private plan is created by account |
+| `farming_pool_address` | [string](#string) |  | farming_pool_address defines the bech32-encoded address of the farming pool |
+| `distribution_pool_address` | [string](#string) |  | distribution_pool_address defines the bech32-encoded address that distributes amount of coins to farmers |
+| `termination_address` | [string](#string) |  | termination_address defines the bech32-encoded address that terminates plan when the plan ends after the end time, the balance of farming pool address is transfered to the termination address |
+| `staking_reserve_address` | [string](#string) |  | staking_reserve_address defines the bech32-encoded address that stores staking reserves |
+| `staking_coins_weight` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | staking_coins_weight specifies coins weight for the plan |
+| `start_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | start_time specifies the start time of the plan |
+| `end_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | end_time specifis the end time of the plan |
+| `epoch_days` | [uint32](#uint32) |  | epoch_days specifis a period of time that triggers the distribution plan; it is measured in days |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.FixedAmountPlan"></a>
+
+### FixedAmountPlan
+FixedAmountPlan defines a fixed amount plan that fixed amount of coins are distributed for every epoch day.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `fixed_amount_plan` | [BasePlan](#cosmos.farming.v1beta1.BasePlan) |  | fixed_amount_plan specifies a struct of `BasePlan` |
+| `epoch_amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | epoch_amount specifies the distributing amount for each epoch |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.RatioPlan"></a>
+
+### RatioPlan
+RatioPlan defines a ratio plan that ratio of total coins in farming pool address is distributed for every epoch day.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `fixed_amount_plan` | [BasePlan](#cosmos.farming.v1beta1.BasePlan) |  | ratio_plan specifies a struct of `BasePlan` |
+| `epoch_ratio` | [string](#string) |  | epoch_ratio specifies the distributing amount by ratio |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
 
  <!-- end services -->
 
