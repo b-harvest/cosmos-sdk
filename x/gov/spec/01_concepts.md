@@ -47,6 +47,8 @@ proposals:
   more parameters. If accepted, the requested parameter change is updated
   automatically by the proposal handler upon conclusion of the voting period.
 - `CancelSoftwareUpgradeProposal` is a gov Content type for cancelling a software upgrade.
+- `CreatePublicFarmingPlanProposal`
+- `ModifyPublicFarmingPlanProposal`
 
 Other modules may expand upon the governance module by implementing their own
 proposal types and handlers. These types are registered and processed through the
