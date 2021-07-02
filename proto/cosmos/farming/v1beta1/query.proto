@@ -5,7 +5,7 @@ option go_package = "github.com/cosmos/cosmos-sdk/x/farming/types";
 
 // Query defines the gRPC query service for the farming module.
 service Query {
-    // TODO
-    // Get specific farming plan
-    // Get existing farming plans
+  // TODO
+  // Get specific farming plan
+  // Get existing farming plans
 }
