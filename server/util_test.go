@@ -18,8 +18,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/cosmos/cosmos-sdk/simapp"
-	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 )
 
 var cancelledInPreRun = errors.New("Cancelled in prerun")

@@ -195,7 +195,7 @@ type Reward struct {
 
 The parameters of the Reward state are:
 
-- Reward: `0x21 | PlanId | FarmerAddr -> ProtocolBuffer(Reward)`
+- Reward: `0x31 | PlanId | FarmerAddr -> ProtocolBuffer(Reward)`
 
 
 

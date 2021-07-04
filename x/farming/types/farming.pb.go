@@ -30,6 +30,50 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Params defines the set of params for the farming module.
+type Params struct {
+	PrivatePlanCreationFee github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,1,rep,name=private_plan_creation_fee,json=privatePlanCreationFee,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"private_plan_creation_fee" yaml:"private_plan_creation_fee"`
+}
+
+func (m *Params) Reset()      { *m = Params{} }
+func (*Params) ProtoMessage() {}
+func (*Params) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0abc81cc983fe36f, []int{0}
+}
+func (m *Params) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Params) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Params.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Params) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Params.Merge(m, src)
+}
+func (m *Params) XXX_Size() int {
+	return m.Size()
+}
+func (m *Params) XXX_DiscardUnknown() {
+	xxx_messageInfo_Params.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Params proto.InternalMessageInfo
+
+func (m *Params) GetPrivatePlanCreationFee() github_com_cosmos_cosmos_sdk_types.Coins {
+	if m != nil {
+		return m.PrivatePlanCreationFee
+	}
+	return nil
+}
+
 // BasePlan defines a base plan type. It contains all the necessary fields
 // for basic farming plan functionality. Any custom farming plan type should extend this
 // type for additional functionality (e.g. fixed amount plan, ratio plan).
@@ -61,7 +105,7 @@ type BasePlan struct {
 func (m *BasePlan) Reset()      { *m = BasePlan{} }
 func (*BasePlan) ProtoMessage() {}
 func (*BasePlan) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0abc81cc983fe36f, []int{0}
+	return fileDescriptor_0abc81cc983fe36f, []int{1}
 }
 func (m *BasePlan) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -101,7 +145,7 @@ type FixedAmountPlan struct {
 func (m *FixedAmountPlan) Reset()      { *m = FixedAmountPlan{} }
 func (*FixedAmountPlan) ProtoMessage() {}
 func (*FixedAmountPlan) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0abc81cc983fe36f, []int{1}
+	return fileDescriptor_0abc81cc983fe36f, []int{2}
 }
 func (m *FixedAmountPlan) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -141,7 +185,7 @@ type RatioPlan struct {
 func (m *RatioPlan) Reset()      { *m = RatioPlan{} }
 func (*RatioPlan) ProtoMessage() {}
 func (*RatioPlan) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0abc81cc983fe36f, []int{2}
+	return fileDescriptor_0abc81cc983fe36f, []int{3}
 }
 func (m *RatioPlan) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -170,10 +214,99 @@ func (m *RatioPlan) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RatioPlan proto.InternalMessageInfo
 
+// Staking contains a farmer has staked on the farming plan.
+type Staking struct {
+	// plan_id specifies index of the target farming plan
+	PlanId uint64 `protobuf:"varint,1,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`
+	// farmer defines the bech32-encoded address of the staker for the plan
+	Farmer string `protobuf:"bytes,2,opt,name=farmer,proto3" json:"farmer,omitempty"`
+	// staked_coins specifies the staking amount for the plan of farmer
+	StakedCoins github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,3,rep,name=staked_coins,json=stakedCoins,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"staked_coins" yaml:"staked_coins"`
+	// queued_coins specifies the coins on standby before current epoch passes and gets staked.
+	QueuedCoins github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,4,rep,name=queued_coins,json=queuedCoins,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"queued_coins" yaml:"queued_coins"`
+}
+
+func (m *Staking) Reset()      { *m = Staking{} }
+func (*Staking) ProtoMessage() {}
+func (*Staking) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0abc81cc983fe36f, []int{4}
+}
+func (m *Staking) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Staking) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Staking.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Staking) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Staking.Merge(m, src)
+}
+func (m *Staking) XXX_Size() int {
+	return m.Size()
+}
+func (m *Staking) XXX_DiscardUnknown() {
+	xxx_messageInfo_Staking.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Staking proto.InternalMessageInfo
+
+// Reward contains a record of rewards at this point in time when farmers receive them from the farming plan.
+type Reward struct {
+	// plan_id specifies index of the target farming plan
+	PlanId uint64 `protobuf:"varint,1,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`
+	// farmer defines the bech32-encoded address of the staker for the plan
+	Farmer string `protobuf:"bytes,2,opt,name=farmer,proto3" json:"farmer,omitempty"`
+	// reward_coins specifies rewards amount at this point in time when farmers receive them from the farming plan
+	RewardCoins github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,3,rep,name=reward_coins,json=rewardCoins,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"reward_coins" yaml:"reward_coins"`
+}
+
+func (m *Reward) Reset()      { *m = Reward{} }
+func (*Reward) ProtoMessage() {}
+func (*Reward) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0abc81cc983fe36f, []int{5}
+}
+func (m *Reward) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Reward) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Reward.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Reward) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Reward.Merge(m, src)
+}
+func (m *Reward) XXX_Size() int {
+	return m.Size()
+}
+func (m *Reward) XXX_DiscardUnknown() {
+	xxx_messageInfo_Reward.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Reward proto.InternalMessageInfo
+
 func init() {
+	proto.RegisterType((*Params)(nil), "cosmos.farming.v1beta1.Params")
 	proto.RegisterType((*BasePlan)(nil), "cosmos.farming.v1beta1.BasePlan")
 	proto.RegisterType((*FixedAmountPlan)(nil), "cosmos.farming.v1beta1.FixedAmountPlan")
 	proto.RegisterType((*RatioPlan)(nil), "cosmos.farming.v1beta1.RatioPlan")
+	proto.RegisterType((*Staking)(nil), "cosmos.farming.v1beta1.Staking")
+	proto.RegisterType((*Reward)(nil), "cosmos.farming.v1beta1.Reward")
 }
 
 func init() {
@@ -181,48 +314,95 @@ func init() {
 }
 
 var fileDescriptor_0abc81cc983fe36f = []byte{
-	// 647 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x54, 0x31, 0x6f, 0xd3, 0x40,
-	0x14, 0xce, 0xa5, 0x69, 0x9b, 0x5c, 0x80, 0xaa, 0x6e, 0xa1, 0x6e, 0x05, 0x76, 0x14, 0x21, 0x14,
-	0x09, 0x6a, 0xd3, 0x56, 0x62, 0xc8, 0x82, 0xea, 0x56, 0x45, 0x6c, 0x95, 0x85, 0x84, 0xc4, 0x62,
-	0x9d, 0xe3, 0x8b, 0x7b, 0xaa, 0xed, 0xb3, 0x7c, 0x97, 0xd2, 0xcc, 0x08, 0x89, 0xb1, 0x23, 0x63,
-	0xe7, 0xce, 0xfc, 0x03, 0x96, 0x8e, 0x11, 0x13, 0x62, 0x48, 0x51, 0xfb, 0x0f, 0xba, 0xb0, 0xa2,
-	0xbb, 0xf3, 0x95, 0x80, 0x2a, 0x54, 0x06, 0xa6, 0xdc, 0xdd, 0xf7, 0xbe, 0xf7, 0xbd, 0xf7, 0xbe,
-	0x17, 0xc3, 0x87, 0x3d, 0xca, 0x52, 0xca, 0xdc, 0x3e, 0x2a, 0x52, 0x92, 0xc5, 0xee, 0xc1, 0x5a,
-	0x88, 0x39, 0x5a, 0xd3, 0x77, 0x27, 0x2f, 0x28, 0xa7, 0xc6, 0x3d, 0x15, 0xe5, 0xe8, 0xd7, 0x32,
-	0x6a, 0x65, 0x31, 0xa6, 0x31, 0x95, 0x21, 0xae, 0x38, 0xa9, 0xe8, 0x95, 0x65, 0x15, 0x1d, 0x28,
-	0xa0, 0xa4, 0x2a, 0xc8, 0x2a, 0xe5, 0x42, 0xc4, 0xf0, 0x95, 0x56, 0x8f, 0x92, 0xac, 0xc4, 0xed,
-	0x98, 0xd2, 0x38, 0xc1, 0xae, 0xbc, 0x85, 0x83, 0xbe, 0xcb, 0x49, 0x8a, 0x19, 0x47, 0x69, 0xae,
-	0x02, 0xda, 0x9f, 0x6b, 0xb0, 0xee, 0x21, 0x86, 0x77, 0x13, 0x94, 0x19, 0x77, 0x60, 0x95, 0x44,
-	0x26, 0x68, 0x81, 0x4e, 0xcd, 0xaf, 0x92, 0xc8, 0x30, 0x60, 0x8d, 0x0f, 0x73, 0x6c, 0x56, 0x5b,
-	0xa0, 0x73, 0xdb, 0x97, 0x67, 0xe3, 0x29, 0x5c, 0x2c, 0xab, 0x0e, 0x72, 0x4a, 0x93, 0x00, 0x45,
-	0x51, 0x81, 0x19, 0x33, 0xa7, 0x5a, 0xa0, 0xd3, 0xf0, 0x8d, 0x12, 0xdb, 0xa5, 0x34, 0xd9, 0x54,
-	0x88, 0xd1, 0x85, 0xcb, 0x11, 0x61, 0xbc, 0x20, 0xe1, 0x80, 0x13, 0x9a, 0xfd, 0x4e, 0xab, 0x49,
-	0xda, 0xd2, 0x64, 0xc0, 0x24, 0xd7, 0x85, 0x0b, 0x1c, 0x8b, 0x8c, 0x48, 0x52, 0x35, 0x6b, 0x5a,
-	0x89, 0x4d, 0x40, 0x9a, 0xf0, 0x0c, 0x2e, 0x31, 0x8e, 0xf6, 0x45, 0x79, 0x05, 0x66, 0xb8, 0x38,
-	0xc0, 0x57, 0xa4, 0x19, 0x49, 0xba, 0x5b, 0xc2, 0xbe, 0x42, 0x35, 0xef, 0x1d, 0x80, 0x8b, 0x9a,
-	0x28, 0xe6, 0xc7, 0x82, 0xb7, 0x98, 0xc4, 0x7b, 0xdc, 0x9c, 0x6d, 0x4d, 0x75, 0x9a, 0xeb, 0xf7,
-	0x9d, 0x72, 0xec, 0x62, 0xd0, 0xda, 0x2e, 0x67, 0x1b, 0xf7, 0xb6, 0x28, 0xc9, 0xbc, 0x8d, 0xd3,
-	0xb1, 0x5d, 0x39, 0x39, 0xb3, 0x1f, 0xc7, 0x84, 0xef, 0x0d, 0x42, 0xa7, 0x47, 0xd3, 0xd2, 0xa6,
-	0xf2, 0x67, 0x95, 0x45, 0xfb, 0xae, 0x18, 0x1f, 0xd3, 0x1c, 0xe6, 0x1b, 0xa5, 0x9c, 0xbc, 0xbd,
-	0x96, 0x62, 0xc6, 0x16, 0x84, 0x8c, 0xa3, 0x82, 0x07, 0xc2, 0x26, 0xb3, 0xde, 0x02, 0x9d, 0xe6,
-	0xfa, 0x8a, 0xa3, 0x3c, 0x74, 0xb4, 0x87, 0xce, 0x2b, 0xed, 0xa1, 0x57, 0x17, 0xc2, 0x47, 0x67,
-	0x36, 0xf0, 0x1b, 0x92, 0x27, 0x10, 0xe3, 0x39, 0xac, 0xe3, 0x2c, 0x52, 0x29, 0x1a, 0xff, 0x90,
-	0x62, 0x16, 0x67, 0x91, 0x4c, 0xf0, 0x00, 0x42, 0x9c, 0xd3, 0xde, 0x5e, 0x10, 0xa1, 0x21, 0x33,
-	0xa1, 0x34, 0xbf, 0x21, 0x5f, 0xb6, 0xd1, 0x90, 0x75, 0xe7, 0x3f, 0x1c, 0xdb, 0x95, 0x8f, 0xc7,
-	0x76, 0xe5, 0xcb, 0xa7, 0xd5, 0x69, 0xb1, 0x37, 0x2f, 0xdb, 0x3f, 0x00, 0x9c, 0xdb, 0x21, 0x87,
-	0x38, 0xda, 0x4c, 0xe9, 0x20, 0xe3, 0x72, 0x99, 0x7c, 0x38, 0xdf, 0x17, 0x4f, 0x01, 0x92, 0x6f,
-	0x41, 0x9e, 0xa0, 0x4c, 0xee, 0x56, 0x73, 0xbd, 0xe5, 0x5c, 0xbf, 0xff, 0x8e, 0xde, 0x44, 0xaf,
-	0x36, 0x1a, 0xdb, 0xc0, 0x9f, 0xeb, 0xff, 0x91, 0xf3, 0x3d, 0x80, 0xb7, 0x54, 0x69, 0x2a, 0xa9,
-	0x59, 0x95, 0xee, 0x2c, 0x5f, 0xeb, 0x8e, 0xb4, 0xe6, 0x85, 0x68, 0xef, 0x72, 0x6c, 0x2f, 0x0c,
-	0x51, 0x9a, 0x74, 0xdb, 0x93, 0xe4, 0xf6, 0xc9, 0x99, 0xdd, 0xb9, 0x81, 0x63, 0xca, 0xae, 0xa6,
-	0xa4, 0xaa, 0x5a, 0xba, 0x75, 0x3d, 0x82, 0xf6, 0x08, 0xc0, 0x86, 0x2f, 0x36, 0xf0, 0xbf, 0xf5,
-	0x8c, 0xa1, 0x92, 0x0e, 0x0a, 0x21, 0x23, 0xff, 0x8b, 0x0d, 0x6f, 0x5b, 0xb4, 0xf5, 0x6d, 0x6c,
-	0x3f, 0xba, 0xd9, 0xc6, 0x5d, 0x8e, 0x6d, 0x63, 0x72, 0x00, 0x32, 0x55, 0xdb, 0x57, 0x36, 0xcb,
-	0xf2, 0x7f, 0xb5, 0xe4, 0xed, 0x9c, 0x9e, 0x5b, 0x60, 0x74, 0x6e, 0x81, 0xef, 0xe7, 0x16, 0x38,
-	0xba, 0xb0, 0x2a, 0xa3, 0x0b, 0xab, 0xf2, 0xf5, 0xc2, 0xaa, 0xbc, 0x79, 0xf2, 0x57, 0xb5, 0xc3,
-	0xab, 0x8f, 0x9e, 0xd4, 0x0d, 0x67, 0xe4, 0xb6, 0x6d, 0xfc, 0x0c, 0x00, 0x00, 0xff, 0xff, 0xc2,
-	0xf1, 0x83, 0x6c, 0x13, 0x05, 0x00, 0x00,
+	// 803 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x55, 0xcf, 0x4f, 0x13, 0x41,
+	0x14, 0xee, 0x94, 0xd2, 0x1f, 0x53, 0x95, 0xb0, 0x20, 0x6c, 0x89, 0x76, 0x9b, 0xc6, 0x98, 0x26,
+	0xca, 0x56, 0x20, 0xf1, 0xd0, 0x8b, 0xa1, 0x10, 0x0c, 0x37, 0xb2, 0x92, 0x98, 0x78, 0xd9, 0x4c,
+	0xbb, 0xd3, 0xb2, 0xa1, 0xbb, 0x53, 0x77, 0xb6, 0x40, 0xcf, 0xc6, 0xc4, 0x23, 0x47, 0x8f, 0x9c,
+	0x39, 0x7b, 0xf3, 0xe8, 0x85, 0xc4, 0x4b, 0x63, 0x3c, 0x18, 0x0f, 0xc5, 0xc0, 0x7f, 0xc0, 0xc5,
+	0xab, 0x99, 0x37, 0xb3, 0xcd, 0x4a, 0x50, 0x29, 0x89, 0xa7, 0xee, 0x9b, 0xf7, 0xbe, 0xef, 0xbd,
+	0x37, 0xef, 0x7b, 0x53, 0xfc, 0xa0, 0xc9, 0xb8, 0xc7, 0x78, 0xb5, 0x45, 0x02, 0xcf, 0xf5, 0xdb,
+	0xd5, 0xbd, 0xa5, 0x06, 0x0d, 0xc9, 0x52, 0x64, 0x9b, 0xdd, 0x80, 0x85, 0x4c, 0x9b, 0x93, 0x51,
+	0x66, 0x74, 0xaa, 0xa2, 0x16, 0x66, 0xdb, 0xac, 0xcd, 0x20, 0xa4, 0x2a, 0xbe, 0x64, 0xf4, 0x42,
+	0x41, 0x46, 0xdb, 0xd2, 0xa1, 0xa0, 0xd2, 0x55, 0x54, 0xe9, 0x1a, 0x84, 0xd3, 0x51, 0xae, 0x26,
+	0x73, 0x7d, 0xe5, 0x37, 0xda, 0x8c, 0xb5, 0x3b, 0xb4, 0x0a, 0x56, 0xa3, 0xd7, 0xaa, 0x86, 0xae,
+	0x47, 0x79, 0x48, 0xbc, 0xae, 0x0c, 0x28, 0x7f, 0x44, 0x38, 0xbd, 0x45, 0x02, 0xe2, 0x71, 0xed,
+	0x18, 0xe1, 0x42, 0x37, 0x70, 0xf7, 0x48, 0x48, 0xed, 0x6e, 0x87, 0xf8, 0x76, 0x33, 0xa0, 0x24,
+	0x74, 0x99, 0x6f, 0xb7, 0x28, 0xd5, 0x51, 0x69, 0xa2, 0x92, 0x5f, 0x2e, 0x98, 0x2a, 0xbd, 0x48,
+	0x18, 0x95, 0x6d, 0xae, 0x31, 0xd7, 0xaf, 0x6f, 0x9f, 0x0c, 0x8d, 0xc4, 0xc5, 0xd0, 0x28, 0xf5,
+	0x89, 0xd7, 0xa9, 0x95, 0xff, 0xc8, 0x54, 0x3e, 0x3e, 0x35, 0x2a, 0x6d, 0x37, 0xdc, 0xe9, 0x35,
+	0xcc, 0x26, 0xf3, 0x54, 0x3f, 0xea, 0x67, 0x91, 0x3b, 0xbb, 0xd5, 0xb0, 0xdf, 0xa5, 0x1c, 0x48,
+	0xb9, 0x35, 0xa7, 0x78, 0xb6, 0x3a, 0xc4, 0x5f, 0x53, 0x2c, 0x1b, 0x94, 0xd6, 0x52, 0xef, 0x8f,
+	0x8c, 0x44, 0xf9, 0x53, 0x0a, 0x67, 0xeb, 0x84, 0x83, 0x57, 0xbb, 0x83, 0x93, 0xae, 0xa3, 0xa3,
+	0x12, 0xaa, 0xa4, 0xac, 0xa4, 0xeb, 0x68, 0x1a, 0x4e, 0x09, 0x26, 0x3d, 0x59, 0x42, 0x95, 0xdb,
+	0x16, 0x7c, 0x6b, 0x4f, 0xf0, 0xac, 0xba, 0x73, 0xbb, 0xcb, 0x58, 0xc7, 0x26, 0x8e, 0x13, 0x50,
+	0xce, 0xf5, 0x89, 0x12, 0xaa, 0xe4, 0x2c, 0x4d, 0xf9, 0xb6, 0x18, 0xeb, 0xac, 0x4a, 0x8f, 0x56,
+	0xc3, 0x05, 0xc7, 0xe5, 0x61, 0xe0, 0x36, 0x7a, 0xd0, 0xc1, 0x6f, 0xb0, 0x14, 0xc0, 0xe6, 0xe3,
+	0x01, 0x71, 0x6c, 0x15, 0xcf, 0x84, 0x54, 0x30, 0xca, 0xe6, 0x23, 0xd4, 0xa4, 0x4c, 0x16, 0x73,
+	0x45, 0x80, 0xa7, 0x78, 0x9e, 0x87, 0x64, 0x57, 0x94, 0x17, 0x50, 0x4e, 0x83, 0x3d, 0x3a, 0x02,
+	0xa5, 0x01, 0x74, 0x57, 0xb9, 0x2d, 0xe9, 0x8d, 0x70, 0x6f, 0x10, 0x9e, 0x8d, 0x80, 0x62, 0xfa,
+	0xdc, 0xde, 0xa7, 0x6e, 0x7b, 0x27, 0xd4, 0x33, 0x30, 0xb5, 0x7b, 0x57, 0x4e, 0x6d, 0x9d, 0x36,
+	0x61, 0x70, 0x2b, 0x62, 0x70, 0xc7, 0xa7, 0xc6, 0xa3, 0x6b, 0x0c, 0x45, 0x61, 0xb8, 0xa5, 0xa9,
+	0x74, 0x60, 0xbd, 0x84, 0x64, 0xda, 0x1a, 0xc6, 0x3c, 0x24, 0x41, 0x68, 0x0b, 0x91, 0xe9, 0xd9,
+	0x12, 0xaa, 0xe4, 0x97, 0x17, 0x4c, 0xa9, 0x40, 0x33, 0x52, 0xa0, 0xb9, 0x1d, 0x29, 0xb0, 0x9e,
+	0x15, 0x89, 0x0f, 0x4f, 0x0d, 0x64, 0xe5, 0x00, 0x27, 0x3c, 0xda, 0x33, 0x9c, 0xa5, 0xbe, 0x23,
+	0x29, 0x72, 0x63, 0x50, 0x64, 0xa8, 0xef, 0x00, 0xc1, 0x7d, 0x8c, 0x69, 0x97, 0x35, 0x77, 0x6c,
+	0x87, 0xf4, 0xb9, 0x8e, 0x61, 0xf8, 0x39, 0x38, 0x59, 0x27, 0x7d, 0x5e, 0x9b, 0x7e, 0x77, 0x64,
+	0x24, 0x84, 0x78, 0xbe, 0x7c, 0x58, 0x9c, 0x14, 0xba, 0xd9, 0x2c, 0xff, 0x44, 0x78, 0x6a, 0xc3,
+	0x3d, 0xa0, 0xce, 0xaa, 0xc7, 0x7a, 0x7e, 0x08, 0x62, 0xb2, 0xf0, 0x74, 0x4b, 0x1c, 0xd9, 0x04,
+	0xce, 0x40, 0xc6, 0xa0, 0xad, 0xfc, 0x72, 0xc9, 0xbc, 0x7a, 0x7b, 0xcd, 0x48, 0x89, 0xf5, 0xd4,
+	0x60, 0x68, 0x20, 0x6b, 0xaa, 0x75, 0x89, 0xf3, 0x2d, 0xc2, 0xb7, 0x64, 0x69, 0x92, 0x54, 0x4f,
+	0xfe, 0x6b, 0xa7, 0x9e, 0xab, 0x9d, 0x9a, 0x91, 0x3b, 0x15, 0x07, 0x8f, 0xb7, 0x46, 0x79, 0x80,
+	0xca, 0x5a, 0x6a, 0xd9, 0xe8, 0x0a, 0xca, 0x03, 0x84, 0x73, 0x96, 0x50, 0xe0, 0x7f, 0xeb, 0x99,
+	0x62, 0x99, 0xda, 0x0e, 0x44, 0x1a, 0xd8, 0xc5, 0x5c, 0x7d, 0x5d, 0xb4, 0xf5, 0x7d, 0x68, 0x3c,
+	0xbc, 0x9e, 0xe2, 0x2e, 0x86, 0x86, 0x16, 0xbf, 0x00, 0xa0, 0x2a, 0x5b, 0x72, 0xcc, 0x50, 0x7e,
+	0xac, 0xa5, 0xaf, 0x49, 0x9c, 0x79, 0x21, 0xb5, 0xa9, 0xcd, 0xe3, 0x0c, 0x3c, 0x3f, 0xa3, 0x67,
+	0x21, 0x2d, 0xcc, 0x4d, 0x47, 0x9b, 0xc3, 0x69, 0xd1, 0x08, 0x0d, 0x64, 0x41, 0x96, 0xb2, 0x60,
+	0x42, 0x42, 0xd8, 0xd4, 0x91, 0x6b, 0xa4, 0x4f, 0x8c, 0x39, 0xa1, 0x38, 0x78, 0xcc, 0x09, 0x49,
+	0x28, 0x18, 0x50, 0xc7, 0xeb, 0x1e, 0xed, 0x8d, 0xea, 0x48, 0x8d, 0x59, 0x47, 0x1c, 0x3c, 0x66,
+	0x1d, 0x12, 0x0a, 0x46, 0xec, 0x5a, 0x3f, 0x23, 0x9c, 0xb6, 0xe8, 0x3e, 0x09, 0x9c, 0x9b, 0xdd,
+	0x6a, 0x00, 0xd8, 0x1b, 0xde, 0x6a, 0x1c, 0x3c, 0x66, 0x37, 0x12, 0x7a, 0xa9, 0x9b, 0xfa, 0xc6,
+	0xc9, 0x59, 0x11, 0x0d, 0xce, 0x8a, 0xe8, 0xc7, 0x59, 0x11, 0x1d, 0x9e, 0x17, 0x13, 0x83, 0xf3,
+	0x62, 0xe2, 0xdb, 0x79, 0x31, 0xf1, 0xea, 0xf1, 0x5f, 0xa9, 0x0f, 0x46, 0xff, 0xeb, 0x90, 0xa4,
+	0x91, 0x86, 0x27, 0x69, 0xe5, 0x57, 0x00, 0x00, 0x00, 0xff, 0xff, 0x0a, 0xcd, 0x0c, 0xb0, 0xf6,
+	0x07, 0x00, 0x00,
+}
+
+func (m *Params) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Params) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Params) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.PrivatePlanCreationFee) > 0 {
+		for iNdEx := len(m.PrivatePlanCreationFee) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.PrivatePlanCreationFee[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintFarming(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *BasePlan) Marshal() (dAtA []byte, err error) {
@@ -415,6 +595,118 @@ func (m *RatioPlan) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *Staking) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Staking) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Staking) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.QueuedCoins) > 0 {
+		for iNdEx := len(m.QueuedCoins) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.QueuedCoins[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintFarming(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.StakedCoins) > 0 {
+		for iNdEx := len(m.StakedCoins) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.StakedCoins[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintFarming(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.Farmer) > 0 {
+		i -= len(m.Farmer)
+		copy(dAtA[i:], m.Farmer)
+		i = encodeVarintFarming(dAtA, i, uint64(len(m.Farmer)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.PlanId != 0 {
+		i = encodeVarintFarming(dAtA, i, uint64(m.PlanId))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Reward) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Reward) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Reward) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.RewardCoins) > 0 {
+		for iNdEx := len(m.RewardCoins) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.RewardCoins[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintFarming(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.Farmer) > 0 {
+		i -= len(m.Farmer)
+		copy(dAtA[i:], m.Farmer)
+		i = encodeVarintFarming(dAtA, i, uint64(len(m.Farmer)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.PlanId != 0 {
+		i = encodeVarintFarming(dAtA, i, uint64(m.PlanId))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintFarming(dAtA []byte, offset int, v uint64) int {
 	offset -= sovFarming(v)
 	base := offset
@@ -426,6 +718,21 @@ func encodeVarintFarming(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *Params) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.PrivatePlanCreationFee) > 0 {
+		for _, e := range m.PrivatePlanCreationFee {
+			l = e.Size()
+			n += 1 + l + sovFarming(uint64(l))
+		}
+	}
+	return n
+}
+
 func (m *BasePlan) Size() (n int) {
 	if m == nil {
 		return 0
@@ -504,11 +811,145 @@ func (m *RatioPlan) Size() (n int) {
 	return n
 }
 
+func (m *Staking) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.PlanId != 0 {
+		n += 1 + sovFarming(uint64(m.PlanId))
+	}
+	l = len(m.Farmer)
+	if l > 0 {
+		n += 1 + l + sovFarming(uint64(l))
+	}
+	if len(m.StakedCoins) > 0 {
+		for _, e := range m.StakedCoins {
+			l = e.Size()
+			n += 1 + l + sovFarming(uint64(l))
+		}
+	}
+	if len(m.QueuedCoins) > 0 {
+		for _, e := range m.QueuedCoins {
+			l = e.Size()
+			n += 1 + l + sovFarming(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *Reward) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.PlanId != 0 {
+		n += 1 + sovFarming(uint64(m.PlanId))
+	}
+	l = len(m.Farmer)
+	if l > 0 {
+		n += 1 + l + sovFarming(uint64(l))
+	}
+	if len(m.RewardCoins) > 0 {
+		for _, e := range m.RewardCoins {
+			l = e.Size()
+			n += 1 + l + sovFarming(uint64(l))
+		}
+	}
+	return n
+}
+
 func sovFarming(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozFarming(x uint64) (n int) {
 	return sovFarming(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *Params) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowFarming
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Params: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Params: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PrivatePlanCreationFee", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarming
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFarming
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarming
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PrivatePlanCreationFee = append(m.PrivatePlanCreationFee, types.Coin{})
+			if err := m.PrivatePlanCreationFee[len(m.PrivatePlanCreationFee)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipFarming(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthFarming
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *BasePlan) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -1061,6 +1502,310 @@ func (m *RatioPlan) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.EpochRatio.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipFarming(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthFarming
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Staking) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowFarming
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Staking: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Staking: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PlanId", wireType)
+			}
+			m.PlanId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarming
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PlanId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Farmer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarming
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarming
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarming
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Farmer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StakedCoins", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarming
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFarming
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarming
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.StakedCoins = append(m.StakedCoins, types.Coin{})
+			if err := m.StakedCoins[len(m.StakedCoins)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field QueuedCoins", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarming
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFarming
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarming
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.QueuedCoins = append(m.QueuedCoins, types.Coin{})
+			if err := m.QueuedCoins[len(m.QueuedCoins)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipFarming(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthFarming
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Reward) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowFarming
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Reward: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Reward: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PlanId", wireType)
+			}
+			m.PlanId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarming
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PlanId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Farmer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarming
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFarming
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarming
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Farmer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RewardCoins", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFarming
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFarming
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFarming
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RewardCoins = append(m.RewardCoins, types.Coin{})
+			if err := m.RewardCoins[len(m.RewardCoins)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

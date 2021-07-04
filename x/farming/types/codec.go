@@ -30,7 +30,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 
 	registry.RegisterInterface(
 		"cosmos.farming.v1beta1.PlanI",
-		(*BasePlan)(nil),
+		(*PlanI)(nil),
 		&FixedAmountPlan{},
 		&RatioPlan{},
 	)
