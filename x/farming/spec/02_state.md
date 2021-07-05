@@ -46,7 +46,7 @@ type PlanI interface {
 
     GetDistributionMethod() string
     GetDistributionThisEpoch() sdk.Coins
-    IsTermitated() bool
+    IsTerminated() bool
 
     String() string
 }
@@ -98,9 +98,10 @@ const (
 The parameters of the Plan state are:
 
 - Plan: `0x11 | Id -> ProtocolBuffer(Plan)`
-- PlanByFarmerAddrIndex: `0x12 | FarmerAddr -> Id`
+- PlanByFarmerAddrIndex: `0x12 | FarmerAddrLen (1 byte) | FarmerAddr -> Id`
+    - iterable for several `PlanId` results by indexed `FarmerAddr`
 - LastEpochTime: `0x13 | Id -> time.Time`
-- GlobalFarmingPlanIdKey: `[]byte("globalFarmingPlanId") -> Id`
+- GlobalFarmingPlanIdKey: `[]byte("globalFarmingPlanId") -> LatestPlanId`
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
 
 - example of `FixedAmountPlan`
@@ -183,7 +184,7 @@ type Staking struct {
 
 The parameters of the Staking state are:
 
-- Staking: `0x21 | PlanId | FarmerAddr -> ProtocolBuffer(Staking)`
+- Staking: `0x21 | PlanId | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(Staking)`
 
 ```go
 type Reward struct {
@@ -195,7 +196,7 @@ type Reward struct {
 
 The parameters of the Reward state are:
 
-- Reward: `0x31 | PlanId | FarmerAddr -> ProtocolBuffer(Reward)`
+- Reward: `0x31 | PlanId | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(Reward)`
 
 
 

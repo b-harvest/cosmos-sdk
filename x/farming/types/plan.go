@@ -7,7 +7,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -16,13 +15,6 @@ var (
 	//_ PlanI                           = (*BasePlan)(nil)
 	_ codectypes.UnpackInterfacesMessage = (*BasePlan)(nil)
 )
-
-// NewBasePlan creates a new BasePlan object
-//nolint:interfacer
-func NewBasePlan(address sdk.AccAddress, pubKey cryptotypes.PubKey, PlanNumber, sequence uint64) *BasePlan {
-	// TODO: Unimplemented
-	return nil
-}
 
 // ProtoBasePlan - a prototype function for BasePlan
 func ProtoBasePlan() PlanI {
@@ -92,7 +84,38 @@ type PlanI interface {
 
 	GetDistributionMethod() string
 	GetDistributionThisEpoch() sdk.Coins
-	IsTermitated() bool
+	IsTerminated() bool
 
 	String() string
+}
+
+// NewBasePlan creates a new BasePlan object
+func NewBasePlan(id uint64, planType uint32, farmingPoolAddr, distPoolAddr, terminationAddr, reserveAddr string, coinWeights sdk.DecCoins, startTime, endTime time.Time, epochDays uint32) *BasePlan {
+	basePlan := &BasePlan{
+		Id:                      id,
+		Type:                    planType,
+		FarmingPoolAddress:      farmingPoolAddr,
+		DistributionPoolAddress: distPoolAddr,
+		TerminationAddress:      terminationAddr,
+		StakingReserveAddress:   reserveAddr,
+		StakingCoinsWeight:      coinWeights,
+		StartTime:               startTime,
+		EndTime:                 endTime,
+		EpochDays:               epochDays,
+	}
+	return basePlan
+}
+
+func NewFixedAmountPlan(basePlan *BasePlan, epochAmount sdk.Coins) *FixedAmountPlan {
+	return &FixedAmountPlan{
+		BasePlan:    basePlan,
+		EpochAmount: epochAmount,
+	}
+}
+
+func NewRatioPlan(basePlan *BasePlan, epochRatio sdk.Dec) *RatioPlan {
+	return &RatioPlan{
+		BasePlan:   basePlan,
+		EpochRatio: epochRatio,
+	}
 }
