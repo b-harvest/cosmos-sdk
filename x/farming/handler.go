@@ -47,7 +47,7 @@ func NewCreateFarmingPlanProposalHandler(k keeper.Keeper) govtypes.Handler {
 		case *types.CreateFixedAmountPlanProposal:
 			return keeper.HandleFixedAmountPlanProposal(ctx, k, c)
 
-		case *types.CreateFarmingPlanProposal:
+		case *types.CreateRatioPlanProposal:
 			return keeper.HandleRatioPlanProposal(ctx, k, c)
 
 		default:

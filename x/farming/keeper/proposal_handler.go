@@ -7,6 +7,8 @@ import (
 
 // HandleFixedAmountPlanProposal is a handler for executing a fixed amount plan creation  proposal
 func HandleFixedAmountPlanProposal(ctx sdk.Context, k Keeper, p *types.CreateFixedAmountPlanProposal) error {
+	// TODO: add logic
+
 	logger := k.Logger(ctx)
 	logger.Info("HandleFixedAmountPlanProposal")
 	// logger.Info("transferred from the community pool to recipient", "amount", p.Amount.String(), "recipient", p.Recipient)
@@ -16,6 +18,7 @@ func HandleFixedAmountPlanProposal(ctx sdk.Context, k Keeper, p *types.CreateFix
 
 // HandleRatioPlanProposal is a handler for executing a ratio plan creation proposal
 func HandleRatioPlanProposal(ctx sdk.Context, k Keeper, p *types.CreateRatioPlanProposal) error {
+	// TODO: add logic
 
 	logger := k.Logger(ctx)
 	logger.Info("HandleRatioPlanProposal")
