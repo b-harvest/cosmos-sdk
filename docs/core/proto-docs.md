@@ -315,6 +315,8 @@
     - [Reward](#cosmos.farming.v1beta1.Reward)
     - [Staking](#cosmos.farming.v1beta1.Staking)
   
+    - [PlanType](#cosmos.farming.v1beta1.PlanType)
+  
 - [cosmos/farming/v1beta1/genesis.proto](#cosmos/farming/v1beta1/genesis.proto)
     - [GenesisState](#cosmos.farming.v1beta1.GenesisState)
     - [PlanRecord](#cosmos.farming.v1beta1.PlanRecord)
@@ -4588,15 +4590,15 @@ type for additional functionality (e.g. fixed amount plan, ratio plan).
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `id` | [uint64](#uint64) |  | id specifies index of the farming plan |
-| `type` | [uint32](#uint32) |  | type specifies the plan type; type 0 is public and 1 is private public plan must be created through governance proposal and private plan is created by account |
+| `type` | [PlanType](#cosmos.farming.v1beta1.PlanType) |  | type specifies the plan type; type 0 is public and 1 is private public plan must be created through governance proposal and private plan is created by account |
 | `farming_pool_address` | [string](#string) |  | farming_pool_address defines the bech32-encoded address of the farming pool |
 | `distribution_pool_address` | [string](#string) |  | distribution_pool_address defines the bech32-encoded address that distributes amount of coins to farmers |
-| `termination_address` | [string](#string) |  | termination_address defines the bech32-encoded address that terminates plan when the plan ends after the end time, the balance of farming pool address is transfered to the termination address |
+| `termination_address` | [string](#string) |  | termination_address defines the bech32-encoded address that terminates plan when the plan ends after the end time, the balance of farming pool address is transferred to the termination address |
 | `staking_reserve_address` | [string](#string) |  | staking_reserve_address defines the bech32-encoded address that stores staking reserves |
-| `staking_coins_weight` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | staking_coins_weight specifies coins weight for the plan |
+| `staking_coin_weights` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | staking_coin_weights specifies coin weights for the plan |
 | `start_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | start_time specifies the start time of the plan |
-| `end_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | end_time specifis the end time of the plan |
-| `epoch_days` | [uint32](#uint32) |  | epoch_days specifis a period of time that triggers the distribution plan; it is measured in days |
+| `end_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | end_time specifies the end time of the plan |
+| `epoch_days` | [uint32](#uint32) |  | epoch_days specifies a period of time that triggers the distribution plan; it is measured in days |
 
 
 
@@ -4611,7 +4613,7 @@ FixedAmountPlan defines a fixed amount plan that fixed amount of coins are distr
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `fixed_amount_plan` | [BasePlan](#cosmos.farming.v1beta1.BasePlan) |  | fixed_amount_plan specifies a struct of `BasePlan` |
+| `base_plan` | [BasePlan](#cosmos.farming.v1beta1.BasePlan) |  |  |
 | `epoch_amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | epoch_amount specifies the distributing amount for each epoch |
 
 
@@ -4642,7 +4644,7 @@ RatioPlan defines a ratio plan that ratio of total coins in farming pool address
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `fixed_amount_plan` | [BasePlan](#cosmos.farming.v1beta1.BasePlan) |  | ratio_plan specifies a struct of `BasePlan` |
+| `base_plan` | [BasePlan](#cosmos.farming.v1beta1.BasePlan) |  |  |
 | `epoch_ratio` | [string](#string) |  | epoch_ratio specifies the distributing amount by ratio |
 
 
@@ -4685,6 +4687,19 @@ Staking defines a farmer's staking information.
 
 
  <!-- end messages -->
+
+
+<a name="cosmos.farming.v1beta1.PlanType"></a>
+
+### PlanType
+PlanType enumerates the valid types of a plan.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| PLAN_TYPE_UNSPECIFIED | 0 | PLAN_TYPE_UNSPECIFIED defines the default plan type. |
+| PLAN_TYPE_PUBLIC | 1 | PLAN_TYPE_PUBLIC defines the public plan type. |
+| PLAN_TYPE_PRIVATE | 2 | PLAN_TYPE_PRIVATE defines the private plan type. |
+
 
  <!-- end enums -->
 

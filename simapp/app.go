@@ -86,8 +86,8 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/cosmos/cosmos-sdk/x/farming"
-	farmingkeeper "github.com/cosmos/cosmos-sdk/x/farming/keeper"
-	farmingtypes "github.com/cosmos/cosmos-sdk/x/farming/types"
+	//farmingkeeper "github.com/cosmos/cosmos-sdk/x/farming/keeper"
+	//farmingtypes "github.com/cosmos/cosmos-sdk/x/farming/types"
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
