@@ -33,11 +33,11 @@ func NewBasePlan(id uint64, typ PlanType, farmingPoolAddr, distPoolAddr, termina
 	return basePlan
 }
 
-func (plan BasePlan) GetId() uint64 {
+func (plan BasePlan) GetId() uint64 { //nolint:golint
 	return plan.Id
 }
 
-func (plan *BasePlan) SetId(id uint64) error {
+func (plan *BasePlan) SetId(id uint64) error { //nolint:golint
 	plan.Id = id
 	return nil
 }

@@ -5,13 +5,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
-
-	"github.com/spf13/cobra"
 )
 
 // GetTxCmd returns a root CLI command handler for all x/farming transaction commands.
@@ -37,7 +37,7 @@ func GetTxCmd() *cobra.Command {
 
 func NewCreateFixedAmountPlanCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "create-fixed-plan ",
+		Use:     "create-fixed-plan",
 		Aliases: []string{"cf"},
 		Args:    cobra.ExactArgs(2),
 		Short:   "create fixed amount farming plan",
@@ -59,20 +59,20 @@ $ %s tx %s create-fixed-plan --from mykey
 			fmt.Println("planCreator: ", planCreator)
 
 			// TODO: replace dummy data
-			farming_pool_address := sdk.AccAddress{}
-			staking_coins_weight := sdk.DecCoins{}
-			start_time := time.Time{}
-			end_time := time.Time{}
-			epoch_days := uint32(1)
-			epoch_amount := sdk.Coins{}
+			farmingPoolAddr := sdk.AccAddress{}
+			stakingCoinWeights := sdk.DecCoins{}
+			startTime := time.Time{}
+			endTime := time.Time{}
+			epochDays := uint32(1)
+			epochAmount := sdk.Coins{}
 
 			msg := types.NewMsgCreateFixedAmountPlan(
-				farming_pool_address,
-				staking_coins_weight,
-				&start_time,
-				&end_time,
-				epoch_days,
-				epoch_amount,
+				farmingPoolAddr,
+				stakingCoinWeights,
+				&startTime,
+				&endTime,
+				epochDays,
+				epochAmount,
 			)
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
@@ -106,20 +106,20 @@ $ %s tx %s create-ratio-plan --from mykey
 			fmt.Println("planCreator: ", planCreator)
 
 			// TODO: replace dummy data
-			farming_pool_address := sdk.AccAddress{}
-			staking_coins_weight := sdk.DecCoins{}
-			start_time := time.Time{}
-			end_time := time.Time{}
-			epoch_days := uint32(1)
-			epoch_ratio := sdk.Dec{}
+			farmingPoolAddr := sdk.AccAddress{}
+			stakingCoinWeights := sdk.DecCoins{}
+			startTime := time.Time{}
+			endTime := time.Time{}
+			epochDays := uint32(1)
+			epochRatio := sdk.Dec{}
 
 			msg := types.NewMsgCreateRatioPlan(
-				farming_pool_address,
-				staking_coins_weight,
-				&start_time,
-				&end_time,
-				epoch_days,
-				epoch_ratio,
+				farmingPoolAddr,
+				stakingCoinWeights,
+				&startTime,
+				&endTime,
+				epochDays,
+				epochRatio,
 			)
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
@@ -152,14 +152,14 @@ $ %s tx %s stake --from mykey
 			fmt.Println("planCreator: ", planCreator)
 
 			// TODO: replace dummy data
-			plan_id := uint64(1)
+			planID := uint64(1)
 			farmer := sdk.AccAddress{}
-			staking_coins := sdk.Coins{}
+			stakingCoins := sdk.Coins{}
 
 			msg := types.NewMsgStake(
-				plan_id,
+				planID,
 				farmer,
-				staking_coins,
+				stakingCoins,
 			)
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
@@ -192,14 +192,14 @@ $ %s tx %s unstake --from mykey
 			fmt.Println("planCreator: ", planCreator)
 
 			// TODO: replace dummy data
-			plan_id := uint64(1)
+			planID := uint64(1)
 			farmer := sdk.AccAddress{}
-			staking_coins := sdk.Coins{}
+			stakingCoins := sdk.Coins{}
 
 			msg := types.NewMsgUnstake(
-				plan_id,
+				planID,
 				farmer,
-				staking_coins,
+				stakingCoins,
 			)
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
@@ -232,11 +232,11 @@ $ %s tx %s claim --from mykey
 			fmt.Println("planCreator: ", planCreator)
 
 			// TODO: replace dummy data
-			plan_id := uint64(1)
+			planID := uint64(1)
 			farmer := sdk.AccAddress{}
 
 			msg := types.NewMsgClaim(
-				plan_id,
+				planID,
 				farmer,
 			)
 

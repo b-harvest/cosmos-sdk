@@ -1,10 +1,10 @@
 package cli
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
-
-	"github.com/spf13/cobra"
 )
 
 // GetQueryCmd returns a root CLI command handler for all x/farming query commands.

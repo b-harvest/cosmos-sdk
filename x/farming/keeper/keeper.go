@@ -3,12 +3,13 @@ package keeper
 import (
 	"fmt"
 
+	gogotypes "github.com/gogo/protobuf/types"
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	gogotypes "github.com/gogo/protobuf/types"
-	"github.com/tendermint/tendermint/libs/log"
 )
 
 // Keeper of the farming store
@@ -103,8 +104,8 @@ func (k Keeper) decodePlan(bz []byte) types.PlanI {
 }
 
 // MarshalPlan protobuf serializes an Plan interface
-func (k Keeper) MarshalPlan(PlanI types.PlanI) ([]byte, error) { // nolint:interfacer
-	return k.cdc.MarshalInterface(PlanI)
+func (k Keeper) MarshalPlan(plan types.PlanI) ([]byte, error) { // nolint:interfacer
+	return k.cdc.MarshalInterface(plan)
 }
 
 // UnmarshalPlan returns an Plan interface from raw encoded plan
