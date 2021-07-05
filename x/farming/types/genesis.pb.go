@@ -33,13 +33,13 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // GenesisState defines the farming module's genesis state.
 type GenesisState struct {
-	// params defines all the parameters for the farming module.
+	// params defines all the parameters for the farming module
 	Params Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params" yaml:"params"`
-	// plan_records defines the plan infos at genesis.
+	// plan_records defines the plan records used for genesis state
 	PlanRecords []PlanRecord `protobuf:"bytes,2,rep,name=plan_records,json=planRecords,proto3" json:"plan_records" yaml:"plan_records"`
-	// stakings defines the staking records at genesis.
+	// stakings defines the staking records used for genesis state
 	Stakings []Staking `protobuf:"bytes,3,rep,name=stakings,proto3" json:"stakings" yaml:"stakings"`
-	// rewards defines the reward records at genesis.
+	// rewards defines the reward records used for genesis state
 	Rewards []Reward `protobuf:"bytes,4,rep,name=rewards,proto3" json:"rewards" yaml:"rewards"`
 }
 
@@ -78,17 +78,18 @@ var xxx_messageInfo_GenesisState proto.InternalMessageInfo
 
 // PlanRecord is used for import/export via genesis json.
 type PlanRecord struct {
-	// plan specifies the plan interface can be FixedAmountPlan, RatioPlan
+	// plan specifies the plan interface; it can be FixedAmountPlan or RatioPlan
 	Plan types.Any `protobuf:"bytes,1,opt,name=plan,proto3" json:"plan" yaml:"plan"`
 	// last_epoch_time specifies the last distributed epoch time of the plan
 	LastEpochTime time.Time `protobuf:"bytes,2,opt,name=last_epoch_time,json=lastEpochTime,proto3,stdtime" json:"last_epoch_time" yaml:"last_epoch_time"`
-	// farming_pool_coins specifies balance of the farming pool for the plan for validating when import/export
+	// farming_pool_coins specifies balance of the farming pool for the plan
+	// this param is needed for import/export validation
 	FarmingPoolCoins github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,3,rep,name=farming_pool_coins,json=farmingPoolCoins,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"farming_pool_coins" yaml:"farming_pool_coins"`
-	// distribution_pool_coins specifies balance of the distribution pool to be distributed in the plan for validating
-	// when import/export
+	// distribution_pool_coins specifies balance of the distribution pool to be distributed in the plan
+	// this param is needed for import/export validation
 	DistributionPoolCoins github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,4,rep,name=distribution_pool_coins,json=distributionPoolCoins,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"distribution_pool_coins" yaml:"farming_pool_coins"`
-	// staking_reserve_coins specifies balance of the staking reserve pool staked in the plan for validating when
-	// import/export
+	// staking_reserve_coins specifies balance of the staking reserve pool staked in the plan
+	// this param is needed for import/export validation
 	StakingReserveCoins github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,5,rep,name=staking_reserve_coins,json=stakingReserveCoins,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"staking_reserve_coins" yaml:"farming_pool_coins"`
 }
 

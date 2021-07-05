@@ -32,6 +32,8 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Params defines the set of params for the farming module.
 type Params struct {
+	// private_plan_creation_fee specifies the fee for plan creation
+	// this fee prevents from spamming and it is collected in the community pool
 	PrivatePlanCreationFee github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,1,rep,name=private_plan_creation_fee,json=privatePlanCreationFee,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"private_plan_creation_fee" yaml:"private_plan_creation_fee"`
 }
 
@@ -134,7 +136,7 @@ func (m *BasePlan) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_BasePlan proto.InternalMessageInfo
 
-// FixedAmountPlan defines a fixed amount plan that fixed amount of coins are distributed for every epoch day.
+// FixedAmountPlan defines a fixed amount plan that fixed amount of coins are distributed for every epoch.
 type FixedAmountPlan struct {
 	// fixed_amount_plan specifies a struct of `BasePlan`
 	*BasePlan `protobuf:"bytes,1,opt,name=fixed_amount_plan,json=fixedAmountPlan,proto3,embedded=fixed_amount_plan" json:"fixed_amount_plan,omitempty"`
@@ -174,7 +176,7 @@ func (m *FixedAmountPlan) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_FixedAmountPlan proto.InternalMessageInfo
 
-// RatioPlan defines a ratio plan that ratio of total coins in farming pool address is distributed for every epoch day.
+// RatioPlan defines a ratio plan that ratio of total coins in farming pool address is distributed for every epoch.
 type RatioPlan struct {
 	// ratio_plan specifies a struct of `BasePlan`
 	*BasePlan `protobuf:"bytes,1,opt,name=fixed_amount_plan,json=fixedAmountPlan,proto3,embedded=fixed_amount_plan" json:"fixed_amount_plan,omitempty"`
@@ -214,7 +216,7 @@ func (m *RatioPlan) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RatioPlan proto.InternalMessageInfo
 
-// Staking contains a farmer has staked on the farming plan.
+// Staking defines a farmer's staking information.
 type Staking struct {
 	// plan_id specifies index of the target farming plan
 	PlanId uint64 `protobuf:"varint,1,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`
@@ -258,7 +260,7 @@ func (m *Staking) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Staking proto.InternalMessageInfo
 
-// Reward contains a record of rewards at this point in time when farmers receive them from the farming plan.
+// Reward defines a record of farming rewards.
 type Reward struct {
 	// plan_id specifies index of the target farming plan
 	PlanId uint64 `protobuf:"varint,1,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`

@@ -4606,7 +4606,7 @@ type for additional functionality (e.g. fixed amount plan, ratio plan).
 <a name="cosmos.farming.v1beta1.FixedAmountPlan"></a>
 
 ### FixedAmountPlan
-FixedAmountPlan defines a fixed amount plan that fixed amount of coins are distributed for every epoch day.
+FixedAmountPlan defines a fixed amount plan that fixed amount of coins are distributed for every epoch.
 
 
 | Field | Type | Label | Description |
@@ -4627,7 +4627,7 @@ Params defines the set of params for the farming module.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `private_plan_creation_fee` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| `private_plan_creation_fee` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | private_plan_creation_fee specifies the fee for plan creation this fee prevents from spamming and it is collected in the community pool |
 
 
 
@@ -4637,7 +4637,7 @@ Params defines the set of params for the farming module.
 <a name="cosmos.farming.v1beta1.RatioPlan"></a>
 
 ### RatioPlan
-RatioPlan defines a ratio plan that ratio of total coins in farming pool address is distributed for every epoch day.
+RatioPlan defines a ratio plan that ratio of total coins in farming pool address is distributed for every epoch.
 
 
 | Field | Type | Label | Description |
@@ -4653,7 +4653,7 @@ RatioPlan defines a ratio plan that ratio of total coins in farming pool address
 <a name="cosmos.farming.v1beta1.Reward"></a>
 
 ### Reward
-Reward contains a record of rewards at this point in time when farmers receive them from the farming plan.
+Reward defines a record of farming rewards.
 
 
 | Field | Type | Label | Description |
@@ -4670,7 +4670,7 @@ Reward contains a record of rewards at this point in time when farmers receive t
 <a name="cosmos.farming.v1beta1.Staking"></a>
 
 ### Staking
-Staking contains a farmer has staked on the farming plan.
+Staking defines a farmer's staking information.
 
 
 | Field | Type | Label | Description |
@@ -4709,10 +4709,10 @@ GenesisState defines the farming module's genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `params` | [Params](#cosmos.farming.v1beta1.Params) |  | params defines all the parameters for the farming module. |
-| `plan_records` | [PlanRecord](#cosmos.farming.v1beta1.PlanRecord) | repeated | plan_records defines the plan infos at genesis. |
-| `stakings` | [Staking](#cosmos.farming.v1beta1.Staking) | repeated | stakings defines the staking records at genesis. |
-| `rewards` | [Reward](#cosmos.farming.v1beta1.Reward) | repeated | rewards defines the reward records at genesis. |
+| `params` | [Params](#cosmos.farming.v1beta1.Params) |  | params defines all the parameters for the farming module |
+| `plan_records` | [PlanRecord](#cosmos.farming.v1beta1.PlanRecord) | repeated | plan_records defines the plan records used for genesis state |
+| `stakings` | [Staking](#cosmos.farming.v1beta1.Staking) | repeated | stakings defines the staking records used for genesis state |
+| `rewards` | [Reward](#cosmos.farming.v1beta1.Reward) | repeated | rewards defines the reward records used for genesis state |
 
 
 
@@ -4727,11 +4727,11 @@ PlanRecord is used for import/export via genesis json.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `plan` | [google.protobuf.Any](#google.protobuf.Any) |  | plan specifies the plan interface can be FixedAmountPlan, RatioPlan |
+| `plan` | [google.protobuf.Any](#google.protobuf.Any) |  | plan specifies the plan interface; it can be FixedAmountPlan or RatioPlan |
 | `last_epoch_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | last_epoch_time specifies the last distributed epoch time of the plan |
-| `farming_pool_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | farming_pool_coins specifies balance of the farming pool for the plan for validating when import/export |
-| `distribution_pool_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | distribution_pool_coins specifies balance of the distribution pool to be distributed in the plan for validating when import/export |
-| `staking_reserve_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | staking_reserve_coins specifies balance of the staking reserve pool staked in the plan for validating when import/export |
+| `farming_pool_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | farming_pool_coins specifies balance of the farming pool for the plan this param is needed for import/export validation |
+| `distribution_pool_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | distribution_pool_coins specifies balance of the distribution pool to be distributed in the plan this param is needed for import/export validation |
+| `staking_reserve_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | staking_reserve_coins specifies balance of the staking reserve pool staked in the plan this param is needed for import/export validation |
 
 
 

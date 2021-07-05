@@ -12,6 +12,8 @@ option go_package = "github.com/cosmos/cosmos-sdk/x/farming/types";
 message Params {
   option (gogoproto.goproto_stringer) = false;
 
+  // private_plan_creation_fee specifies the fee for plan creation
+  // this fee prevents from spamming and it is collected in the community pool
   repeated cosmos.base.v1beta1.Coin private_plan_creation_fee = 1 [
     (gogoproto.moretags)     = "yaml:\"private_plan_creation_fee\"",
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
@@ -62,7 +64,7 @@ message BasePlan {
   uint32 epoch_days = 10;
 }
 
-// FixedAmountPlan defines a fixed amount plan that fixed amount of coins are distributed for every epoch day.
+// FixedAmountPlan defines a fixed amount plan that fixed amount of coins are distributed for every epoch.
 message FixedAmountPlan {
   option (gogoproto.goproto_getters)  = false;
   option (gogoproto.goproto_stringer) = false;
@@ -78,7 +80,7 @@ message FixedAmountPlan {
   ];
 }
 
-// RatioPlan defines a ratio plan that ratio of total coins in farming pool address is distributed for every epoch day.
+// RatioPlan defines a ratio plan that ratio of total coins in farming pool address is distributed for every epoch.
 message RatioPlan {
   option (gogoproto.goproto_getters)  = false;
   option (gogoproto.goproto_stringer) = false;
@@ -94,7 +96,7 @@ message RatioPlan {
   ];
 }
 
-// Staking contains a farmer has staked on the farming plan.
+// Staking defines a farmer's staking information.
 message Staking {
   option (gogoproto.goproto_getters)  = false;
   option (gogoproto.goproto_stringer) = false;
@@ -120,7 +122,7 @@ message Staking {
   ];
 }
 
-// Reward contains a record of rewards at this point in time when farmers receive them from the farming plan.
+// Reward defines a record of farming rewards.
 message Reward {
   option (gogoproto.goproto_getters)  = false;
   option (gogoproto.goproto_stringer) = false;
