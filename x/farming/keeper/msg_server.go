@@ -29,7 +29,14 @@ var _ types.MsgServer = msgServer{}
 // CreateFixedAmountPlan defines a method for creating fixed amount farming plan.
 func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCreateFixedAmountPlan) (*types.MsgCreateFixedAmountPlanResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	fmt.Println("ctx: ", ctx)
+
+	plan, err := k.Keeper.CreateFixedAmountPlan(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: emit events
+
 	return &types.MsgCreateFixedAmountPlanResponse{}, nil
 }
 

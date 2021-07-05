@@ -17,9 +17,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	//"github.com/cosmos/cosmos-sdk/x/farming/client/cli"
+
 	//"github.com/cosmos/cosmos-sdk/x/farming/client/rest"
+	"github.com/cosmos/cosmos-sdk/x/farming/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/farming/keeper"
+
 	//"github.com/cosmos/cosmos-sdk/x/farming/simulation"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
@@ -76,16 +78,12 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx sdkclient.Context, mux
 
 // GetTxCmd returns the root tx command for the farming module.
 func (AppModuleBasic) GetTxCmd() *cobra.Command {
-	// TODO: unimplemented
-	//return cli.NewTxCmd()
-	return nil
+	return cli.GetTxCmd()
 }
 
 // GetQueryCmd returns the root query command for the farming module.
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-	// TODO: unimplemented
-	//return cli.GetQueryCmd()
-	return nil
+	return cli.GetQueryCmd()
 }
 
 // RegisterInterfaces implements InterfaceModule
