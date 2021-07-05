@@ -319,6 +319,10 @@
     - [GenesisState](#cosmos.farming.v1beta1.GenesisState)
     - [PlanRecord](#cosmos.farming.v1beta1.PlanRecord)
   
+- [cosmos/farming/v1beta1/gov.proto](#cosmos/farming/v1beta1/gov.proto)
+    - [CreateFixedAmountPlanProposal](#cosmos.farming.v1beta1.CreateFixedAmountPlanProposal)
+    - [CreateRatioPlanProposal](#cosmos.farming.v1beta1.CreateRatioPlanProposal)
+  
 - [cosmos/farming/v1beta1/query.proto](#cosmos/farming/v1beta1/query.proto)
     - [Query](#cosmos.farming.v1beta1.Query)
   
@@ -4732,6 +4736,56 @@ PlanRecord is used for import/export via genesis json.
 | `farming_pool_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | farming_pool_coins specifies balance of the farming pool for the plan this param is needed for import/export validation |
 | `distribution_pool_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | distribution_pool_coins specifies balance of the distribution pool to be distributed in the plan this param is needed for import/export validation |
 | `staking_reserve_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | staking_reserve_coins specifies balance of the staking reserve pool staked in the plan this param is needed for import/export validation |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="cosmos/farming/v1beta1/gov.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## cosmos/farming/v1beta1/gov.proto
+
+
+
+<a name="cosmos.farming.v1beta1.CreateFixedAmountPlanProposal"></a>
+
+### CreateFixedAmountPlanProposal
+CreateFixedAmountPlanProposal details a proposal for fixed amount plan creation.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `title` | [string](#string) |  |  |
+| `description` | [string](#string) |  |  |
+| `plan` | [FixedAmountPlan](#cosmos.farming.v1beta1.FixedAmountPlan) | repeated |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.CreateRatioPlanProposal"></a>
+
+### CreateRatioPlanProposal
+CreateRatioPlanProposal details a proposal for ratio plan creation.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `title` | [string](#string) |  |  |
+| `description` | [string](#string) |  |  |
+| `plan` | [RatioPlan](#cosmos.farming.v1beta1.RatioPlan) | repeated |  |
 
 
 

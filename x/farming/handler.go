@@ -3,9 +3,9 @@ package farming
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-
 	"github.com/cosmos/cosmos-sdk/x/farming/keeper"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 func NewHandler(k keeper.Keeper) sdk.Handler {
@@ -37,6 +37,21 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		default:
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
+		}
+	}
+}
+
+func NewCreateFarmingPlanProposalHandler(k keeper.Keeper) govtypes.Handler {
+	return func(ctx sdk.Context, content govtypes.Content) error {
+		switch c := content.(type) {
+		case *types.CreateFixedAmountPlanProposal:
+			return keeper.HandleFixedAmountPlanProposal(ctx, k, c)
+
+		case *types.CreateFarmingPlanProposal:
+			return keeper.HandleRatioPlanProposal(ctx, k, c)
+
+		default:
+			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized farming proposal content type: %T", c)
 		}
 	}
 }

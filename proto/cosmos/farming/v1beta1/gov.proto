@@ -1,0 +1,26 @@
+syntax = "proto3";
+package cosmos.farming.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
+import "cosmos/farming/v1beta1/farming.proto";
+
+option go_package = "github.com/cosmos/cosmos-sdk/x/farming/types";
+
+// CreateFixedAmountPlanProposal details a proposal for fixed amount plan creation.
+message CreateFixedAmountPlanProposal {
+  option (gogoproto.goproto_getters) = false;
+
+  string                   title       = 1;
+  string                   description = 2;
+  repeated FixedAmountPlan plan        = 3 [(gogoproto.nullable) = false];
+}
+
+// CreateRatioPlanProposal details a proposal for ratio plan creation.
+message CreateRatioPlanProposal {
+  option (gogoproto.goproto_getters) = false;
+
+  string             title       = 1;
+  string             description = 2;
+  repeated RatioPlan plan        = 3 [(gogoproto.nullable) = false];
+}
