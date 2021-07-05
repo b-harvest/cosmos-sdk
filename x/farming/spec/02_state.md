@@ -2,7 +2,7 @@
 
  # State
 
-The farming module `x/farming` keeps...
+The farming module `x/farming` keeps track of the staking and rewards states.
 
 ## Plan
 
@@ -11,6 +11,7 @@ Plan stores information about the farming plan.
 Plan type has the following structure.
 
 ```go
+// PlanI is an interface used to store plan records within state.
 type PlanI interface {
     proto.Message
     
@@ -46,41 +47,46 @@ type PlanI interface {
 
     GetDistributionMethod() string
     GetDistributionThisEpoch() sdk.Coins
-    IsTermitated() bool
+    IsTerminated() bool
 
     String() string
 }
 ```
 
 ```go
+// BasePlan defines a base plan type. It contains all the necessary fields
+// for basic farming plan functionality. Any custom farming plan type should extend this
+// type for additional functionality (e.g. fixed amount plan, ratio plan).
 type BasePlan struct {
-    Id                       uint64          // index of this farming plan
-    Type                     int32           // type of this farming plan, private/public
-    FarmingPoolAddress       string          // 
-    DistributionPoolAddress  string          // 
-    TerminationAddress       string
-    StakingReserveAddress    string     
-    StakingCoinsWeight       []CoinWeight
-    StartTime                time.Time
-    EndTime                  time.Time
-    EpochDays                uint32
+    Id                       uint64       // index of the plan
+    Type                     int32        // type of the plan; public or private
+    FarmingPoolAddress       string       // bech32-encoded farming pool address
+    DistributionPoolAddress  string       // bech32-encoded distribution pool address
+    TerminationAddress       string       // bech32-encoded termination address
+    StakingReserveAddress    string       // bech32-encoded staking reserve address
+    StakingCoinWeights       []CoinWeight // coin weights for the plan
+    StartTime                time.Time    // start time of the plan
+    EndTime                  time.Time    // end time of the plan
+    EpochDays                uint32       // distributing epoch measuring in days
 }
 ```
 
 ```go
+// FixedAmountPlan defines a fixed amount plan that fixed amount of coins are distributed for every epoch day.
 type FixedAmountPlan struct {
     *BasePlan
 
-    EpochAmount      sdk.Coins
+    EpochAmount      sdk.Coins // distributing amount for each epoch
 }
 
 ```
 
 ```go
+// RatioPlan defines a ratio plan that ratio of total coins in farming pool address is distributed for every epoch day.
 type RatioPlan struct {
     *BasePlan
 
-    EpochRatio            sdk.Dec
+    EpochRatio            sdk.Dec // distributing amount by ratio
 }
 
 ```
@@ -97,23 +103,21 @@ const (
 
 The parameters of the Plan state are:
 
+- ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
 - Plan: `0x11 | Id -> ProtocolBuffer(Plan)`
 - PlanByFarmerAddrIndex: `0x12 | FarmerAddr -> Id`
 - LastEpochTime: `0x13 | Id -> time.Time`
 - GlobalFarmingPlanIdKey: `[]byte("globalFarmingPlanId") -> Id`
-- ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
-
-- example of `FixedAmountPlan`
-
+- An example of `FixedAmountPlan`
     ```json
     {
       "base_plan": {
         "id": 0,
         "type": 0,
-        "farmingPoolAddress": "xxx",
-        "distributionPoolAddress": "yyy",
-        "stakingReserveAddress": "kkk",
-        "stakingCoinsWithWeight": [
+        "farmingPoolAddress": "cosmos1...",
+        "distributionPoolAddress": "cosmos1...",
+        "stakingReserveAddress": "cosmos1...",
+        "stakingCoinWeights": [
           {
             "denom": "xxx",
             "amount": "0.200000000000000000"
@@ -130,7 +134,7 @@ The parameters of the Plan state are:
         "startTime": "2021-10-01T00:00:00Z",
         "endTime": "2022-04-01T00:00:00Z",
         "epochDays": 1,
-        "terminationAddress": "zzz"
+        "terminationAddress": "cosmos1..."
       },
       "epochAmount": {
         "denom": "uatom",
@@ -139,17 +143,16 @@ The parameters of the Plan state are:
     }
     ```
 
-- example of `RatioPlan`
-
+- An example of `RatioPlan`
     ```json
     {
       "base_plan": {
         "id": 0,
         "type": 0,
-        "farmingPoolAddress": "xxx",
-        "distributionPoolAddress": "yyy",
-        "stakingReserveAddress": "kkk",
-        "stakingCoinsWithWeight": [
+        "farmingPoolAddress": "cosmos1...",
+        "distributionPoolAddress": "cosmos1...",
+        "stakingReserveAddress": "cosmos1...",
+        "stakingCoinWeights": [
           {
             "denom": "xxx",
             "amount": "0.200000000000000000"
@@ -166,13 +169,14 @@ The parameters of the Plan state are:
         "startTime": "2021-10-01T00:00:00Z",
         "endTime": "2022-04-01T00:00:00Z",
         "epochDays": 1,
-        "terminationAddress": "zzz"
+        "terminationAddress": "cosmos1..."
       },
       "epochRatio": "0.01"
     }
     ```
 
 ```go
+// Staking defines a farmer's staking information.
 type Staking struct {
     PlanId                   uint64
     Farmer                   string
@@ -186,6 +190,7 @@ The parameters of the Staking state are:
 - Staking: `0x21 | PlanId | FarmerAddr -> ProtocolBuffer(Staking)`
 
 ```go
+// Reward defines a record of farming rewards.
 type Reward struct {
     PlanId                   uint64
     Farmer                   string

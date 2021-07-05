@@ -4,7 +4,7 @@
 
 Messages (Msg) are objects that trigger state transitions. Msgs are wrapped in transactions (Txs) that clients submit to the network. The Cosmos SDK wraps and unwraps farming module messages from transactions.
 
-## **MsgCreatePlan**
+## **MsgCreateFixedAmountPlan**
 
 ```go
 type MsgCreateFixedAmountPlan struct {
@@ -16,6 +16,8 @@ type MsgCreateFixedAmountPlan struct {
 		EpochAmount         sdk.Coins
 }
 ```
+
+## **MsgCreateRatioPlan**
 
 ```go
 type MsgCreateRatioPlan struct {
@@ -42,8 +44,9 @@ type MsgStake struct {
 
 ## **MsgUnstake**
 
-- If farmer wants to terminate staking, he/she can unstake the coins
-- All accumulated farming rewards is automatically withdrawn to farmer when unstake
+- If farmer wants to terminate staking, the farmer can unstake the coins at any time
+- There is no unbonding period of time required to unstake coins from the plan
+- All accumulated farming rewards are automatically withdrawn to farmer when unstake event occurs
 
 ```go
 type MsgUnstake struct {
@@ -52,4 +55,15 @@ type MsgUnstake struct {
     UnstakingCoins sdk.Coins
 }
 
+```
+
+## **MsgClaim**
+
+- A farmer should claim their farming rewards. This is similar mechanism with claiming rewards from distribution module.
+
+```go
+type MsgClaim struct {
+	PlanId uint64
+	Farmer string
+}
 ```

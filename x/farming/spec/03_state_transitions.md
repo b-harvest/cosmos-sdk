@@ -2,17 +2,9 @@
 
  # State Transitions
 
-These messages (Msg) in the farming module trigger state transitions.
+This document describes the state transaction operations pertaining to the farming module. 
 
-- Private/Public type Farming plan
-    - Private type Farming plan
-        - Anyone can create a private `farmingPlan` with his/her own account as `farmingPoolAddress`
-        - Plan creator should pay `planCreationFee`
-        - Plan creator should provide a signature with his/her own account which will be used for `farmingPoolAddress`
-        - Funds inside the `farmingPoolAddress` will be distributed to farmers automatically
-    - Public type Farming plan
-        - Only governance can create a public `farmingPlan` with a module account as `farmingPoolAddress`
-        - Funds inside the `farmingPoolAddress` will be distributed to farmers automatically
+As stated in [01_concepts.md](01_concepts.md), there are public and private farming plans available in the `farming` module. Public plan can be created by any account whereas private plan can only be created through governance proposal.
 
     ```go
     type PlanType int32
