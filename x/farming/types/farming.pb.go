@@ -216,7 +216,7 @@ func (m *RatioPlan) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RatioPlan proto.InternalMessageInfo
 
-// Staking contains a farmer has staked on the farming plan.
+// Staking defines a farmer's staking information.
 type Staking struct {
 	// plan_id specifies index of the target farming plan
 	PlanId uint64 `protobuf:"varint,1,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`
@@ -260,7 +260,7 @@ func (m *Staking) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Staking proto.InternalMessageInfo
 
-// Reward contains a record of rewards at this point in time when farmers receive them from the farming plan.
+// Reward defines a record of farming rewards.
 type Reward struct {
 	// plan_id specifies index of the target farming plan
 	PlanId uint64 `protobuf:"varint,1,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`

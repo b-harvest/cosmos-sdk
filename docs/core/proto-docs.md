@@ -4653,7 +4653,7 @@ RatioPlan defines a ratio plan that ratio of total coins in farming pool address
 <a name="cosmos.farming.v1beta1.Reward"></a>
 
 ### Reward
-Reward contains a record of rewards at this point in time when farmers receive them from the farming plan.
+Reward defines a record of farming rewards.
 
 
 | Field | Type | Label | Description |
@@ -4670,7 +4670,7 @@ Reward contains a record of rewards at this point in time when farmers receive t
 <a name="cosmos.farming.v1beta1.Staking"></a>
 
 ### Staking
-Staking contains a farmer has staked on the farming plan.
+Staking defines a farmer's staking information.
 
 
 | Field | Type | Label | Description |
