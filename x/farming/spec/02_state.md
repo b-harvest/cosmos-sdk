@@ -24,8 +24,8 @@ type PlanI interface {
     GetFarmingPoolAddress() sdk.AccAddress
     SetFarmingPoolAddress(sdk.AccAddress) error
 
-    GetDistributionPoolAddress() sdk.AccAddress
-    SetDistributionPoolAddress(sdk.AccAddress) error
+    GetRewardPoolAddress() sdk.AccAddress
+    SetRewardPoolAddress(sdk.AccAddress) error
 
     GetTerminationAddress() sdk.AccAddress
     SetTerminationAddress(sdk.AccAddress) error
@@ -57,7 +57,7 @@ type BasePlan struct {
     Id                       uint64       // index of the plan
     Type                     PlanType     // type of the plan; public or private
     FarmingPoolAddress       string       // bech32-encoded farming pool address
-    DistributionPoolAddress  string       // bech32-encoded distribution pool address
+    RewardPoolAddress        string       // bech32-encoded reward pool address
     TerminationAddress       string       // bech32-encoded termination address
     StakingReserveAddress    string       // bech32-encoded staking reserve address
     StakingCoinWeights       sdk.DecCoins // coin weights for the plan
@@ -119,7 +119,7 @@ The parameters of the Plan state are:
         "id": 0,
         "type": 0,
         "farmingPoolAddress": "cosmos1...",
-        "distributionPoolAddress": "cosmos1...",
+        "rewardPoolAddress": "cosmos1...",
         "stakingReserveAddress": "cosmos1...",
         "stakingCoinWeights": [
           {
@@ -154,7 +154,7 @@ The parameters of the Plan state are:
         "id": 0,
         "type": 0,
         "farmingPoolAddress": "cosmos1...",
-        "distributionPoolAddress": "cosmos1...",
+        "rewardPoolAddress": "cosmos1...",
         "stakingReserveAddress": "cosmos1...",
         "stakingCoinWeights": [
           {

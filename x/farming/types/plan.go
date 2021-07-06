@@ -17,18 +17,18 @@ var (
 
 // NewBasePlan creates a new BasePlan object
 //nolint:interfacer
-func NewBasePlan(id uint64, typ PlanType, farmingPoolAddr, distPoolAddr, terminationAddr, reserveAddr string, coinWeights sdk.DecCoins, startTime, endTime time.Time, epochDays uint32) *BasePlan {
+func NewBasePlan(id uint64, typ PlanType, farmingPoolAddr, rewardPoolAddr, terminationAddr, reserveAddr string, coinWeights sdk.DecCoins, startTime, endTime time.Time, epochDays uint32) *BasePlan {
 	basePlan := &BasePlan{
-		Id:                      id,
-		Type:                    typ,
-		FarmingPoolAddress:      farmingPoolAddr,
-		DistributionPoolAddress: distPoolAddr,
-		TerminationAddress:      terminationAddr,
-		StakingReserveAddress:   reserveAddr,
-		StakingCoinWeights:      coinWeights,
-		StartTime:               startTime,
-		EndTime:                 endTime,
-		EpochDays:               epochDays,
+		Id:                    id,
+		Type:                  typ,
+		FarmingPoolAddress:    farmingPoolAddr,
+		RewardPoolAddress:     rewardPoolAddr,
+		TerminationAddress:    terminationAddr,
+		StakingReserveAddress: reserveAddr,
+		StakingCoinWeights:    coinWeights,
+		StartTime:             startTime,
+		EndTime:               endTime,
+		EpochDays:             epochDays,
 	}
 	return basePlan
 }
@@ -61,13 +61,13 @@ func (plan *BasePlan) SetFarmingPoolAddress(addr sdk.AccAddress) error {
 	return nil
 }
 
-func (plan BasePlan) GetDistributionPoolAddress() sdk.AccAddress {
-	addr, _ := sdk.AccAddressFromBech32(plan.DistributionPoolAddress)
+func (plan BasePlan) GetRewardPoolAddress() sdk.AccAddress {
+	addr, _ := sdk.AccAddressFromBech32(plan.RewardPoolAddress)
 	return addr
 }
 
-func (plan *BasePlan) SetDistributionPoolAddress(addr sdk.AccAddress) error {
-	plan.DistributionPoolAddress = addr.String()
+func (plan *BasePlan) SetRewardPoolAddress(addr sdk.AccAddress) error {
+	plan.RewardPoolAddress = addr.String()
 	return nil
 }
 
@@ -173,8 +173,8 @@ type PlanI interface {
 	GetFarmingPoolAddress() sdk.AccAddress
 	SetFarmingPoolAddress(sdk.AccAddress) error
 
-	GetDistributionPoolAddress() sdk.AccAddress
-	SetDistributionPoolAddress(sdk.AccAddress) error
+	GetRewardPoolAddress() sdk.AccAddress
+	SetRewardPoolAddress(sdk.AccAddress) error
 
 	GetTerminationAddress() sdk.AccAddress
 	SetTerminationAddress(sdk.AccAddress) error

@@ -36,7 +36,9 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 
 	nextId := k.GetNextPlanID(ctx)
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
-	distributionPoolAddr := k.accountKeeper.GetModuleAddress(distrtypes.ModuleName)
+	// TODO: fix to deterministically generated rewardPoolAddr for the plan
+	rewardPoolAddr := k.accountKeeper.GetModuleAddress(distrtypes.ModuleName)
+	// TODO: fix to deterministically generated stakingPoolAddr for the plan
 	stakingReserveAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	terminationAddr := farmingPoolAddr
 
@@ -45,7 +47,7 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 		nextId,
 		types.PlanTypePrivate,
 		farmingPoolAddr,
-		distributionPoolAddr.String(),
+		rewardPoolAddr.String(),
 		terminationAddr,
 		stakingReserveAddr.String(),
 		msg.GetStakingCoinWeights(),
@@ -62,7 +64,7 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 		sdk.NewEvent(
 			types.EventTypeCreateFixedAmountPlan,
 			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetFarmingPoolAddress()),
-			sdk.NewAttribute(types.AttributeKeyDistributionPoolAddress, distributionPoolAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyRewardPoolAddress, rewardPoolAddr.String()),
 			sdk.NewAttribute(types.AttributeKeyStakingReserveAddress, stakingReserveAddr.String()),
 			sdk.NewAttribute(types.AttributeKeyStartTime, msg.StartTime.String()),
 			sdk.NewAttribute(types.AttributeKeyEndTime, msg.EndTime.String()),
@@ -84,7 +86,9 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 
 	nextId := k.GetNextPlanID(ctx)
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
-	distributionPoolAddr := k.accountKeeper.GetModuleAddress(distrtypes.ModuleName)
+	// TODO: fix to deterministically generated rewardPoolAddr for the plan
+	rewardPoolAddr := k.accountKeeper.GetModuleAddress(distrtypes.ModuleName)
+	// TODO: fix to deterministically generated stakingPoolAddr for the plan
 	stakingReserveAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	terminationAddr := farmingPoolAddr
 
@@ -93,7 +97,7 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 		nextId,
 		types.PlanTypePrivate,
 		farmingPoolAddr,
-		distributionPoolAddr.String(),
+		rewardPoolAddr.String(),
 		terminationAddr,
 		stakingReserveAddr.String(),
 		msg.GetStakingCoinWeights(),
@@ -110,7 +114,7 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 		sdk.NewEvent(
 			types.EventTypeCreateRatioPlan,
 			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetFarmingPoolAddress()),
-			sdk.NewAttribute(types.AttributeKeyDistributionPoolAddress, distributionPoolAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyRewardPoolAddress, rewardPoolAddr.String()),
 			sdk.NewAttribute(types.AttributeKeyStakingReserveAddress, stakingReserveAddr.String()),
 			sdk.NewAttribute(types.AttributeKeyStartTime, msg.StartTime.String()),
 			sdk.NewAttribute(types.AttributeKeyEndTime, msg.EndTime.String()),
