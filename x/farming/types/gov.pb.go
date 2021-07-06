@@ -24,25 +24,24 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// CreateFixedAmountPlanProposal details a proposal for fixed amount plan creation.
-type CreateFixedAmountPlanProposal struct {
-	Title       string            `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
-	Description string            `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Plan        []FixedAmountPlan `protobuf:"bytes,3,rep,name=plan,proto3" json:"plan"`
+// FixedAmountPlanProposal details a proposal for fixed amount plan creation.
+type FixedAmountPlanProposal struct {
+	Title       string          `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Description string          `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Plan        FixedAmountPlan `protobuf:"bytes,3,opt,name=plan,proto3" json:"plan"`
 }
 
-func (m *CreateFixedAmountPlanProposal) Reset()         { *m = CreateFixedAmountPlanProposal{} }
-func (m *CreateFixedAmountPlanProposal) String() string { return proto.CompactTextString(m) }
-func (*CreateFixedAmountPlanProposal) ProtoMessage()    {}
-func (*CreateFixedAmountPlanProposal) Descriptor() ([]byte, []int) {
+func (m *FixedAmountPlanProposal) Reset()      { *m = FixedAmountPlanProposal{} }
+func (*FixedAmountPlanProposal) ProtoMessage() {}
+func (*FixedAmountPlanProposal) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f67bbc18e8b6ac0a, []int{0}
 }
-func (m *CreateFixedAmountPlanProposal) XXX_Unmarshal(b []byte) error {
+func (m *FixedAmountPlanProposal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *CreateFixedAmountPlanProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *FixedAmountPlanProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_CreateFixedAmountPlanProposal.Marshal(b, m, deterministic)
+		return xxx_messageInfo_FixedAmountPlanProposal.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -52,58 +51,36 @@ func (m *CreateFixedAmountPlanProposal) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *CreateFixedAmountPlanProposal) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CreateFixedAmountPlanProposal.Merge(m, src)
+func (m *FixedAmountPlanProposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FixedAmountPlanProposal.Merge(m, src)
 }
-func (m *CreateFixedAmountPlanProposal) XXX_Size() int {
+func (m *FixedAmountPlanProposal) XXX_Size() int {
 	return m.Size()
 }
-func (m *CreateFixedAmountPlanProposal) XXX_DiscardUnknown() {
-	xxx_messageInfo_CreateFixedAmountPlanProposal.DiscardUnknown(m)
+func (m *FixedAmountPlanProposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_FixedAmountPlanProposal.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_CreateFixedAmountPlanProposal proto.InternalMessageInfo
+var xxx_messageInfo_FixedAmountPlanProposal proto.InternalMessageInfo
 
-func (m *CreateFixedAmountPlanProposal) GetTitle() string {
-	if m != nil {
-		return m.Title
-	}
-	return ""
+// RatioPlanProposal details a proposal for ratio plan creation.
+type RatioPlanProposal struct {
+	Title       string    `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Description string    `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Plan        RatioPlan `protobuf:"bytes,3,opt,name=plan,proto3" json:"plan"`
 }
 
-func (m *CreateFixedAmountPlanProposal) GetDescription() string {
-	if m != nil {
-		return m.Description
-	}
-	return ""
-}
-
-func (m *CreateFixedAmountPlanProposal) GetPlan() []FixedAmountPlan {
-	if m != nil {
-		return m.Plan
-	}
-	return nil
-}
-
-// CreateRatioPlanProposal details a proposal for ratio plan creation.
-type CreateRatioPlanProposal struct {
-	Title       string      `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
-	Description string      `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Plan        []RatioPlan `protobuf:"bytes,3,rep,name=plan,proto3" json:"plan"`
-}
-
-func (m *CreateRatioPlanProposal) Reset()         { *m = CreateRatioPlanProposal{} }
-func (m *CreateRatioPlanProposal) String() string { return proto.CompactTextString(m) }
-func (*CreateRatioPlanProposal) ProtoMessage()    {}
-func (*CreateRatioPlanProposal) Descriptor() ([]byte, []int) {
+func (m *RatioPlanProposal) Reset()      { *m = RatioPlanProposal{} }
+func (*RatioPlanProposal) ProtoMessage() {}
+func (*RatioPlanProposal) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f67bbc18e8b6ac0a, []int{1}
 }
-func (m *CreateRatioPlanProposal) XXX_Unmarshal(b []byte) error {
+func (m *RatioPlanProposal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *CreateRatioPlanProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RatioPlanProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_CreateRatioPlanProposal.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RatioPlanProposal.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -113,70 +90,49 @@ func (m *CreateRatioPlanProposal) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (m *CreateRatioPlanProposal) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CreateRatioPlanProposal.Merge(m, src)
+func (m *RatioPlanProposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RatioPlanProposal.Merge(m, src)
 }
-func (m *CreateRatioPlanProposal) XXX_Size() int {
+func (m *RatioPlanProposal) XXX_Size() int {
 	return m.Size()
 }
-func (m *CreateRatioPlanProposal) XXX_DiscardUnknown() {
-	xxx_messageInfo_CreateRatioPlanProposal.DiscardUnknown(m)
+func (m *RatioPlanProposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_RatioPlanProposal.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_CreateRatioPlanProposal proto.InternalMessageInfo
-
-func (m *CreateRatioPlanProposal) GetTitle() string {
-	if m != nil {
-		return m.Title
-	}
-	return ""
-}
-
-func (m *CreateRatioPlanProposal) GetDescription() string {
-	if m != nil {
-		return m.Description
-	}
-	return ""
-}
-
-func (m *CreateRatioPlanProposal) GetPlan() []RatioPlan {
-	if m != nil {
-		return m.Plan
-	}
-	return nil
-}
+var xxx_messageInfo_RatioPlanProposal proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*CreateFixedAmountPlanProposal)(nil), "cosmos.farming.v1beta1.CreateFixedAmountPlanProposal")
-	proto.RegisterType((*CreateRatioPlanProposal)(nil), "cosmos.farming.v1beta1.CreateRatioPlanProposal")
+	proto.RegisterType((*FixedAmountPlanProposal)(nil), "cosmos.farming.v1beta1.FixedAmountPlanProposal")
+	proto.RegisterType((*RatioPlanProposal)(nil), "cosmos.farming.v1beta1.RatioPlanProposal")
 }
 
 func init() { proto.RegisterFile("cosmos/farming/v1beta1/gov.proto", fileDescriptor_f67bbc18e8b6ac0a) }
 
 var fileDescriptor_f67bbc18e8b6ac0a = []byte{
-	// 292 bytes of a gzipped FileDescriptorProto
+	// 295 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x52, 0x48, 0xce, 0x2f, 0xce,
 	0xcd, 0x2f, 0xd6, 0x4f, 0x4b, 0x2c, 0xca, 0xcd, 0xcc, 0x4b, 0xd7, 0x2f, 0x33, 0x4c, 0x4a, 0x2d,
 	0x49, 0x34, 0xd4, 0x4f, 0xcf, 0x2f, 0xd3, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0x83, 0xa8,
 	0xd0, 0x83, 0xaa, 0xd0, 0x83, 0xaa, 0x90, 0x12, 0x49, 0xcf, 0x4f, 0xcf, 0x07, 0x2b, 0xd1, 0x07,
 	0xb1, 0x20, 0xaa, 0xa5, 0x24, 0x21, 0xaa, 0xe3, 0x21, 0x12, 0x50, 0xad, 0x10, 0x29, 0x15, 0x1c,
-	0x56, 0xc1, 0x0c, 0x06, 0xab, 0x52, 0x9a, 0xc5, 0xc8, 0x25, 0xeb, 0x5c, 0x94, 0x9a, 0x58, 0x92,
-	0xea, 0x96, 0x59, 0x91, 0x9a, 0xe2, 0x98, 0x9b, 0x5f, 0x9a, 0x57, 0x12, 0x90, 0x93, 0x98, 0x17,
-	0x50, 0x94, 0x5f, 0x90, 0x5f, 0x9c, 0x98, 0x23, 0x24, 0xc2, 0xc5, 0x5a, 0x92, 0x59, 0x92, 0x93,
-	0x2a, 0xc1, 0xa8, 0xc0, 0xa8, 0xc1, 0x19, 0x04, 0xe1, 0x08, 0x29, 0x70, 0x71, 0xa7, 0xa4, 0x16,
-	0x27, 0x17, 0x65, 0x16, 0x94, 0x64, 0xe6, 0xe7, 0x49, 0x30, 0x81, 0xe5, 0x90, 0x85, 0x84, 0x1c,
-	0xb9, 0x58, 0x0a, 0x72, 0x12, 0xf3, 0x24, 0x98, 0x15, 0x98, 0x35, 0xb8, 0x8d, 0xd4, 0xf5, 0xb0,
-	0xfb, 0x4b, 0x0f, 0xcd, 0x5a, 0x27, 0x96, 0x13, 0xf7, 0xe4, 0x19, 0x82, 0xc0, 0x5a, 0x95, 0xfa,
-	0x18, 0xb9, 0xc4, 0x21, 0x8e, 0x0b, 0x4a, 0x2c, 0xc9, 0xcc, 0xa7, 0x8a, 0xb3, 0xac, 0x51, 0x9c,
-	0xa5, 0x88, 0xcb, 0x59, 0x70, 0x0b, 0x91, 0x1d, 0xe4, 0xe4, 0x76, 0xe2, 0x91, 0x1c, 0xe3, 0x85,
-	0x47, 0x72, 0x8c, 0x0f, 0x1e, 0xc9, 0x31, 0x4e, 0x78, 0x2c, 0xc7, 0x70, 0xe1, 0xb1, 0x1c, 0xc3,
-	0x8d, 0xc7, 0x72, 0x0c, 0x51, 0x3a, 0xe9, 0x99, 0x25, 0x19, 0xa5, 0x49, 0x7a, 0xc9, 0xf9, 0xb9,
-	0xd0, 0x68, 0x80, 0x52, 0xba, 0xc5, 0x29, 0xd9, 0xfa, 0x15, 0xf0, 0x58, 0x28, 0xa9, 0x2c, 0x48,
-	0x2d, 0x4e, 0x62, 0x03, 0x07, 0xbe, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0xd3, 0xde, 0x7d, 0xea,
-	0x0f, 0x02, 0x00, 0x00,
+	0x56, 0xc1, 0x0c, 0x06, 0xab, 0x52, 0x9a, 0xc7, 0xc8, 0x25, 0xee, 0x96, 0x59, 0x91, 0x9a, 0xe2,
+	0x98, 0x9b, 0x5f, 0x9a, 0x57, 0x12, 0x90, 0x93, 0x98, 0x17, 0x50, 0x94, 0x5f, 0x90, 0x5f, 0x9c,
+	0x98, 0x23, 0x24, 0xc2, 0xc5, 0x5a, 0x92, 0x59, 0x92, 0x93, 0x2a, 0xc1, 0xa8, 0xc0, 0xa8, 0xc1,
+	0x19, 0x04, 0xe1, 0x08, 0x29, 0x70, 0x71, 0xa7, 0xa4, 0x16, 0x27, 0x17, 0x65, 0x16, 0x94, 0x64,
+	0xe6, 0xe7, 0x49, 0x30, 0x81, 0xe5, 0x90, 0x85, 0x84, 0x1c, 0xb9, 0x58, 0x0a, 0x72, 0x12, 0xf3,
+	0x24, 0x98, 0x15, 0x18, 0x35, 0xb8, 0x8d, 0xd4, 0xf5, 0xb0, 0xfb, 0x48, 0x0f, 0xcd, 0x5a, 0x27,
+	0x96, 0x13, 0xf7, 0xe4, 0x19, 0x82, 0xc0, 0x5a, 0xad, 0x38, 0x3a, 0x16, 0xc8, 0x33, 0xcc, 0x58,
+	0x20, 0xcf, 0xa0, 0x34, 0x89, 0x91, 0x4b, 0x30, 0x28, 0xb1, 0x24, 0x33, 0x9f, 0x2a, 0x4e, 0xb3,
+	0x46, 0x71, 0x9a, 0x22, 0x2e, 0xa7, 0xc1, 0x2d, 0xc4, 0xee, 0x28, 0x27, 0xb7, 0x13, 0x8f, 0xe4,
+	0x18, 0x2f, 0x3c, 0x92, 0x63, 0x7c, 0xf0, 0x48, 0x8e, 0x71, 0xc2, 0x63, 0x39, 0x86, 0x0b, 0x8f,
+	0xe5, 0x18, 0x6e, 0x3c, 0x96, 0x63, 0x88, 0xd2, 0x49, 0xcf, 0x2c, 0xc9, 0x28, 0x4d, 0xd2, 0x4b,
+	0xce, 0xcf, 0x85, 0x46, 0x07, 0x94, 0xd2, 0x2d, 0x4e, 0xc9, 0xd6, 0xaf, 0x80, 0xc7, 0x46, 0x49,
+	0x65, 0x41, 0x6a, 0x71, 0x12, 0x1b, 0x38, 0x12, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x89,
+	0xf2, 0xa3, 0xd9, 0x17, 0x02, 0x00, 0x00,
 }
 
-func (m *CreateFixedAmountPlanProposal) Marshal() (dAtA []byte, err error) {
+func (m *FixedAmountPlanProposal) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -186,30 +142,26 @@ func (m *CreateFixedAmountPlanProposal) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *CreateFixedAmountPlanProposal) MarshalTo(dAtA []byte) (int, error) {
+func (m *FixedAmountPlanProposal) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *CreateFixedAmountPlanProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *FixedAmountPlanProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Plan) > 0 {
-		for iNdEx := len(m.Plan) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Plan[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGov(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x1a
+	{
+		size, err := m.Plan.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
 		}
+		i -= size
+		i = encodeVarintGov(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x1a
 	if len(m.Description) > 0 {
 		i -= len(m.Description)
 		copy(dAtA[i:], m.Description)
@@ -227,7 +179,7 @@ func (m *CreateFixedAmountPlanProposal) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *CreateRatioPlanProposal) Marshal() (dAtA []byte, err error) {
+func (m *RatioPlanProposal) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -237,30 +189,26 @@ func (m *CreateRatioPlanProposal) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *CreateRatioPlanProposal) MarshalTo(dAtA []byte) (int, error) {
+func (m *RatioPlanProposal) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *CreateRatioPlanProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RatioPlanProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Plan) > 0 {
-		for iNdEx := len(m.Plan) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Plan[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGov(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x1a
+	{
+		size, err := m.Plan.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
 		}
+		i -= size
+		i = encodeVarintGov(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x1a
 	if len(m.Description) > 0 {
 		i -= len(m.Description)
 		copy(dAtA[i:], m.Description)
@@ -289,7 +237,7 @@ func encodeVarintGov(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *CreateFixedAmountPlanProposal) Size() (n int) {
+func (m *FixedAmountPlanProposal) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -303,16 +251,12 @@ func (m *CreateFixedAmountPlanProposal) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovGov(uint64(l))
 	}
-	if len(m.Plan) > 0 {
-		for _, e := range m.Plan {
-			l = e.Size()
-			n += 1 + l + sovGov(uint64(l))
-		}
-	}
+	l = m.Plan.Size()
+	n += 1 + l + sovGov(uint64(l))
 	return n
 }
 
-func (m *CreateRatioPlanProposal) Size() (n int) {
+func (m *RatioPlanProposal) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -326,12 +270,8 @@ func (m *CreateRatioPlanProposal) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovGov(uint64(l))
 	}
-	if len(m.Plan) > 0 {
-		for _, e := range m.Plan {
-			l = e.Size()
-			n += 1 + l + sovGov(uint64(l))
-		}
-	}
+	l = m.Plan.Size()
+	n += 1 + l + sovGov(uint64(l))
 	return n
 }
 
@@ -341,7 +281,7 @@ func sovGov(x uint64) (n int) {
 func sozGov(x uint64) (n int) {
 	return sovGov(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *CreateFixedAmountPlanProposal) Unmarshal(dAtA []byte) error {
+func (m *FixedAmountPlanProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -364,10 +304,10 @@ func (m *CreateFixedAmountPlanProposal) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CreateFixedAmountPlanProposal: wiretype end group for non-group")
+			return fmt.Errorf("proto: FixedAmountPlanProposal: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: CreateFixedAmountPlanProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: FixedAmountPlanProposal: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -463,8 +403,7 @@ func (m *CreateFixedAmountPlanProposal) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Plan = append(m.Plan, FixedAmountPlan{})
-			if err := m.Plan[len(m.Plan)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Plan.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -489,7 +428,7 @@ func (m *CreateFixedAmountPlanProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *CreateRatioPlanProposal) Unmarshal(dAtA []byte) error {
+func (m *RatioPlanProposal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -512,10 +451,10 @@ func (m *CreateRatioPlanProposal) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CreateRatioPlanProposal: wiretype end group for non-group")
+			return fmt.Errorf("proto: RatioPlanProposal: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: CreateRatioPlanProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RatioPlanProposal: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -611,8 +550,7 @@ func (m *CreateRatioPlanProposal) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Plan = append(m.Plan, RatioPlan{})
-			if err := m.Plan[len(m.Plan)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Plan.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

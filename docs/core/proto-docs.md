@@ -320,8 +320,8 @@
     - [PlanRecord](#cosmos.farming.v1beta1.PlanRecord)
   
 - [cosmos/farming/v1beta1/gov.proto](#cosmos/farming/v1beta1/gov.proto)
-    - [CreateFixedAmountPlanProposal](#cosmos.farming.v1beta1.CreateFixedAmountPlanProposal)
-    - [CreateRatioPlanProposal](#cosmos.farming.v1beta1.CreateRatioPlanProposal)
+    - [FixedAmountPlanProposal](#cosmos.farming.v1beta1.FixedAmountPlanProposal)
+    - [RatioPlanProposal](#cosmos.farming.v1beta1.RatioPlanProposal)
   
 - [cosmos/farming/v1beta1/query.proto](#cosmos/farming/v1beta1/query.proto)
     - [Query](#cosmos.farming.v1beta1.Query)
@@ -4758,34 +4758,34 @@ PlanRecord is used for import/export via genesis json.
 
 
 
-<a name="cosmos.farming.v1beta1.CreateFixedAmountPlanProposal"></a>
+<a name="cosmos.farming.v1beta1.FixedAmountPlanProposal"></a>
 
-### CreateFixedAmountPlanProposal
-CreateFixedAmountPlanProposal details a proposal for fixed amount plan creation.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `title` | [string](#string) |  |  |
-| `description` | [string](#string) |  |  |
-| `plan` | [FixedAmountPlan](#cosmos.farming.v1beta1.FixedAmountPlan) | repeated |  |
-
-
-
-
-
-
-<a name="cosmos.farming.v1beta1.CreateRatioPlanProposal"></a>
-
-### CreateRatioPlanProposal
-CreateRatioPlanProposal details a proposal for ratio plan creation.
+### FixedAmountPlanProposal
+FixedAmountPlanProposal details a proposal for fixed amount plan creation.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `title` | [string](#string) |  |  |
 | `description` | [string](#string) |  |  |
-| `plan` | [RatioPlan](#cosmos.farming.v1beta1.RatioPlan) | repeated |  |
+| `plan` | [FixedAmountPlan](#cosmos.farming.v1beta1.FixedAmountPlan) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.RatioPlanProposal"></a>
+
+### RatioPlanProposal
+RatioPlanProposal details a proposal for ratio plan creation.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `title` | [string](#string) |  |  |
+| `description` | [string](#string) |  |  |
+| `plan` | [RatioPlan](#cosmos.farming.v1beta1.RatioPlan) |  |  |
 
 
 
