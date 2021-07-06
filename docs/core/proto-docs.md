@@ -4829,10 +4829,10 @@ MsgCreateFixedAmountPlan defines a SDK message for creating a new fixed amount f
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `farming_pool_address` | [string](#string) |  | farming_pool_address defines the bech32-encoded address of the farming pool |
-| `staking_coins_weight` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | staking_coins_weight specifies coins weight for the plan |
+| `staking_coin_weights` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | staking_coin_weights specifies coins weight for the plan |
 | `start_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | start_time specifies the start time of the plan |
-| `end_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | end_time specifis the end time of the plan |
-| `epoch_days` | [uint32](#uint32) |  | epoch_days specifis a period of time that triggers the distribution plan; it is measured in days |
+| `end_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | end_time specifies the end time of the plan |
+| `epoch_days` | [uint32](#uint32) |  | epoch_days specifies a period of time that triggers the distribution plan; it is measured in days |
 | `epoch_amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | epoch_amount specifies the distributing amount for each epoch |
 
 
@@ -4859,10 +4859,10 @@ MsgCreateRatioPlan defines a SDK message for creating a new ratio farming plan.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `farming_pool_address` | [string](#string) |  | farming_pool_address defines the bech32-encoded address of the farming pool |
-| `staking_coins_weight` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | staking_coins_weight specifies coins weight for the plan |
+| `staking_coin_weights` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | staking_coin_weights specifies coins weight for the plan |
 | `start_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | start_time specifies the start time of the plan |
-| `end_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | end_time specifis the end time of the plan |
-| `epoch_days` | [uint32](#uint32) |  | epoch_days specifis a period of time that triggers the distribution plan; it is measured in days |
+| `end_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | end_time specifies the end time of the plan |
+| `epoch_days` | [uint32](#uint32) |  | epoch_days specifies a period of time that triggers the distribution plan; it is measured in days |
 | `epoch_ratio` | [string](#string) |  | epoch_ratio specifies the distributing amount by ratio |
 
 
@@ -4943,7 +4943,7 @@ MsgUnstakeResponse defines the Msg/MsgUnstakeResponse response type.
 <a name="cosmos.farming.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the feegrant Msg service.
+Msg defines the farming Msg service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |

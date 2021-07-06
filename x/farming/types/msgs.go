@@ -25,20 +25,20 @@ const (
 
 // NewMsgCreateFixedAmountPlan creates a new MsgCreateFixedAmountPlan.
 func NewMsgCreateFixedAmountPlan(
-	farming_pool_address sdk.AccAddress,
-	staking_coins_weight sdk.DecCoins,
-	start_time *time.Time,
-	end_time *time.Time,
-	epoch_days uint32,
-	epoch_amount sdk.Coins,
+	farmingPoolAddr sdk.AccAddress,
+	stakingCoinWeights sdk.DecCoins,
+	starTime *time.Time,
+	endTime *time.Time,
+	epochDays uint32,
+	epochAmount sdk.Coins,
 ) *MsgCreateFixedAmountPlan {
 	return &MsgCreateFixedAmountPlan{
-		FarmingPoolAddress: farming_pool_address.String(),
-		StakingCoinsWeight: staking_coins_weight,
-		StartTime:          start_time,
-		EndTime:            end_time,
-		EpochDays:          epoch_days,
-		EpochAmount:        epoch_amount,
+		FarmingPoolAddress: farmingPoolAddr.String(),
+		StakingCoinWeights: stakingCoinWeights,
+		StartTime:          starTime,
+		EndTime:            endTime,
+		EpochDays:          epochDays,
+		EpochAmount:        epochAmount,
 	}
 }
 
@@ -79,20 +79,20 @@ func (msg MsgCreateFixedAmountPlan) GetPlanCreator() sdk.AccAddress {
 
 // NewMsgCreateRatioPlan creates a new MsgCreateRatioPlan.
 func NewMsgCreateRatioPlan(
-	farming_pool_address sdk.AccAddress,
-	staking_coins_weight sdk.DecCoins,
-	start_time *time.Time,
-	end_time *time.Time,
-	epoch_days uint32,
-	epoch_ratio sdk.Dec,
+	farmingPoolAddr sdk.AccAddress,
+	stakingCoinWeights sdk.DecCoins,
+	startTime *time.Time,
+	endTime *time.Time,
+	epochDays uint32,
+	epochRatio sdk.Dec,
 ) *MsgCreateRatioPlan {
 	return &MsgCreateRatioPlan{
-		FarmingPoolAddress: farming_pool_address.String(),
-		StakingCoinsWeight: staking_coins_weight,
-		StartTime:          start_time,
-		EndTime:            end_time,
-		EpochDays:          epoch_days,
-		EpochRatio:         epoch_ratio,
+		FarmingPoolAddress: farmingPoolAddr.String(),
+		StakingCoinWeights: stakingCoinWeights,
+		StartTime:          startTime,
+		EndTime:            endTime,
+		EpochDays:          epochDays,
+		EpochRatio:         epochRatio,
 	}
 }
 
@@ -130,14 +130,14 @@ func (msg MsgCreateRatioPlan) GetPlanCreator() sdk.AccAddress {
 
 // NewMsgStake creates a new MsgStake.
 func NewMsgStake(
-	plan_id uint64,
+	planID uint64,
 	farmer sdk.AccAddress,
-	staking_coins sdk.Coins,
+	stakingCoins sdk.Coins,
 ) *MsgStake {
 	return &MsgStake{
-		PlanId:       plan_id,
+		PlanId:       planID,
 		Farmer:       farmer.String(),
-		StakingCoins: staking_coins,
+		StakingCoins: stakingCoins,
 	}
 }
 
@@ -178,14 +178,14 @@ func (msg MsgStake) GetStaker() sdk.AccAddress {
 
 // NewMsgUnstake creates a new MsgUnstake.
 func NewMsgUnstake(
-	plan_id uint64,
+	planID uint64,
 	farmer sdk.AccAddress,
-	unstaking_coins sdk.Coins,
+	unstakingCoins sdk.Coins,
 ) *MsgUnstake {
 	return &MsgUnstake{
-		PlanId:         plan_id,
+		PlanId:         planID,
 		Farmer:         farmer.String(),
-		UnstakingCoins: unstaking_coins,
+		UnstakingCoins: unstakingCoins,
 	}
 }
 
@@ -226,11 +226,11 @@ func (msg MsgUnstake) GetUnstaker() sdk.AccAddress {
 
 // NewMsgClaim creates a new MsgClaim.
 func NewMsgClaim(
-	plan_id uint64,
+	planID uint64,
 	farmer sdk.AccAddress,
 ) *MsgClaim {
 	return &MsgClaim{
-		PlanId: plan_id,
+		PlanId: planID,
 		Farmer: farmer.String(),
 	}
 }

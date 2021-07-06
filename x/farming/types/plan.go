@@ -33,11 +33,11 @@ func NewBasePlan(id uint64, typ PlanType, farmingPoolAddr, distPoolAddr, termina
 	return basePlan
 }
 
-func (plan BasePlan) GetId() uint64 {
+func (plan BasePlan) GetId() uint64 { //nolint:golint
 	return plan.Id
 }
 
-func (plan *BasePlan) SetId(id uint64) error {
+func (plan *BasePlan) SetId(id uint64) error { //nolint:golint
 	plan.Id = id
 	return nil
 }
@@ -198,11 +198,27 @@ type PlanI interface {
 }
 
 func (s Staking) String() string {
-	// TODO: not implemented
-	return ""
+	out, _ := s.MarshalYAML()
+	return out.(string)
+}
+
+func (s Staking) MarshalYAML() (interface{}, error) {
+	bz, err := codec.MarshalYAML(codec.NewProtoCodec(codectypes.NewInterfaceRegistry()), &s)
+	if err != nil {
+		return nil, err
+	}
+	return string(bz), err
 }
 
 func (r Reward) String() string {
-	// TODO: not implemented
-	return ""
+	out, _ := r.MarshalYAML()
+	return out.(string)
+}
+
+func (r Reward) MarshalYAML() (interface{}, error) {
+	bz, err := codec.MarshalYAML(codec.NewProtoCodec(codectypes.NewInterfaceRegistry()), &r)
+	if err != nil {
+		return nil, err
+	}
+	return string(bz), err
 }
