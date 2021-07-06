@@ -109,8 +109,10 @@ var (
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
-			paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler, upgradeclient.CancelProposalHandler,
-			// todo: add farming proposal type handlers
+			paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler,
+			upgradeclient.CancelProposalHandler,
+			// todo: farming proposal handler
+			// farmingclient.ProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -286,8 +288,9 @@ func NewSimApp(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(farmingtypes.RouterKey, farming.NewCreatePublicFarmingPlanProposal(app.FarmingKeeper)).
-		AddRoute(farmingtypes.RouterKey, farming.NewModifyPublicFarmingPlanProposalHandler(app.FarmingKeeper))
+		// todo: come back after private plan implementation
+		AddRoute(farmingtypes.RouterKey, farming.NewCreatePublicFarmingPlanProposal(app.FarmingKeeper))
+		// AddRoute(farmingtypes.RouterKey, farming.NewModifyPublicFarmingPlanProposalHandler(app.FarmingKeeper))
 
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,

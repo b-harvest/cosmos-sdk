@@ -27,7 +27,7 @@ const (
 func NewMsgCreateFixedAmountPlan(
 	farmingPoolAddr sdk.AccAddress,
 	stakingCoinWeights sdk.DecCoins,
-	starTime *time.Time,
+	startTime *time.Time,
 	endTime *time.Time,
 	epochDays uint32,
 	epochAmount sdk.Coins,
@@ -35,7 +35,7 @@ func NewMsgCreateFixedAmountPlan(
 	return &MsgCreateFixedAmountPlan{
 		FarmingPoolAddress: farmingPoolAddr.String(),
 		StakingCoinWeights: stakingCoinWeights,
-		StartTime:          starTime,
+		StartTime:          startTime,
 		EndTime:            endTime,
 		EpochDays:          epochDays,
 		EpochAmount:        epochAmount,

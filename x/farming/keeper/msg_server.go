@@ -10,7 +10,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
 )
 
@@ -28,14 +28,48 @@ var _ types.MsgServer = msgServer{}
 
 // CreateFixedAmountPlan defines a method for creating fixed amount farming plan.
 func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCreateFixedAmountPlan) (*types.MsgCreateFixedAmountPlanResponse, error) {
-	//ctx := sdk.UnwrapSDKContext(goCtx)
-	//
-	//plan, err := k.Keeper.CreateFixedAmountPlan(ctx, msg)
-	//if err != nil {
-	//	return nil, err
-	//}
+	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// TODO: emit events
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	nextId := k.GetNextPlanID(ctx)
+	farmingPoolAddr := msg.GetFarmingPoolAddress()
+	distributionPoolAddr := k.accountKeeper.GetModuleAddress(distrtypes.ModuleName)
+	stakingReserveAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
+	terminationAddr := farmingPoolAddr
+
+	// TODO: consider having CreateRatioPlan keeper
+	basePlan := types.NewBasePlan(
+		nextId,
+		types.PlanTypePrivate,
+		farmingPoolAddr,
+		distributionPoolAddr.String(),
+		terminationAddr,
+		stakingReserveAddr.String(),
+		msg.GetStakingCoinWeights(),
+		*msg.StartTime,
+		*msg.EndTime,
+		msg.GetEpochDays(),
+	)
+
+	fixedPlan := types.NewFixedAmountPlan(basePlan, msg.EpochAmount)
+
+	k.SetPlan(ctx, fixedPlan)
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeCreateFixedAmountPlan,
+			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetFarmingPoolAddress()),
+			sdk.NewAttribute(types.AttributeKeyDistributionPoolAddress, distributionPoolAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyStakingReserveAddress, stakingReserveAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyStartTime, msg.StartTime.String()),
+			sdk.NewAttribute(types.AttributeKeyEndTime, msg.EndTime.String()),
+			sdk.NewAttribute(types.AttributeKeyEpochDays, fmt.Sprint(msg.GetEpochDays())),
+			sdk.NewAttribute(types.AttributeKeyEpochAmount, fmt.Sprint(msg.GetEpochAmount())),
+		),
+	})
 
 	return &types.MsgCreateFixedAmountPlanResponse{}, nil
 }
@@ -43,21 +77,77 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 // CreateRatioPlan defines a method for creating ratio farming plan.
 func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRatioPlan) (*types.MsgCreateRatioPlanResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	fmt.Println("ctx: ", ctx)
+
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	nextId := k.GetNextPlanID(ctx)
+	farmingPoolAddr := msg.GetFarmingPoolAddress()
+	distributionPoolAddr := k.accountKeeper.GetModuleAddress(distrtypes.ModuleName)
+	stakingReserveAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
+	terminationAddr := farmingPoolAddr
+
+	// TODO: consider having CreateRatioPlan keeper
+	basePlan := types.NewBasePlan(
+		nextId,
+		types.PlanTypePrivate,
+		farmingPoolAddr,
+		distributionPoolAddr.String(),
+		terminationAddr,
+		stakingReserveAddr.String(),
+		msg.GetStakingCoinWeights(),
+		*msg.StartTime,
+		*msg.EndTime,
+		msg.GetEpochDays(),
+	)
+
+	ratioPlan := types.NewRatioPlan(basePlan, msg.EpochRatio)
+
+	k.SetPlan(ctx, ratioPlan)
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeCreateRatioPlan,
+			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetFarmingPoolAddress()),
+			sdk.NewAttribute(types.AttributeKeyDistributionPoolAddress, distributionPoolAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyStakingReserveAddress, stakingReserveAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyStartTime, msg.StartTime.String()),
+			sdk.NewAttribute(types.AttributeKeyEndTime, msg.EndTime.String()),
+			sdk.NewAttribute(types.AttributeKeyEpochDays, fmt.Sprint(msg.GetEpochDays())),
+			sdk.NewAttribute(types.AttributeKeyEpochRatio, fmt.Sprint(msg.EpochRatio)),
+		),
+	})
+
 	return &types.MsgCreateRatioPlanResponse{}, nil
 }
 
 // Stake defines a method for staking coins to the farming plan.
 func (k msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.MsgStakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	fmt.Println("ctx: ", ctx)
+
+	plan := k.GetPlan(ctx, msg.PlanId)
+	if plan == nil {
+		return nil, types.ErrPlanNotExists
+	}
+
+	// SetStake
+	// SetUnstake
+	// SetClaim
+	// k.Stake(msg.PlanId, msg.Farmer, msg.StakingCoins)
+
 	return &types.MsgStakeResponse{}, nil
 }
 
 // Unstake defines a method for unstaking coins from the farming plan.
 func (k msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types.MsgUnstakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	fmt.Println("ctx: ", ctx)
+
+	plan := k.GetPlan(ctx, msg.PlanId)
+	if plan == nil {
+		return nil, types.ErrPlanNotExists
+	}
+
 	return &types.MsgUnstakeResponse{}, nil
 }
 
