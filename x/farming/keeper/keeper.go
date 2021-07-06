@@ -3,11 +3,13 @@ package keeper
 import (
 	"fmt"
 
+	gogotypes "github.com/gogo/protobuf/types"
+	"github.com/tendermint/tendermint/libs/log"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	"github.com/tendermint/tendermint/libs/log"
 )
 
 // Keeper of the farming store
@@ -67,3 +69,51 @@ func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
 func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }
+
+// GetNextPlanID returns next plan id for new plan, using index of latest plan id
+func (k Keeper) GetNextPlanID(ctx sdk.Context) uint64 {
+	var id uint64
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(types.GlobalFarmingPlanIDKey)
+	if bz == nil {
+		// initialize the PlanId
+		id = 1
+	} else {
+		val := gogotypes.UInt64Value{}
+
+		err := k.cdc.Unmarshal(bz, &val)
+		if err != nil {
+			panic(err)
+		}
+
+		id = val.GetValue()
+	}
+	bz = k.cdc.MustMarshal(&gogotypes.UInt64Value{Value: id + 1})
+	store.Set(types.GlobalFarmingPlanIDKey, bz)
+	return id
+}
+
+func (k Keeper) decodePlan(bz []byte) types.PlanI {
+	acc, err := k.UnmarshalPlan(bz)
+	if err != nil {
+		panic(err)
+	}
+
+	return acc
+}
+
+// MarshalPlan protobuf serializes an Plan interface
+func (k Keeper) MarshalPlan(plan types.PlanI) ([]byte, error) { // nolint:interfacer
+	return k.cdc.MarshalInterface(plan)
+}
+
+// UnmarshalPlan returns an Plan interface from raw encoded plan
+// bytes of a Proto-based Plan type
+func (k Keeper) UnmarshalPlan(bz []byte) (types.PlanI, error) {
+	var acc types.PlanI
+	return acc, k.cdc.UnmarshalInterface(bz, &acc)
+}
+
+// GetCodec return codec.Codec object used by the keeper
+func (k Keeper) GetCodec() codec.BinaryCodec { return k.cdc }

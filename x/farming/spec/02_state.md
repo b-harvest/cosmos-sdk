@@ -45,10 +45,6 @@ type PlanI interface {
     GetEpochDays() uint32
     SetEpochDays(uint32) error
 
-    GetDistributionMethod() string
-    GetDistributionThisEpoch() sdk.Coins
-    IsTerminated() bool
-
     String() string
 }
 ```
@@ -59,12 +55,12 @@ type PlanI interface {
 // type for additional functionality (e.g. fixed amount plan, ratio plan).
 type BasePlan struct {
     Id                       uint64       // index of the plan
-    Type                     int32        // type of the plan; public or private
+    Type                     PlanType     // type of the plan; public or private
     FarmingPoolAddress       string       // bech32-encoded farming pool address
     DistributionPoolAddress  string       // bech32-encoded distribution pool address
     TerminationAddress       string       // bech32-encoded termination address
     StakingReserveAddress    string       // bech32-encoded staking reserve address
-    StakingCoinWeights       []CoinWeight // coin weights for the plan
+    StakingCoinWeights       sdk.DecCoins // coin weights for the plan
     StartTime                time.Time    // start time of the plan
     EndTime                  time.Time    // end time of the plan
     EpochDays                uint32       // distributing epoch measuring in days
@@ -92,12 +88,16 @@ type RatioPlan struct {
 ```
 
 ```go
-type CoinWeight sdk.DecCoin
+// PlanType enumerates the valid types of a plan.
 type PlanType int32
 
 const (
-    TypePublic  PlanType = 0
-    TypePrivate PlanType = 1
+    // PLAN_TYPE_UNSPECIFIED defines the default plan type.
+    PlanTypeNil PlanType = 0
+    // PLAN_TYPE_PUBLIC defines the public plan type.
+    PlanTypePublic PlanType = 1
+    // PLAN_TYPE_PRIVATE defines the private plan type.
+    PlanTypePrivate PlanType = 2
 )
 ```
 
@@ -105,10 +105,14 @@ The parameters of the Plan state are:
 
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
 - Plan: `0x11 | Id -> ProtocolBuffer(Plan)`
-- PlanByFarmerAddrIndex: `0x12 | FarmerAddr -> Id`
+- PlanByFarmerAddrIndex: `0x12 | FarmerAddrLen (1 byte) | FarmerAddr -> Id`
+    - iterable for several `PlanId` results by indexed `FarmerAddr`
 - LastEpochTime: `0x13 | Id -> time.Time`
-- GlobalFarmingPlanIdKey: `[]byte("globalFarmingPlanId") -> Id`
+- GlobalFarmingPlanIdKey: `[]byte("globalFarmingPlanId") -> LatestPlanId`
+- ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
+
 - An example of `FixedAmountPlan`
+
     ```json
     {
       "base_plan": {
@@ -187,7 +191,7 @@ type Staking struct {
 
 The parameters of the Staking state are:
 
-- Staking: `0x21 | PlanId | FarmerAddr -> ProtocolBuffer(Staking)`
+- Staking: `0x21 | PlanId | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(Staking)`
 
 ```go
 // Reward defines a record of farming rewards.
@@ -200,7 +204,7 @@ type Reward struct {
 
 The parameters of the Reward state are:
 
-- Reward: `0x31 | PlanId | FarmerAddr -> ProtocolBuffer(Reward)`
+- Reward: `0x31 | PlanId | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(Reward)`
 
 
 

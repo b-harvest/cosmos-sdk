@@ -55,36 +55,14 @@ package keeper
 //
 //	return plans
 //}
-//
-////// GetNextPlanIDWithUpdate returns and increments the global Plan ID counter.
-////// If the global account number is not set, it initializes it with value 0.
-////func (k Keeper) GetNextPlanIDWithUpdate(ctx sdk.Context) uint64 {
-////	store := ctx.KVStore(k.storeKey)
-////	planID := k.GetNextPlanID(ctx)
-////	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.UInt64Value{Value: planID + 1})
-////	store.Set(types.GlobalFarmingPlanIDKey, bz)
-////	return planID
-////}
-////
-//// GetNextPlanID returns next plan id for new plan, using index of latest plan id
-//func (k Keeper) GetNextPlanID(ctx sdk.Context) uint64 {
-//	var planID uint64
+
+//// GetNextPlanIDWithUpdate returns and increments the global Plan ID counter.
+//// If the global account number is not set, it initializes it with value 0.
+//func (k Keeper) GetNextPlanIDWithUpdate(ctx sdk.Context) uint64 {
 //	store := ctx.KVStore(k.storeKey)
-//
-//	bz := store.Get(types.GlobalFarmingPlanIDKey)
-//	if bz == nil {
-//		// initialize the FarmingPlanID
-//		planID = 1
-//	} else {
-//		val := gogotypes.UInt64Value{}
-//
-//		err := k.cdc.UnmarshalBinaryBare(bz, &val)
-//		if err != nil {
-//			panic(err)
-//		}
-//
-//		planID = val.GetValue()
-//	}
+//	planID := k.GetNextPlanID(ctx)
+//	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.UInt64Value{Value: planID + 1})
+//	store.Set(types.GlobalFarmingPlanIDKey, bz)
 //	return planID
 //}
 

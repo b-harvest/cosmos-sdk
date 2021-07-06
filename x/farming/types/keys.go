@@ -42,7 +42,7 @@ func GetPlanKey(planID uint64) []byte {
 
 // GetPlanByFarmerAddrIndexKeyPrefix returns kv indexing key of the plan indexed by reserve account
 func GetPlanByFarmerAddrIndexKeyPrefix(farmerAcc sdk.AccAddress) []byte {
-	return append(PlanByFarmerAddrIndexKeyPrefix, farmerAcc.Bytes()...)
+	return append(PlanByFarmerAddrIndexKeyPrefix, address.MustLengthPrefix(farmerAcc.Bytes())...)
 }
 
 // GetStakingPrefix returns prefix of staking records in the plan

@@ -7,54 +7,158 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
-	// TODO: Unimplemented
-	//_ PlanI                           = (*BasePlan)(nil)
-	_ codectypes.UnpackInterfacesMessage = (*BasePlan)(nil)
+	_ PlanI = (*FixedAmountPlan)(nil)
+	_ PlanI = (*RatioPlan)(nil)
 )
 
 // NewBasePlan creates a new BasePlan object
 //nolint:interfacer
-func NewBasePlan(address sdk.AccAddress, pubKey cryptotypes.PubKey, PlanNumber, sequence uint64) *BasePlan {
-	// TODO: Unimplemented
+func NewBasePlan(id uint64, typ PlanType, farmingPoolAddr, distPoolAddr, terminationAddr, reserveAddr string, coinWeights sdk.DecCoins, startTime, endTime time.Time, epochDays uint32) *BasePlan {
+	basePlan := &BasePlan{
+		Id:                      id,
+		Type:                    typ,
+		FarmingPoolAddress:      farmingPoolAddr,
+		DistributionPoolAddress: distPoolAddr,
+		TerminationAddress:      terminationAddr,
+		StakingReserveAddress:   reserveAddr,
+		StakingCoinWeights:      coinWeights,
+		StartTime:               startTime,
+		EndTime:                 endTime,
+		EpochDays:               epochDays,
+	}
+	return basePlan
+}
+
+func (plan BasePlan) GetId() uint64 { //nolint:golint
+	return plan.Id
+}
+
+func (plan *BasePlan) SetId(id uint64) error { //nolint:golint
+	plan.Id = id
 	return nil
 }
 
-// ProtoBasePlan - a prototype function for BasePlan
-func ProtoBasePlan() PlanI {
-	// TODO: Unimplemented
+func (plan BasePlan) GetType() PlanType {
+	return plan.Type
+}
+
+func (plan *BasePlan) SetType(typ PlanType) error {
+	plan.Type = typ
 	return nil
-	//return &BasePlan{}
+}
+
+func (plan BasePlan) GetFarmingPoolAddress() sdk.AccAddress {
+	addr, _ := sdk.AccAddressFromBech32(plan.FarmingPoolAddress)
+	return addr
+}
+
+func (plan *BasePlan) SetFarmingPoolAddress(addr sdk.AccAddress) error {
+	plan.FarmingPoolAddress = addr.String()
+	return nil
+}
+
+func (plan BasePlan) GetDistributionPoolAddress() sdk.AccAddress {
+	addr, _ := sdk.AccAddressFromBech32(plan.DistributionPoolAddress)
+	return addr
+}
+
+func (plan *BasePlan) SetDistributionPoolAddress(addr sdk.AccAddress) error {
+	plan.DistributionPoolAddress = addr.String()
+	return nil
+}
+
+func (plan BasePlan) GetTerminationAddress() sdk.AccAddress {
+	addr, _ := sdk.AccAddressFromBech32(plan.TerminationAddress)
+	return addr
+}
+
+func (plan *BasePlan) SetTerminationAddress(addr sdk.AccAddress) error {
+	plan.TerminationAddress = addr.String()
+	return nil
+}
+
+func (plan BasePlan) GetStakingReserveAddress() sdk.AccAddress {
+	addr, _ := sdk.AccAddressFromBech32(plan.StakingReserveAddress)
+	return addr
+}
+
+func (plan *BasePlan) SetStakingReserveAddress(addr sdk.AccAddress) error {
+	plan.StakingReserveAddress = addr.String()
+	return nil
+}
+
+func (plan BasePlan) GetStakingCoinWeights() sdk.DecCoins {
+	return plan.StakingCoinWeights
+}
+
+func (plan *BasePlan) SetStakingCoinWeights(coinWeights sdk.DecCoins) error {
+	plan.StakingCoinWeights = coinWeights
+	return nil
+}
+
+func (plan BasePlan) GetStartTime() time.Time {
+	return plan.StartTime
+}
+
+func (plan *BasePlan) SetStartTime(t time.Time) error {
+	plan.StartTime = t
+	return nil
+}
+
+func (plan BasePlan) GetEndTime() time.Time {
+	return plan.EndTime
+}
+
+func (plan *BasePlan) SetEndTime(t time.Time) error {
+	plan.EndTime = t
+	return nil
+}
+
+func (plan BasePlan) GetEpochDays() uint32 {
+	return plan.EpochDays
+}
+
+func (plan *BasePlan) SetEpochDays(days uint32) error {
+	plan.EpochDays = days
+	return nil
 }
 
 // Validate checks for errors on the Plan fields
-func (acc BasePlan) Validate() error {
+func (plan BasePlan) Validate() error {
 	// TODO: Unimplemented
 	return nil
 }
 
-func (acc BasePlan) String() string {
-	out, _ := acc.MarshalYAML()
+func (plan BasePlan) String() string {
+	out, _ := plan.MarshalYAML()
 	return out.(string)
 }
 
 // MarshalYAML returns the YAML representation of an Plan.
-func (acc BasePlan) MarshalYAML() (interface{}, error) {
-	bz, err := codec.MarshalYAML(codec.NewProtoCodec(codectypes.NewInterfaceRegistry()), &acc)
+func (plan BasePlan) MarshalYAML() (interface{}, error) {
+	bz, err := codec.MarshalYAML(codec.NewProtoCodec(codectypes.NewInterfaceRegistry()), &plan)
 	if err != nil {
 		return nil, err
 	}
 	return string(bz), err
 }
 
-// UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
-func (acc BasePlan) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
-	// TODO: Unimplemented
-	return nil
+func NewFixedAmountPlan(basePlan *BasePlan, epochAmount sdk.Coins) *FixedAmountPlan {
+	return &FixedAmountPlan{
+		BasePlan:    basePlan,
+		EpochAmount: epochAmount,
+	}
+}
+
+func NewRatioPlan(basePlan *BasePlan, epochRatio sdk.Dec) *RatioPlan {
+	return &RatioPlan{
+		BasePlan:   basePlan,
+		EpochRatio: epochRatio,
+	}
 }
 
 type PlanI interface {
@@ -63,8 +167,8 @@ type PlanI interface {
 	GetId() uint64
 	SetId(uint64) error
 
-	GetType() int32
-	SetType(int32) error
+	GetType() PlanType
+	SetType(PlanType) error
 
 	GetFarmingPoolAddress() sdk.AccAddress
 	SetFarmingPoolAddress(sdk.AccAddress) error
@@ -78,8 +182,8 @@ type PlanI interface {
 	GetStakingReserveAddress() sdk.AccAddress
 	SetStakingReserveAddress(sdk.AccAddress) error
 
-	GetStakingCoinsWeight() sdk.DecCoins
-	SetStakingCoinsWeight(sdk.DecCoins) error
+	GetStakingCoinWeights() sdk.DecCoins
+	SetStakingCoinWeights(sdk.DecCoins) error
 
 	GetStartTime() time.Time
 	SetStartTime(time.Time) error
@@ -90,9 +194,31 @@ type PlanI interface {
 	GetEpochDays() uint32
 	SetEpochDays(uint32) error
 
-	GetDistributionMethod() string
-	GetDistributionThisEpoch() sdk.Coins
-	IsTermitated() bool
-
 	String() string
+}
+
+func (s Staking) String() string {
+	out, _ := s.MarshalYAML()
+	return out.(string)
+}
+
+func (s Staking) MarshalYAML() (interface{}, error) {
+	bz, err := codec.MarshalYAML(codec.NewProtoCodec(codectypes.NewInterfaceRegistry()), &s)
+	if err != nil {
+		return nil, err
+	}
+	return string(bz), err
+}
+
+func (r Reward) String() string {
+	out, _ := r.MarshalYAML()
+	return out.(string)
+}
+
+func (r Reward) MarshalYAML() (interface{}, error) {
+	bz, err := codec.MarshalYAML(codec.NewProtoCodec(codectypes.NewInterfaceRegistry()), &r)
+	if err != nil {
+		return nil, err
+	}
+	return string(bz), err
 }
