@@ -17,6 +17,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 
 	//"github.com/cosmos/cosmos-sdk/x/farming/client/rest"
 	"github.com/cosmos/cosmos-sdk/x/farming/client/cli"
@@ -24,7 +25,6 @@ import (
 
 	//"github.com/cosmos/cosmos-sdk/x/farming/simulation"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
-	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 )
 
 var (
@@ -98,20 +98,20 @@ type AppModule struct {
 	keeper        keeper.Keeper
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
-	stakingKeeper stakingkeeper.Keeper
+	distrKeeper   distrkeeper.Keeper
 }
 
 // NewAppModule creates a new AppModule object
 func NewAppModule(
 	cdc codec.Codec, keeper keeper.Keeper, accountKeeper types.AccountKeeper,
-	bankKeeper types.BankKeeper, stakingKeeper stakingkeeper.Keeper,
+	bankKeeper types.BankKeeper, distrKeeper distrkeeper.Keeper,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},
 		keeper:         keeper,
 		accountKeeper:  accountKeeper,
 		bankKeeper:     bankKeeper,
-		stakingKeeper:  stakingKeeper,
+		distrKeeper:    distrKeeper,
 	}
 }
 
