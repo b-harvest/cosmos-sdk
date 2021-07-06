@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"fmt"
-
 	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -30,13 +28,14 @@ type Keeper struct {
 // - sending to and from ModuleAccounts
 // - minting, burning PoolCoins
 func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, paramSpace paramtypes.Subspace,
-	bankKeeper types.BankKeeper, accountKeeper types.AccountKeeper, distrKeeper types.DistributionKeeper,
+	accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, distrKeeper types.DistributionKeeper,
 	blockedAddrs map[string]bool,
 ) Keeper {
-	// ensure farming module account is set
-	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
-		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
-	}
+	// TODO: TBD module account for farming
+	//// ensure farming module account is set
+	//if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
+	//	panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
+	//}
 
 	// set KeyTable if it has not already been set
 	if !paramSpace.HasKeyTable() {
@@ -47,8 +46,8 @@ func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, paramSpace paramtypes.Su
 		storeKey:      key,
 		cdc:           cdc,
 		paramSpace:    paramSpace,
-		bankKeeper:    bankKeeper,
 		accountKeeper: accountKeeper,
+		bankKeeper:    bankKeeper,
 		distrKeeper:   distrKeeper,
 		blockedAddrs:  blockedAddrs,
 	}
