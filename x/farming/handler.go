@@ -41,14 +41,29 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 	}
 }
 
-func NewCreateFarmingPlanProposalHandler(k keeper.Keeper) govtypes.Handler {
+func NewCreatePublicFarmingPlanProposal(k keeper.Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
-		case *types.CreateFixedAmountPlanProposal:
-			return keeper.HandleFixedAmountPlanProposal(ctx, k, c)
+		case *types.FixedAmountPlanProposal:
+			return keeper.HandleFixedAmountPlanProposal(ctx, k, c.Plan)
 
-		case *types.CreateRatioPlanProposal:
-			return keeper.HandleRatioPlanProposal(ctx, k, c)
+		case *types.RatioPlanProposal:
+			return keeper.HandleRatioPlanProposal(ctx, k, c.Plan)
+
+		default:
+			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized farming proposal content type: %T", c)
+		}
+	}
+}
+
+func NewModifyPublicFarmingPlanProposalHandler(k keeper.Keeper) govtypes.Handler {
+	return func(ctx sdk.Context, content govtypes.Content) error {
+		switch c := content.(type) {
+		case *types.FixedAmountPlanProposal:
+			return keeper.ModifyFixedAmountPlanProposal(ctx, k, c.Plan)
+
+		case *types.RatioPlanProposal:
+			return keeper.ModifyRatioPlanProposal(ctx, k, c.Plan)
 
 		default:
 			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized farming proposal content type: %T", c)
