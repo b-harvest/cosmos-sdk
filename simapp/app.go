@@ -288,9 +288,8 @@ func NewSimApp(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		// todo: come back after private plan implementation
-		AddRoute(farmingtypes.RouterKey, farming.NewCreatePublicFarmingPlanProposal(app.FarmingKeeper))
-		// AddRoute(farmingtypes.RouterKey, farming.NewModifyPublicFarmingPlanProposalHandler(app.FarmingKeeper))
+		// todo: implementing...
+		AddRoute(farmingtypes.RouterKey, farming.NewPublicPlanProposal(app.FarmingKeeper))
 
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,

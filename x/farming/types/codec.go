@@ -32,8 +32,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 
 	registry.RegisterImplementations(
 		(*govtypes.Content)(nil),
-		&FixedAmountPlanProposal{},
-		&RatioPlanProposal{},
+		&PublicPlanProposal{},
 	)
 
 	registry.RegisterInterface(

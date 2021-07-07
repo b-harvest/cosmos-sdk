@@ -5,8 +5,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
 )
 
-// HandleFixedAmountPlanProposal is a handler for executing a fixed amount plan creation proposal.
-func HandleFixedAmountPlanProposal(ctx sdk.Context, k Keeper, plan types.FixedAmountPlan) error {
+// HandlePublicPlanProposal is a handler for executing a fixed amount plan creation proposal.
+func HandlePublicPlanProposal(ctx sdk.Context, k Keeper, plan types.FixedAmountPlan) error {
 	// TODO: not implemented yet
 
 	// checks needed in Validate:
@@ -27,28 +27,5 @@ func HandleFixedAmountPlanProposal(ctx sdk.Context, k Keeper, plan types.FixedAm
 	logger.Info("HandleFixedAmountPlanProposal")
 	// logger.Info("transferred from the community pool to recipient", "amount", p.Amount.String(), "recipient", p.Recipient)
 
-	return nil
-}
-
-// HandleRatioPlanProposal is a handler for executing a ratio plan creation proposal.
-func HandleRatioPlanProposal(ctx sdk.Context, k Keeper, plan types.RatioPlan) error {
-	// TODO: not implemented yet
-
-	logger := k.Logger(ctx)
-	logger.Info("HandleRatioPlanProposal")
-	// logger.Info("transferred from the community pool to recipient", "amount", p.Amount.String(), "recipient", p.Recipient)
-
-	return nil
-}
-
-// ModifyFixedAmountPlanProposal is a handler for executing proposal modification.
-func ModifyFixedAmountPlanProposal(ctx sdk.Context, k Keeper, plan types.FixedAmountPlan) error {
-	// TODO: not implemented yet
-	return nil
-}
-
-// ModifyRatioPlanProposal is a handler for executing proposal modification.
-func ModifyRatioPlanProposal(ctx sdk.Context, k Keeper, plan types.RatioPlan) error {
-	// TODO: not implemented yet
 	return nil
 }

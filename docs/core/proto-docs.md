@@ -322,8 +322,7 @@
     - [PlanRecord](#cosmos.farming.v1beta1.PlanRecord)
   
 - [cosmos/farming/v1beta1/gov.proto](#cosmos/farming/v1beta1/gov.proto)
-    - [FixedAmountPlanProposal](#cosmos.farming.v1beta1.FixedAmountPlanProposal)
-    - [RatioPlanProposal](#cosmos.farming.v1beta1.RatioPlanProposal)
+    - [PublicPlanProposal](#cosmos.farming.v1beta1.PublicPlanProposal)
   
 - [cosmos/farming/v1beta1/query.proto](#cosmos/farming/v1beta1/query.proto)
     - [Query](#cosmos.farming.v1beta1.Query)
@@ -4773,34 +4772,17 @@ PlanRecord is used for import/export via genesis json.
 
 
 
-<a name="cosmos.farming.v1beta1.FixedAmountPlanProposal"></a>
+<a name="cosmos.farming.v1beta1.PublicPlanProposal"></a>
 
-### FixedAmountPlanProposal
-FixedAmountPlanProposal details a proposal for fixed amount plan creation.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `title` | [string](#string) |  |  |
-| `description` | [string](#string) |  |  |
-| `plan` | [FixedAmountPlan](#cosmos.farming.v1beta1.FixedAmountPlan) |  |  |
-
-
-
-
-
-
-<a name="cosmos.farming.v1beta1.RatioPlanProposal"></a>
-
-### RatioPlanProposal
-RatioPlanProposal details a proposal for ratio plan creation.
+### PublicPlanProposal
+PublicPlanProposal details a proposal for creating a public plan.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `title` | [string](#string) |  |  |
 | `description` | [string](#string) |  |  |
-| `plan` | [RatioPlan](#cosmos.farming.v1beta1.RatioPlan) |  |  |
+| `plans` | [google.protobuf.Any](#google.protobuf.Any) | repeated | plans specifies the plan interface(s); it can be FixedAmountPlan or RatioPlan |
 
 
 

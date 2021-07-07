@@ -122,7 +122,8 @@ type BasePlan struct {
 	// distribution_pool_address defines the bech32-encoded address that distributes amount of coins to farmers
 	DistributionPoolAddress string `protobuf:"bytes,4,opt,name=distribution_pool_address,json=distributionPoolAddress,proto3" json:"distribution_pool_address,omitempty" yaml:"distribution_pool_address"`
 	// termination_address defines the bech32-encoded address that terminates plan
-	// when the plan ends after the end time, the balance of farming pool address is transferred to the termination address
+	// when the plan ends after the end time, the balance of farming pool address is transferred to the termination
+	// address
 	TerminationAddress string `protobuf:"bytes,5,opt,name=termination_address,json=terminationAddress,proto3" json:"termination_address,omitempty" yaml:"termination_address"`
 	// staking_reserve_address defines the bech32-encoded address that stores staking reserves
 	StakingReserveAddress string `protobuf:"bytes,6,opt,name=staking_reserve_address,json=stakingReserveAddress,proto3" json:"staking_reserve_address,omitempty" yaml:"staking_reserve_address"`
