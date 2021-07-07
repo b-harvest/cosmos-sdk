@@ -4,6 +4,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 var (
@@ -27,8 +28,8 @@ const (
 func NewMsgCreateFixedAmountPlan(
 	farmingPoolAddr sdk.AccAddress,
 	stakingCoinWeights sdk.DecCoins,
-	startTime *time.Time,
-	endTime *time.Time,
+	startTime time.Time,
+	endTime time.Time,
 	epochDays uint32,
 	epochAmount sdk.Coins,
 ) *MsgCreateFixedAmountPlan {
@@ -48,12 +49,20 @@ func (msg MsgCreateFixedAmountPlan) Type() string { return TypeMsgCreateFixedAmo
 
 func (msg MsgCreateFixedAmountPlan) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.FarmingPoolAddress); err != nil {
-		return ErrInvalidFarmingPoolAddress
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid farming pool address %q: %v", msg.FarmingPoolAddress, err)
+	}
+	if !msg.EndTime.After(msg.StartTime) {
+		return sdkerrors.Wrapf(ErrInvalidPlanEndTime, "end time %s must be greater than start time %s", msg.EndTime, msg.StartTime)
+	}
+	if msg.EpochDays == 0 {
+		return sdkerrors.Wrapf(ErrInvalidPlanEpochDays, "epoch days must be positive")
+	}
+	if err := msg.StakingCoinWeights.Validate(); err != nil {
+		return err
 	}
 	if err := msg.EpochAmount.Validate(); err != nil {
 		return err
 	}
-	// TODO: more details for each field
 	return nil
 }
 
@@ -81,8 +90,8 @@ func (msg MsgCreateFixedAmountPlan) GetPlanCreator() sdk.AccAddress {
 func NewMsgCreateRatioPlan(
 	farmingPoolAddr sdk.AccAddress,
 	stakingCoinWeights sdk.DecCoins,
-	startTime *time.Time,
-	endTime *time.Time,
+	startTime time.Time,
+	endTime time.Time,
 	epochDays uint32,
 	epochRatio sdk.Dec,
 ) *MsgCreateRatioPlan {
@@ -102,7 +111,7 @@ func (msg MsgCreateRatioPlan) Type() string { return TypeMsgCreateRatioPlan }
 
 func (msg MsgCreateRatioPlan) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.FarmingPoolAddress); err != nil {
-		return ErrInvalidFarmingPoolAddress
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid farming pool address %q: %v", msg.FarmingPoolAddress, err)
 	}
 	// TODO: more details for each field
 	return nil
@@ -147,7 +156,7 @@ func (msg MsgStake) Type() string { return TypeMsgStake }
 
 func (msg MsgStake) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Farmer); err != nil {
-		return ErrInvalidFarmerAddress
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid farmer address %q: %v", msg.Farmer, err)
 	}
 	if err := msg.StakingCoins.Validate(); err != nil {
 		return err
@@ -195,7 +204,7 @@ func (msg MsgUnstake) Type() string { return TypeMsgUnstake }
 
 func (msg MsgUnstake) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Farmer); err != nil {
-		return ErrInvalidFarmerAddress
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid farmer address %q: %v", msg.Farmer, err)
 	}
 	if err := msg.UnstakingCoins.Validate(); err != nil {
 		return err
@@ -241,7 +250,7 @@ func (msg MsgClaim) Type() string { return TypeMsgClaim }
 
 func (msg MsgClaim) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Farmer); err != nil {
-		return ErrInvalidFarmerAddress
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid farmer address %q: %v", msg.Farmer, err)
 	}
 	// TODO: more details for each field
 	return nil

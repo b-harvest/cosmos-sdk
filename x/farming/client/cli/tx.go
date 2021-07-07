@@ -69,8 +69,8 @@ $ %s tx %s create-fixed-plan --from mykey
 			msg := types.NewMsgCreateFixedAmountPlan(
 				farmingPoolAddr,
 				stakingCoinWeights,
-				&startTime,
-				&endTime,
+				startTime,
+				endTime,
 				epochDays,
 				epochAmount,
 			)
@@ -116,8 +116,8 @@ $ %s tx %s create-ratio-plan --from mykey
 			msg := types.NewMsgCreateRatioPlan(
 				farmingPoolAddr,
 				stakingCoinWeights,
-				&startTime,
-				&endTime,
+				startTime,
+				endTime,
 				epochDays,
 				epochRatio,
 			)
