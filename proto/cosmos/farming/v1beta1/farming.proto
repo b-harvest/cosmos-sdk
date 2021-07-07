@@ -40,8 +40,8 @@ message BasePlan {
   // farming_pool_address defines the bech32-encoded address of the farming pool
   string farming_pool_address = 3 [(gogoproto.moretags) = "yaml:\"farming_pool_address\""];
 
-  // distribution_pool_address defines the bech32-encoded address that distributes amount of coins to farmers
-  string distribution_pool_address = 4 [(gogoproto.moretags) = "yaml:\"distribution_pool_address\""];
+  // reward_pool_address defines the bech32-encoded address that distributes reward amount of coins to farmers
+  string reward_pool_address = 4 [(gogoproto.moretags) = "yaml:\"reward_pool_address\""];
 
   // termination_address defines the bech32-encoded address that terminates plan
   // when the plan ends after the end time, the balance of farming pool address is transferred to the termination

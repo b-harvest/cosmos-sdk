@@ -50,10 +50,10 @@ message PlanRecord {
     (gogoproto.nullable)     = false
   ];
 
-  // distribution_pool_coins specifies balance of the distribution pool to be distributed in the plan
+  // reward_pool_coins specifies balance of the reward pool to be distributed in the plan
   // this param is needed for import/export validation
-  repeated cosmos.base.v1beta1.Coin distribution_pool_coins = 4 [
-    (gogoproto.moretags)     = "yaml:\"distribution_pool_coins\"",
+  repeated cosmos.base.v1beta1.Coin reward_pool_coins = 4 [
+    (gogoproto.moretags)     = "yaml:\"reward_pool_coins\"",
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.nullable)     = false
   ];

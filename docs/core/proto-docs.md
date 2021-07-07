@@ -4595,7 +4595,7 @@ type for additional functionality (e.g. fixed amount plan, ratio plan).
 | `id` | [uint64](#uint64) |  | id specifies index of the farming plan |
 | `type` | [PlanType](#cosmos.farming.v1beta1.PlanType) |  | type specifies the plan type; type 0 is public and 1 is private public plan must be created through governance proposal and private plan is created by account |
 | `farming_pool_address` | [string](#string) |  | farming_pool_address defines the bech32-encoded address of the farming pool |
-| `distribution_pool_address` | [string](#string) |  | distribution_pool_address defines the bech32-encoded address that distributes amount of coins to farmers |
+| `reward_pool_address` | [string](#string) |  | reward_pool_address defines the bech32-encoded address that distributes reward amount of coins to farmers |
 | `termination_address` | [string](#string) |  | termination_address defines the bech32-encoded address that terminates plan when the plan ends after the end time, the balance of farming pool address is transferred to the termination address |
 | `staking_reserve_address` | [string](#string) |  | staking_reserve_address defines the bech32-encoded address that stores staking reserves |
 | `staking_coin_weights` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | staking_coin_weights specifies coin weights for the plan |
@@ -4748,7 +4748,7 @@ PlanRecord is used for import/export via genesis json.
 | `plan` | [google.protobuf.Any](#google.protobuf.Any) |  | plan specifies the plan interface; it can be FixedAmountPlan or RatioPlan |
 | `last_epoch_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | last_epoch_time specifies the last distributed epoch time of the plan |
 | `farming_pool_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | farming_pool_coins specifies balance of the farming pool for the plan this param is needed for import/export validation |
-| `distribution_pool_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | distribution_pool_coins specifies balance of the distribution pool to be distributed in the plan this param is needed for import/export validation |
+| `reward_pool_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | reward_pool_coins specifies balance of the reward pool to be distributed in the plan this param is needed for import/export validation |
 | `staking_reserve_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | staking_reserve_coins specifies balance of the staking reserve pool staked in the plan this param is needed for import/export validation |
 
 
