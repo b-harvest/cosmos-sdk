@@ -113,7 +113,18 @@ func (msg MsgCreateRatioPlan) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.FarmingPoolAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid farming pool address %q: %v", msg.FarmingPoolAddress, err)
 	}
-	// TODO: more details for each field
+	if !msg.EndTime.After(msg.StartTime) {
+		return sdkerrors.Wrapf(ErrInvalidPlanEndTime, "end time %s must be greater than start time %s", msg.EndTime, msg.StartTime)
+	}
+	if msg.EpochDays == 0 {
+		return sdkerrors.Wrapf(ErrInvalidPlanEpochDays, "epoch days must be positive")
+	}
+	if err := msg.StakingCoinWeights.Validate(); err != nil {
+		return err
+	}
+	if !msg.EpochRatio.IsPositive() {
+		return ErrInvalidPlanEpochRatio
+	}
 	return nil
 }
 
@@ -161,7 +172,6 @@ func (msg MsgStake) ValidateBasic() error {
 	if err := msg.StakingCoins.Validate(); err != nil {
 		return err
 	}
-	// TODO: more details for each field
 	return nil
 }
 
@@ -209,7 +219,6 @@ func (msg MsgUnstake) ValidateBasic() error {
 	if err := msg.UnstakingCoins.Validate(); err != nil {
 		return err
 	}
-	// TODO: more details for each field
 	return nil
 }
 
@@ -252,7 +261,6 @@ func (msg MsgClaim) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Farmer); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid farmer address %q: %v", msg.Farmer, err)
 	}
-	// TODO: more details for each field
 	return nil
 }
 
