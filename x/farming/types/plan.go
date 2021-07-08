@@ -1,6 +1,8 @@
 package types
 
 import (
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gogo/protobuf/proto"
@@ -8,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/address"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
@@ -18,14 +21,14 @@ var (
 
 // NewBasePlan creates a new BasePlan object
 //nolint:interfacer
-func NewBasePlan(id uint64, typ PlanType, farmingPoolAddr, rewardPoolAddr, terminationAddr, reserveAddr string, coinWeights sdk.DecCoins, startTime, endTime time.Time, epochDays uint32) *BasePlan {
+func NewBasePlan(id uint64, typ PlanType, farmingPoolAddr, terminationAddr string, coinWeights sdk.DecCoins, startTime, endTime time.Time, epochDays uint32) *BasePlan {
 	basePlan := &BasePlan{
 		Id:                    id,
 		Type:                  typ,
 		FarmingPoolAddress:    farmingPoolAddr,
-		RewardPoolAddress:     rewardPoolAddr,
+		RewardPoolAddress:     GenerateRewardPoolAcc(PlanName(id, typ, farmingPoolAddr)).String(),
 		TerminationAddress:    terminationAddr,
-		StakingReserveAddress: reserveAddr,
+		StakingReserveAddress: GenerateStakingReserveAcc(PlanName(id, typ, farmingPoolAddr)).String(),
 		StakingCoinWeights:    coinWeights,
 		StartTime:             startTime,
 		EndTime:               endTime,
@@ -183,6 +186,30 @@ func NewRatioPlan(basePlan *BasePlan, epochRatio sdk.Dec) *RatioPlan {
 		BasePlan:   basePlan,
 		EpochRatio: epochRatio,
 	}
+}
+
+// GetPlanName returns unique name of the plan
+func (plan BasePlan) Name() string {
+	return PlanName(plan.Id, plan.Type, plan.FarmingPoolAddress)
+}
+
+// PlanName returns unique name of the plan consists of given Id, Type and FarmingPoolAddress.
+func PlanName(id uint64, typ PlanType, farmingPoolAddr string) string {
+	poolNameObjects := make([]string, 3)
+	poolNameObjects[0] = strconv.FormatUint(id, 10)
+	poolNameObjects[1] = strconv.FormatInt(int64(typ), 10)
+	poolNameObjects[2] = farmingPoolAddr
+	return strings.Join(poolNameObjects, "/")
+}
+
+// GenerateRewardPoolAcc returns deterministically generated reward pool account for the given plan name
+func GenerateRewardPoolAcc(name string) sdk.AccAddress {
+	return sdk.AccAddress(address.Module(ModuleName, []byte(strings.Join([]string{RewardPoolAccKeyPrefix, name}, "/"))))
+}
+
+// GenerateRewardPoolAcc returns deterministically generated staking reserve account for the given plan name
+func GenerateStakingReserveAcc(name string) sdk.AccAddress {
+	return sdk.AccAddress(address.Module(ModuleName, []byte(strings.Join([]string{StakingReserveAccKeyPrefix, name}, "/"))))
 }
 
 type PlanI interface {

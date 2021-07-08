@@ -10,7 +10,6 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
 )
 
@@ -36,10 +35,6 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 
 	nextId := k.GetNextPlanID(ctx)
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
-	// TODO: fix to deterministically generated rewardPoolAddr for the plan
-	rewardPoolAddr := k.accountKeeper.GetModuleAddress(distrtypes.ModuleName)
-	// TODO: fix to deterministically generated stakingPoolAddr for the plan
-	stakingReserveAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	terminationAddr := farmingPoolAddr
 
 	// TODO: consider having CreateRatioPlan keeper
@@ -47,9 +42,7 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 		nextId,
 		types.PlanTypePrivate,
 		farmingPoolAddr,
-		rewardPoolAddr.String(),
 		terminationAddr,
-		stakingReserveAddr.String(),
 		msg.GetStakingCoinWeights(),
 		msg.StartTime,
 		msg.EndTime,
@@ -64,8 +57,8 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 		sdk.NewEvent(
 			types.EventTypeCreateFixedAmountPlan,
 			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetFarmingPoolAddress()),
-			sdk.NewAttribute(types.AttributeKeyRewardPoolAddress, rewardPoolAddr.String()),
-			sdk.NewAttribute(types.AttributeKeyStakingReserveAddress, stakingReserveAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyRewardPoolAddress, fixedPlan.RewardPoolAddress),
+			sdk.NewAttribute(types.AttributeKeyStakingReserveAddress, fixedPlan.StakingReserveAddress),
 			sdk.NewAttribute(types.AttributeKeyStartTime, msg.StartTime.String()),
 			sdk.NewAttribute(types.AttributeKeyEndTime, msg.EndTime.String()),
 			sdk.NewAttribute(types.AttributeKeyEpochDays, fmt.Sprint(msg.GetEpochDays())),
@@ -86,10 +79,6 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 
 	nextId := k.GetNextPlanID(ctx)
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
-	// TODO: fix to deterministically generated rewardPoolAddr for the plan
-	rewardPoolAddr := k.accountKeeper.GetModuleAddress(distrtypes.ModuleName)
-	// TODO: fix to deterministically generated stakingPoolAddr for the plan
-	stakingReserveAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	terminationAddr := farmingPoolAddr
 
 	// TODO: consider having CreateRatioPlan keeper
@@ -97,9 +86,7 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 		nextId,
 		types.PlanTypePrivate,
 		farmingPoolAddr,
-		rewardPoolAddr.String(),
 		terminationAddr,
-		stakingReserveAddr.String(),
 		msg.GetStakingCoinWeights(),
 		msg.StartTime,
 		msg.EndTime,
@@ -114,8 +101,8 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 		sdk.NewEvent(
 			types.EventTypeCreateRatioPlan,
 			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetFarmingPoolAddress()),
-			sdk.NewAttribute(types.AttributeKeyRewardPoolAddress, rewardPoolAddr.String()),
-			sdk.NewAttribute(types.AttributeKeyStakingReserveAddress, stakingReserveAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyRewardPoolAddress, ratioPlan.RewardPoolAddress),
+			sdk.NewAttribute(types.AttributeKeyStakingReserveAddress, ratioPlan.StakingReserveAddress),
 			sdk.NewAttribute(types.AttributeKeyStartTime, msg.StartTime.String()),
 			sdk.NewAttribute(types.AttributeKeyEndTime, msg.EndTime.String()),
 			sdk.NewAttribute(types.AttributeKeyEpochDays, fmt.Sprint(msg.GetEpochDays())),

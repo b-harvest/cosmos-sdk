@@ -17,6 +17,12 @@ const (
 
 	// QuerierRoute is the querier route for the farming module
 	QuerierRoute = ModuleName
+
+	// RewardPoolAccKeyPrefix is prefix for generating deterministic reward pool module account of the each plan
+	RewardPoolAccKeyPrefix = "RewardPoolAcc"
+
+	// StakingReserveAccKeyPrefix is prefix for generating deterministic staking reserve module account of the each plan
+	StakingReserveAccKeyPrefix = "StakingReserveAcc"
 )
 
 var (

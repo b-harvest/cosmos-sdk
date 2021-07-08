@@ -14,15 +14,13 @@ func TestGetSetNewPlan(t *testing.T) {
 	app, ctx := createTestApp(true)
 
 	farmingPoolAddr := sdk.AccAddress([]byte("farmingPoolAddr"))
-	rewardPoolAddr := sdk.AccAddress([]byte("rewardPoolAddr"))
 	terminationAddr := sdk.AccAddress([]byte("terminationAddr"))
-	reserveAddr := sdk.AccAddress([]byte("reserveAddr"))
 	coinWeights := sdk.NewDecCoins(
 		sdk.DecCoin{Denom: "testFarmStakingCoinDenom", Amount: sdk.MustNewDecFromStr("1.0")},
 	)
 	startTime := time.Now().UTC()
 	endTime := startTime.AddDate(1, 0, 0)
-	basePlan := types.NewBasePlan(1, 1, farmingPoolAddr.String(), rewardPoolAddr.String(), terminationAddr.String(), reserveAddr.String(), coinWeights, startTime, endTime, 1)
+	basePlan := types.NewBasePlan(1, 1, farmingPoolAddr.String(), terminationAddr.String(), coinWeights, startTime, endTime, 1)
 	fixedPlan := types.NewFixedAmountPlan(basePlan, sdk.NewCoins(sdk.NewCoin("testFarmCoinDenom", sdk.NewInt(1000000))))
 	app.FarmingKeeper.SetPlan(ctx, fixedPlan)
 
