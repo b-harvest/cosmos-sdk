@@ -6,10 +6,9 @@ import (
 
 // farming module sentinel errors
 var (
-	ErrPlanNotExists             = sdkerrors.Register(ModuleName, 2, "plan not exists")
-	ErrPlanTypeNotExists         = sdkerrors.Register(ModuleName, 3, "plan type not exists")
-	ErrInvalidFarmingPoolAddress = sdkerrors.Register(ModuleName, 4, "invalid farming pool address")
-	ErrInvalidFarmerAddress      = sdkerrors.Register(ModuleName, 5, "invalid farmer address")
+	ErrInvalidPlanType      = sdkerrors.Register(ModuleName, 2, "invalid plan type")
+	ErrInvalidPlanEndTime   = sdkerrors.Register(ModuleName, 3, "invalid plan end time")
+	ErrInvalidPlanEpochDays = sdkerrors.Register(ModuleName, 4, "invalid plan epoch days")
 
 	// TODO: TBD more err types for farming module
 )

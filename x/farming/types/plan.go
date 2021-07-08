@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 var (
@@ -129,7 +130,30 @@ func (plan *BasePlan) SetEpochDays(days uint32) error {
 
 // Validate checks for errors on the Plan fields
 func (plan BasePlan) Validate() error {
-	// TODO: Unimplemented
+	if plan.Type != PlanTypePrivate && plan.Type != PlanTypePublic {
+		return sdkerrors.Wrapf(ErrInvalidPlanType, "unknown plan type: %s", plan.Type)
+	}
+	if _, err := sdk.AccAddressFromBech32(plan.FarmingPoolAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid farming pool address %q: %v", plan.FarmingPoolAddress, err)
+	}
+	if _, err := sdk.AccAddressFromBech32(plan.DistributionPoolAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid distribution pool address %q: %v", plan.DistributionPoolAddress, err)
+	}
+	if _, err := sdk.AccAddressFromBech32(plan.TerminationAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid termination address %q: %v", plan.TerminationAddress, err)
+	}
+	if _, err := sdk.AccAddressFromBech32(plan.StakingReserveAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid staking reserve address %q: %v", plan.StakingReserveAddress, err)
+	}
+	if err := plan.StakingCoinWeights.Validate(); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid staking coin weights: %v", err)
+	}
+	if !plan.EndTime.After(plan.StartTime) {
+		return sdkerrors.Wrapf(ErrInvalidPlanEndTime, "end time %s must be greater than start time %s", plan.EndTime, plan.StartTime)
+	}
+	if plan.EpochDays == 0 {
+		return sdkerrors.Wrapf(ErrInvalidPlanEpochDays, "epoch days must be positive")
+	}
 	return nil
 }
 
