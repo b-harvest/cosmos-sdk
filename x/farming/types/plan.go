@@ -146,7 +146,7 @@ func (plan BasePlan) Validate() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid staking reserve address %q: %v", plan.StakingReserveAddress, err)
 	}
 	if err := plan.StakingCoinWeights.Validate(); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid staking coin weights: %v", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid staking coin weights: %v", err)
 	}
 	if !plan.EndTime.After(plan.StartTime) {
 		return sdkerrors.Wrapf(ErrInvalidPlanEndTime, "end time %s must be greater than start time %s", plan.EndTime, plan.StartTime)
