@@ -50,8 +50,8 @@ func TestMsgCreateFixedAmountPlan(t *testing.T) {
 	msg := types.NewMsgCreateFixedAmountPlan(
 		farmingPoolAddr,
 		stakingCoinWeights,
-		&startTime,
-		&endTime,
+		startTime,
+		endTime,
 		epochDays,
 		epochAmount,
 	)
@@ -81,8 +81,8 @@ func TestMsgCreateRatioPlan(t *testing.T) {
 	msg := types.NewMsgCreateFixedAmountPlan(
 		farmingPoolAddr,
 		stakingCoinWeights,
-		&startTime,
-		&endTime,
+		startTime,
+		endTime,
 		epochDays,
 		epochAmount,
 	)
