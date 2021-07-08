@@ -64,3 +64,34 @@ func TestMsgCreateFixedAmountPlan(t *testing.T) {
 	require.Equal(t, 1, len(plans))
 	require.Equal(t, farmingPoolAddr.String(), plans[0].GetFarmingPoolAddress().String())
 }
+
+func TestMsgCreateRatioPlan(t *testing.T) {
+	app, ctx := createTestInput()
+
+	farmingPoolAddr := sdk.AccAddress([]byte("farmingPoolAddr"))
+	stakingCoinWeights := sdk.NewDecCoins(
+		sdk.DecCoin{Denom: "testFarmStakingCoinDenom", Amount: sdk.MustNewDecFromStr("1.0")},
+	)
+	startTime := time.Now().UTC()
+	endTime, err := time.Parse(time.RFC3339, "2021-11-01T22:08:41+00:00")
+	require.NoError(t, err)
+	epochDays := uint32(1)
+	epochAmount := sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(1)))
+
+	msg := types.NewMsgCreateFixedAmountPlan(
+		farmingPoolAddr,
+		stakingCoinWeights,
+		&startTime,
+		&endTime,
+		epochDays,
+		epochAmount,
+	)
+
+	handler := farming.NewHandler(app.FarmingKeeper)
+	_, err = handler(ctx, msg)
+	require.NoError(t, err)
+
+	plans := app.FarmingKeeper.GetAllPlans(ctx)
+	require.Equal(t, 1, len(plans))
+	require.Equal(t, farmingPoolAddr.String(), plans[0].GetFarmingPoolAddress().String())
+}

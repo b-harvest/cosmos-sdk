@@ -136,8 +136,8 @@ func (plan BasePlan) Validate() error {
 	if _, err := sdk.AccAddressFromBech32(plan.FarmingPoolAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid farming pool address %q: %v", plan.FarmingPoolAddress, err)
 	}
-	if _, err := sdk.AccAddressFromBech32(plan.DistributionPoolAddress); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid distribution pool address %q: %v", plan.DistributionPoolAddress, err)
+	if _, err := sdk.AccAddressFromBech32(plan.RewardPoolAddress); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid reward pool address %q: %v", plan.RewardPoolAddress, err)
 	}
 	if _, err := sdk.AccAddressFromBech32(plan.TerminationAddress); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid termination address %q: %v", plan.TerminationAddress, err)

@@ -51,8 +51,8 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 		terminationAddr,
 		stakingReserveAddr.String(),
 		msg.GetStakingCoinWeights(),
-		*msg.StartTime,
-		*msg.EndTime,
+		msg.StartTime,
+		msg.EndTime,
 		msg.GetEpochDays(),
 	)
 
@@ -101,8 +101,8 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 		terminationAddr,
 		stakingReserveAddr.String(),
 		msg.GetStakingCoinWeights(),
-		*msg.StartTime,
-		*msg.EndTime,
+		msg.StartTime,
+		msg.EndTime,
 		msg.GetEpochDays(),
 	)
 
