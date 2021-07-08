@@ -37,7 +37,6 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
 	terminationAddr := farmingPoolAddr
 
-	// TODO: consider having CreateRatioPlan keeper
 	basePlan := types.NewBasePlan(
 		nextId,
 		types.PlanTypePrivate,
@@ -81,7 +80,6 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
 	terminationAddr := farmingPoolAddr
 
-	// TODO: consider having CreateRatioPlan keeper
 	basePlan := types.NewBasePlan(
 		nextId,
 		types.PlanTypePrivate,

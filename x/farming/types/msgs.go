@@ -57,6 +57,9 @@ func (msg MsgCreateFixedAmountPlan) ValidateBasic() error {
 	if msg.EpochDays == 0 {
 		return sdkerrors.Wrapf(ErrInvalidPlanEpochDays, "epoch days must be positive")
 	}
+	if msg.StakingCoinWeights.Empty() {
+		return ErrEmptyStakingCoinWeights
+	}
 	if err := msg.StakingCoinWeights.Validate(); err != nil {
 		return err
 	}
@@ -121,6 +124,9 @@ func (msg MsgCreateRatioPlan) ValidateBasic() error {
 	}
 	if msg.EpochDays == 0 {
 		return sdkerrors.Wrapf(ErrInvalidPlanEpochDays, "epoch days must be positive")
+	}
+	if msg.StakingCoinWeights.Empty() {
+		return ErrEmptyStakingCoinWeights
 	}
 	if err := msg.StakingCoinWeights.Validate(); err != nil {
 		return err
