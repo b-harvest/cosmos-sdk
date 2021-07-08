@@ -3,77 +3,95 @@ package types
 import (
 	"fmt"
 
+	"github.com/cosmos/cosmos-sdk/codec/types"
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
+
+	proto "github.com/gogo/protobuf/proto"
 )
 
 const (
-	ProposalTypeFixedAmountPlan string = "FixedAmountPlan"
-	ProposalTypeRatioPlan       string = "RatioPlan"
+	ProposalTypePublicPlan string = "PublicPlan"
 )
 
 // Implements Proposal Interface
-var _ gov.Content = &FixedAmountPlanProposal{}
-var _ gov.Content = &RatioPlanProposal{}
+var _ gov.Content = &PublicPlanProposal{}
 
 func init() {
-	gov.RegisterProposalType(ProposalTypeFixedAmountPlan)
-	gov.RegisterProposalTypeCodec(&FixedAmountPlanProposal{}, "cosmos-sdk/FixedAmountPlanProposal")
-	gov.RegisterProposalType(ProposalTypeRatioPlan)
-	gov.RegisterProposalTypeCodec(&RatioPlanProposal{}, "cosmos-sdk/RatioPlanProposal")
+	gov.RegisterProposalType(ProposalTypePublicPlan)
+	gov.RegisterProposalTypeCodec(&PublicPlanProposal{}, "cosmos-sdk/PublicPlanProposal")
 }
 
-func NewFixedAmountPlanProposal(title, description string, plan FixedAmountPlan) gov.Content {
-	return &FixedAmountPlanProposal{title, description, plan}
+func NewPublicPlanProposal(title, description string, plans []PlanI) (gov.Content, error) {
+	plansAny, err := PackPlans(plans)
+	if err != nil {
+		panic(err)
+	}
+
+	return &PublicPlanProposal{
+		Title:       title,
+		Description: description,
+		Plans:       plansAny,
+	}, nil
 }
 
-func (p *FixedAmountPlanProposal) GetTitle() string { return p.Title }
+func (p *PublicPlanProposal) GetTitle() string { return p.Title }
 
-func (p *FixedAmountPlanProposal) GetDescription() string { return p.Description }
+func (p *PublicPlanProposal) GetDescription() string { return p.Description }
 
-func (p *FixedAmountPlanProposal) ProposalRoute() string { return RouterKey }
+func (p *PublicPlanProposal) ProposalRoute() string { return RouterKey }
 
-func (p *FixedAmountPlanProposal) ProposalType() string { return ProposalTypeFixedAmountPlan }
+func (p *PublicPlanProposal) ProposalType() string { return ProposalTypePublicPlan }
 
-func (p *FixedAmountPlanProposal) ValidateBasic() error {
-	// TODO: more checks? (ex. length check?)
-	if err := p.Plan.Validate(); err != nil {
-		return err
+func (p *PublicPlanProposal) ValidateBasic() error {
+	for _, plan := range p.Plans {
+		_, ok := plan.GetCachedValue().(PlanI)
+		if !ok {
+			return fmt.Errorf("expected planI")
+		}
+		// TODO: PlanI needs ValidateBasic()?
+		// if err := p.ValidateBasic(); err != nil {
+		// 	return err
+		// }
 	}
 	return gov.ValidateAbstract(p)
 }
 
-func (p FixedAmountPlanProposal) String() string {
+func (p PublicPlanProposal) String() string {
 	return fmt.Sprintf(`Create FixedAmountPlan Proposal:
   Title:       %s
   Description: %s
-  Plan: 	   %s
-`, p.Title, p.Description, p.Plan)
+  Plans: 	   %s
+`, p.Title, p.Description, p.Plans)
 }
 
-func NewRatioPlanProposal(title, description string, plan RatioPlan) gov.Content {
-	return &RatioPlanProposal{title, description, plan}
-}
-
-func (p *RatioPlanProposal) GetTitle() string { return p.Title }
-
-func (p *RatioPlanProposal) GetDescription() string { return p.Description }
-
-func (p *RatioPlanProposal) ProposalRoute() string { return RouterKey }
-
-func (p *RatioPlanProposal) ProposalType() string { return ProposalTypeRatioPlan }
-
-func (p *RatioPlanProposal) ValidateBasic() error {
-	// TODO: more checks? (ex. length check?)
-	if err := p.Plan.Validate(); err != nil {
-		return err
+// PackPlans converts PlanIs to Any slice
+func PackPlans(plans []PlanI) ([]*types.Any, error) {
+	plansAny := make([]*types.Any, len(plans))
+	for i, plan := range plans {
+		msg, ok := plan.(proto.Message)
+		if !ok {
+			return nil, fmt.Errorf("cannot proto marshal %T", plan)
+		}
+		any, err := types.NewAnyWithValue(msg)
+		if err != nil {
+			return nil, err
+		}
+		plansAny[i] = any
 	}
-	return gov.ValidateAbstract(p)
+
+	return plansAny, nil
 }
 
-func (p RatioPlanProposal) String() string {
-	return fmt.Sprintf(`Create RatioPlan Proposal:
-  Title:       %s
-  Description: %s
-  Plan:        %s
-`, p.Title, p.Description, p.Plan)
+// UnpackPlans converts Any slice to PlanIs
+func UnpackPlans(plansAny []*types.Any) ([]PlanI, error) {
+	plans := make([]PlanI, len(plansAny))
+	for i, any := range plansAny {
+		acc, ok := any.GetCachedValue().(PlanI)
+		if !ok {
+			return nil, fmt.Errorf("expected planI")
+		}
+		plans[i] = acc
+	}
+
+	return plans, nil
 }
