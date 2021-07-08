@@ -15,7 +15,7 @@ var (
 )
 
 var (
-	DefaultPrivatePlanCreationFee = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000000)))
+	DefaultPrivatePlanCreationFee = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100_000_000)))
 )
 
 var _ paramstypes.ParamSet = (*Params)(nil)

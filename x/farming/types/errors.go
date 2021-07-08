@@ -12,4 +12,5 @@ var (
 	ErrInvalidPlanEndTime    = sdkerrors.Register(ModuleName, 5, "invalid plan end time")
 	ErrInvalidPlanEpochDays  = sdkerrors.Register(ModuleName, 6, "invalid plan epoch days")
 	ErrInvalidPlanEpochRatio = sdkerrors.Register(ModuleName, 7, "invalid plan epoch ratio")
+	ErrEmptyEpochAmount      = sdkerrors.Register(ModuleName, 8, "epoch amount must not be empty")
 )

@@ -60,6 +60,9 @@ func (msg MsgCreateFixedAmountPlan) ValidateBasic() error {
 	if err := msg.StakingCoinWeights.Validate(); err != nil {
 		return err
 	}
+	if msg.EpochAmount.Empty() {
+		return ErrEmptyEpochAmount
+	}
 	if err := msg.EpochAmount.Validate(); err != nil {
 		return err
 	}
