@@ -24,7 +24,8 @@ func TestGetSetNewPlan(t *testing.T) {
 	fixedPlan := types.NewFixedAmountPlan(basePlan, sdk.NewCoins(sdk.NewCoin("testFarmCoinDenom", sdk.NewInt(1000000))))
 	app.FarmingKeeper.SetPlan(ctx, fixedPlan)
 
-	planGet := app.FarmingKeeper.GetPlan(ctx, 1)
+	planGet, found := app.FarmingKeeper.GetPlan(ctx, 1)
+	require.True(t, found)
 	require.Equal(t, fixedPlan, planGet)
 
 	plans := app.FarmingKeeper.GetAllPlans(ctx)

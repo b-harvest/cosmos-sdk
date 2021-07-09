@@ -60,7 +60,7 @@ package keeper
 //// If the global account number is not set, it initializes it with value 0.
 //func (k Keeper) GetNextPlanIDWithUpdate(ctx sdk.Context) uint64 {
 //	store := ctx.KVStore(k.storeKey)
-//	planID := k.GetNextPlanID(ctx)
+//	planID := k.GetNextPlanIdWithUpdate(ctx)
 //	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.UInt64Value{Value: planID + 1})
 //	store.Set(types.GlobalFarmingPlanIDKey, bz)
 //	return planID

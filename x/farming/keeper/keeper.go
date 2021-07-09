@@ -69,8 +69,9 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }
 
-// GetNextPlanID returns next plan id for new plan, using index of latest plan id
-func (k Keeper) GetNextPlanID(ctx sdk.Context) uint64 {
+// GetNextPlanIdWithUpdate returns and increments the global Plan ID counter.
+// If the global plan number is not set, it initializes it with value 1.
+func (k Keeper) GetNextPlanIdWithUpdate(ctx sdk.Context) uint64 {
 	var id uint64
 	store := ctx.KVStore(k.storeKey)
 

@@ -33,7 +33,7 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 		return nil, err
 	}
 
-	nextId := k.GetNextPlanID(ctx)
+	nextId := k.GetNextPlanIdWithUpdate(ctx)
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
 	terminationAddr := farmingPoolAddr
 
@@ -76,7 +76,7 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 		return nil, err
 	}
 
-	nextId := k.GetNextPlanID(ctx)
+	nextId := k.GetNextPlanIdWithUpdate(ctx)
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
 	terminationAddr := farmingPoolAddr
 
@@ -115,8 +115,8 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 func (k msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.MsgStakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	plan := k.GetPlan(ctx, msg.PlanId)
-	if plan == nil {
+	_, found := k.GetPlan(ctx, msg.PlanId)
+	if !found {
 		return nil, types.ErrPlanNotExists
 	}
 
@@ -132,8 +132,8 @@ func (k msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.Msg
 func (k msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types.MsgUnstakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	plan := k.GetPlan(ctx, msg.PlanId)
-	if plan == nil {
+	_, found := k.GetPlan(ctx, msg.PlanId)
+	if !found {
 		return nil, types.ErrPlanNotExists
 	}
 
