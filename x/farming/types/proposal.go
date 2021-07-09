@@ -64,7 +64,7 @@ func (p PublicPlanProposal) String() string {
 `, p.Title, p.Description, p.Plans)
 }
 
-// PackPlans converts PlanIs to Any slice
+// PackPlans converts PlanIs to Any slice.
 func PackPlans(plans []PlanI) ([]*types.Any, error) {
 	plansAny := make([]*types.Any, len(plans))
 	for i, plan := range plans {
@@ -82,16 +82,26 @@ func PackPlans(plans []PlanI) ([]*types.Any, error) {
 	return plansAny, nil
 }
 
-// UnpackPlans converts Any slice to PlanIs
+// UnpackPlans converts Any slice to PlanIs.
 func UnpackPlans(plansAny []*types.Any) ([]PlanI, error) {
 	plans := make([]PlanI, len(plansAny))
 	for i, any := range plansAny {
-		acc, ok := any.GetCachedValue().(PlanI)
+		p, ok := any.GetCachedValue().(PlanI)
 		if !ok {
 			return nil, fmt.Errorf("expected planI")
 		}
-		plans[i] = acc
+		plans[i] = p
 	}
 
 	return plans, nil
+}
+
+// UnpackPlan converts Any slice to PlanI.
+func UnpackPlan(any *types.Any) (PlanI, error) {
+	p, ok := any.GetCachedValue().(PlanI)
+	if !ok {
+		return nil, fmt.Errorf("expected planI")
+	}
+
+	return p, nil
 }
