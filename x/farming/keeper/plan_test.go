@@ -15,6 +15,8 @@ func TestGetSetNewPlan(t *testing.T) {
 
 	farmingPoolAddr := sdk.AccAddress([]byte("farmingPoolAddr"))
 	terminationAddr := sdk.AccAddress([]byte("terminationAddr"))
+	farmerAddr := sdk.AccAddress([]byte("farmer"))
+	stakingCoins := sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(1000000)))
 	coinWeights := sdk.NewDecCoins(
 		sdk.DecCoin{Denom: "testFarmStakingCoinDenom", Amount: sdk.MustNewDecFromStr("1.0")},
 	)
@@ -31,4 +33,15 @@ func TestGetSetNewPlan(t *testing.T) {
 	plans := app.FarmingKeeper.GetAllPlans(ctx)
 	require.Len(t, plans, 1)
 	require.Equal(t, fixedPlan, plans[0])
+
+	// TODO: tmp test codes for testing functionality, need to separated
+	msgStake := types.NewMsgStake(fixedPlan.Id, farmerAddr, stakingCoins)
+	app.FarmingKeeper.Stake(ctx, msgStake)
+
+	stakings := app.FarmingKeeper.GetAllStakings(ctx)
+	stakingsByPlan := app.FarmingKeeper.GetStakingsByPlanId(ctx, fixedPlan.Id)
+	require.Equal(t, stakings, stakingsByPlan)
+	plansByFarmer := app.FarmingKeeper.GetPlansByFarmerAddrIndex(ctx, farmerAddr)
+
+	require.Equal(t, plans, plansByFarmer)
 }

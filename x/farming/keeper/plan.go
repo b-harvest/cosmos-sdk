@@ -92,17 +92,23 @@ func (k Keeper) IteratePlansByFarmerAddr(ctx sdk.Context, farmerAcc sdk.AccAddre
 
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		plan := k.decodePlan(iterator.Value())
+		planId := gogotypes.UInt64Value{}
 
+		err := k.cdc.Unmarshal(iterator.Value(), &planId)
+		if err != nil {
+			panic(err)
+		}
+		plan, _ := k.GetPlan(ctx, planId.GetValue())
 		if cb(plan) {
 			break
 		}
 	}
 }
 
+// TODO: need to gas cost check for existing check or update everytime
 // SetPlanByFarmerAddrIndex sets Index by FarmerAddr
-func (k Keeper) SetPlanByFarmerAddrIndex(ctx sdk.Context, plan types.PlanI, farmerAcc sdk.AccAddress) {
+func (k Keeper) SetPlanIdByFarmerAddrIndex(ctx sdk.Context, planId uint64, farmerAcc sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
-	b := k.cdc.MustMarshal(&gogotypes.UInt64Value{Value: plan.GetId()})
-	store.Set(types.GetPlanByFarmerAddrIndexKey(farmerAcc, plan.GetId()), b)
+	b := k.cdc.MustMarshal(&gogotypes.UInt64Value{Value: planId})
+	store.Set(types.GetPlanByFarmerAddrIndexKey(farmerAcc, planId), b)
 }
