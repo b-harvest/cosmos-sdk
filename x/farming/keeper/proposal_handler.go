@@ -17,9 +17,35 @@ func HandlePublicPlanProposal(ctx sdk.Context, k Keeper, plansAny []*codectypes.
 	for _, plan := range plans {
 		switch p := plan.(type) {
 		case *types.FixedAmountPlan:
-			// TODO: not implemented
+			msg := types.NewMsgCreateFixedAmountPlan(
+				p.GetFarmingPoolAddress(),
+				p.GetStakingCoinWeights(),
+				p.GetStartTime(),
+				p.GetEndTime(),
+				p.GetEpochDays(),
+				p.EpochAmount,
+			)
+
+			fixedPlan := k.CreateFixedAmountPlan(ctx, msg, types.PlanTypePublic)
+
+			logger := k.Logger(ctx)
+			logger.Info("created public fixed amount plan", "fixed_amount_plan", fixedPlan)
+
 		case *types.RatioPlan:
-			// TODO: not implemented
+			msg := types.NewMsgCreateRatioPlan(
+				p.GetFarmingPoolAddress(),
+				p.GetStakingCoinWeights(),
+				p.GetStartTime(),
+				p.GetEndTime(),
+				p.GetEpochDays(),
+				p.EpochRatio,
+			)
+
+			ratioPlan := k.CreateRatioPlan(ctx, msg, types.PlanTypePublic)
+
+			logger := k.Logger(ctx)
+			logger.Info("created public fixed amount plan", "ratio_plan", ratioPlan)
+
 		default:
 			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized farming proposal plan type: %T", p)
 		}

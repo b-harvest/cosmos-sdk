@@ -33,24 +33,7 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 		return nil, err
 	}
 
-	nextId := k.GetNextPlanID(ctx)
-	farmingPoolAddr := msg.GetFarmingPoolAddress()
-	terminationAddr := farmingPoolAddr
-
-	basePlan := types.NewBasePlan(
-		nextId,
-		types.PlanTypePrivate,
-		farmingPoolAddr,
-		terminationAddr,
-		msg.GetStakingCoinWeights(),
-		msg.StartTime,
-		msg.EndTime,
-		msg.GetEpochDays(),
-	)
-
-	fixedPlan := types.NewFixedAmountPlan(basePlan, msg.EpochAmount)
-
-	k.SetPlan(ctx, fixedPlan)
+	fixedPlan := k.Keeper.CreateFixedAmountPlan(ctx, msg, types.PlanTypePrivate)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
@@ -76,24 +59,7 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 		return nil, err
 	}
 
-	nextId := k.GetNextPlanID(ctx)
-	farmingPoolAddr := msg.GetFarmingPoolAddress()
-	terminationAddr := farmingPoolAddr
-
-	basePlan := types.NewBasePlan(
-		nextId,
-		types.PlanTypePrivate,
-		farmingPoolAddr,
-		terminationAddr,
-		msg.GetStakingCoinWeights(),
-		msg.StartTime,
-		msg.EndTime,
-		msg.GetEpochDays(),
-	)
-
-	ratioPlan := types.NewRatioPlan(basePlan, msg.EpochRatio)
-
-	k.SetPlan(ctx, ratioPlan)
+	ratioPlan := k.Keeper.CreateRatioPlan(ctx, msg, types.PlanTypePrivate)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(

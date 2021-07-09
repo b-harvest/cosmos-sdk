@@ -71,3 +71,51 @@ func (k Keeper) IteratePlans(ctx sdk.Context, cb func(plan types.PlanI) (stop bo
 		}
 	}
 }
+
+// CreateFixedAmountPlan sets fixed amount plan.
+func (k Keeper) CreateFixedAmountPlan(ctx sdk.Context, msg *types.MsgCreateFixedAmountPlan, typ types.PlanType) *types.FixedAmountPlan {
+	nextId := k.GetNextPlanID(ctx)
+	farmingPoolAddr := msg.GetFarmingPoolAddress()
+	terminationAddr := farmingPoolAddr
+
+	basePlan := types.NewBasePlan(
+		nextId,
+		typ,
+		farmingPoolAddr,
+		terminationAddr,
+		msg.GetStakingCoinWeights(),
+		msg.StartTime,
+		msg.EndTime,
+		msg.GetEpochDays(),
+	)
+
+	fixedPlan := types.NewFixedAmountPlan(basePlan, msg.EpochAmount)
+
+	k.SetPlan(ctx, fixedPlan)
+
+	return fixedPlan
+}
+
+// CreateRatioPlan sets ratio plan.
+func (k Keeper) CreateRatioPlan(ctx sdk.Context, msg *types.MsgCreateRatioPlan, typ types.PlanType) *types.RatioPlan {
+	nextId := k.GetNextPlanID(ctx)
+	farmingPoolAddr := msg.GetFarmingPoolAddress()
+	terminationAddr := farmingPoolAddr
+
+	basePlan := types.NewBasePlan(
+		nextId,
+		typ,
+		farmingPoolAddr,
+		terminationAddr,
+		msg.GetStakingCoinWeights(),
+		msg.StartTime,
+		msg.EndTime,
+		msg.GetEpochDays(),
+	)
+
+	ratioPlan := types.NewRatioPlan(basePlan, msg.EpochRatio)
+
+	k.SetPlan(ctx, ratioPlan)
+
+	return ratioPlan
+}
