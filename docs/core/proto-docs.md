@@ -325,6 +325,25 @@
     - [PublicPlanProposal](#cosmos.farming.v1beta1.PublicPlanProposal)
   
 - [cosmos/farming/v1beta1/query.proto](#cosmos/farming/v1beta1/query.proto)
+    - [QueryFarmerRewardRequest](#cosmos.farming.v1beta1.QueryFarmerRewardRequest)
+    - [QueryFarmerRewardResponse](#cosmos.farming.v1beta1.QueryFarmerRewardResponse)
+    - [QueryFarmerRewardsRequest](#cosmos.farming.v1beta1.QueryFarmerRewardsRequest)
+    - [QueryFarmerRewardsResponse](#cosmos.farming.v1beta1.QueryFarmerRewardsResponse)
+    - [QueryFarmerStakingRequest](#cosmos.farming.v1beta1.QueryFarmerStakingRequest)
+    - [QueryFarmerStakingResponse](#cosmos.farming.v1beta1.QueryFarmerStakingResponse)
+    - [QueryFarmerStakingsRequest](#cosmos.farming.v1beta1.QueryFarmerStakingsRequest)
+    - [QueryFarmerStakingsResponse](#cosmos.farming.v1beta1.QueryFarmerStakingsResponse)
+    - [QueryParamsRequest](#cosmos.farming.v1beta1.QueryParamsRequest)
+    - [QueryParamsResponse](#cosmos.farming.v1beta1.QueryParamsResponse)
+    - [QueryPlanRequest](#cosmos.farming.v1beta1.QueryPlanRequest)
+    - [QueryPlanResponse](#cosmos.farming.v1beta1.QueryPlanResponse)
+    - [QueryPlanRewardsRequest](#cosmos.farming.v1beta1.QueryPlanRewardsRequest)
+    - [QueryPlanRewardsResponse](#cosmos.farming.v1beta1.QueryPlanRewardsResponse)
+    - [QueryPlanStakingsRequest](#cosmos.farming.v1beta1.QueryPlanStakingsRequest)
+    - [QueryPlanStakingsResponse](#cosmos.farming.v1beta1.QueryPlanStakingsResponse)
+    - [QueryPlansRequest](#cosmos.farming.v1beta1.QueryPlansRequest)
+    - [QueryPlansResponse](#cosmos.farming.v1beta1.QueryPlansResponse)
+  
     - [Query](#cosmos.farming.v1beta1.Query)
   
 - [cosmos/farming/v1beta1/tx.proto](#cosmos/farming/v1beta1/tx.proto)
@@ -4804,6 +4823,288 @@ PublicPlanProposal details a proposal for creating a public plan.
 ## cosmos/farming/v1beta1/query.proto
 
 
+
+<a name="cosmos.farming.v1beta1.QueryFarmerRewardRequest"></a>
+
+### QueryFarmerRewardRequest
+QueryFarmerRewardRequest is the request type for the Query/FarmerReward RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `farmer` | [string](#string) |  |  |
+| `plan_id` | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryFarmerRewardResponse"></a>
+
+### QueryFarmerRewardResponse
+QueryFarmerRewardResponse is the response type for the Query/FarmerReward RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `reward` | [Reward](#cosmos.farming.v1beta1.Reward) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryFarmerRewardsRequest"></a>
+
+### QueryFarmerRewardsRequest
+QueryFarmerRewardsRequest is the request type for the Query/FarmerRewards RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `farmer` | [string](#string) |  |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryFarmerRewardsResponse"></a>
+
+### QueryFarmerRewardsResponse
+QueryFarmerRewardsResponse is the response type for the Query/FarmerRewards RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `rewards` | [Reward](#cosmos.farming.v1beta1.Reward) | repeated |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryFarmerStakingRequest"></a>
+
+### QueryFarmerStakingRequest
+QueryFarmerStakingRequest is the request type for the Query/FarmerStaking RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `farmer` | [string](#string) |  |  |
+| `plan_id` | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryFarmerStakingResponse"></a>
+
+### QueryFarmerStakingResponse
+QueryFarmerStakingResponse is the response type for the Query/FarmerStaking RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `staking` | [Staking](#cosmos.farming.v1beta1.Staking) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryFarmerStakingsRequest"></a>
+
+### QueryFarmerStakingsRequest
+QueryFarmerStakingsRequest is the request type for the Query/FarmerStakings RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `farmer` | [string](#string) |  |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryFarmerStakingsResponse"></a>
+
+### QueryFarmerStakingsResponse
+QueryFarmerStakingsResponse is the response type for the Query/FarmerStakings RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `stakings` | [Staking](#cosmos.farming.v1beta1.Staking) | repeated |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+QueryParamsRequest is the request type for the Query/Params RPC method.
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+QueryParamsResponse is the response type for the Query/Params RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#cosmos.farming.v1beta1.Params) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryPlanRequest"></a>
+
+### QueryPlanRequest
+QueryPlanRequest is the request type for the Query/Plan RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `plan_id` | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryPlanResponse"></a>
+
+### QueryPlanResponse
+QueryPlanResponse is the response type for the Query/Plan RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `plan` | [google.protobuf.Any](#google.protobuf.Any) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryPlanRewardsRequest"></a>
+
+### QueryPlanRewardsRequest
+QueryPlanRewardsRequest is the request type for the Query/PlanRewards RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `plan_id` | [uint64](#uint64) |  |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryPlanRewardsResponse"></a>
+
+### QueryPlanRewardsResponse
+QueryPlanRewardsResponse is the response type for the Query/PlanRewards RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `rewards` | [Reward](#cosmos.farming.v1beta1.Reward) | repeated |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryPlanStakingsRequest"></a>
+
+### QueryPlanStakingsRequest
+QueryPlanStakingsRequest is the request type for the Query/PlanStakings RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `plan_id` | [uint64](#uint64) |  |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryPlanStakingsResponse"></a>
+
+### QueryPlanStakingsResponse
+QueryPlanStakingsResponse is the response type for the Query/PlanStakings RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `stakings` | [Staking](#cosmos.farming.v1beta1.Staking) | repeated |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryPlansRequest"></a>
+
+### QueryPlansRequest
+QueryPlansRequest is the request type for the Query/Plans RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `type` | [string](#string) |  |  |
+| `farming_pool_address` | [string](#string) |  |  |
+| `reward_pool_address` | [string](#string) |  |  |
+| `termination_address` | [string](#string) |  |  |
+| `staking_reserve_address` | [string](#string) |  |  |
+| `staking_coin_denom` | [string](#string) |  |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.QueryPlansResponse"></a>
+
+### QueryPlansResponse
+QueryPlansResponse is the response type for the Query/Plans RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `plans` | [google.protobuf.Any](#google.protobuf.Any) | repeated |  |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
  <!-- end messages -->
 
  <!-- end enums -->
@@ -4818,6 +5119,15 @@ Query defines the gRPC query service for the farming module.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `Params` | [QueryParamsRequest](#cosmos.farming.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#cosmos.farming.v1beta1.QueryParamsResponse) | Params returns parameters of the farming module. | GET|/cosmos/farming/v1beta1/params|
+| `Plans` | [QueryPlansRequest](#cosmos.farming.v1beta1.QueryPlansRequest) | [QueryPlansResponse](#cosmos.farming.v1beta1.QueryPlansResponse) | Plans returns all plans. | GET|/cosmos/farming/v1beta1/plans|
+| `Plan` | [QueryPlanRequest](#cosmos.farming.v1beta1.QueryPlanRequest) | [QueryPlanResponse](#cosmos.farming.v1beta1.QueryPlanResponse) | Plan returns a specific plan. | GET|/cosmos/farming/v1beta1/plans/{plan_id}|
+| `PlanStakings` | [QueryPlanStakingsRequest](#cosmos.farming.v1beta1.QueryPlanStakingsRequest) | [QueryPlanStakingsResponse](#cosmos.farming.v1beta1.QueryPlanStakingsResponse) | PlanStakings returns all stakings of the plan. | GET|/cosmos/farming/v1beta1/plans/{plan_id}/stakings|
+| `FarmerStakings` | [QueryFarmerStakingsRequest](#cosmos.farming.v1beta1.QueryFarmerStakingsRequest) | [QueryFarmerStakingsResponse](#cosmos.farming.v1beta1.QueryFarmerStakingsResponse) | FarmerStakings returns all stakings owned by the farmer. | GET|/cosmos/farming/v1beta1/stakings/{farmer}|
+| `FarmerStaking` | [QueryFarmerStakingRequest](#cosmos.farming.v1beta1.QueryFarmerStakingRequest) | [QueryFarmerStakingResponse](#cosmos.farming.v1beta1.QueryFarmerStakingResponse) | FarmerStaking returns a specific staking of the plan which is owned by the farmer. | GET|/cosmos/farming/v1beta1/stakings/{farmer}/plans/{plan_id}|
+| `PlanRewards` | [QueryPlanRewardsRequest](#cosmos.farming.v1beta1.QueryPlanRewardsRequest) | [QueryPlanRewardsResponse](#cosmos.farming.v1beta1.QueryPlanRewardsResponse) | PlanRewards returns all rewards of the plan. | GET|/cosmos/farming/v1beta1/plans/{plan_id}/rewards|
+| `FarmerRewards` | [QueryFarmerRewardsRequest](#cosmos.farming.v1beta1.QueryFarmerRewardsRequest) | [QueryFarmerRewardsResponse](#cosmos.farming.v1beta1.QueryFarmerRewardsResponse) | FarmerRewards returns all rewards owned by the farmer. | GET|/cosmos/farming/v1beta1/rewards/{farmer}|
+| `FarmerReward` | [QueryFarmerRewardRequest](#cosmos.farming.v1beta1.QueryFarmerRewardRequest) | [QueryFarmerRewardResponse](#cosmos.farming.v1beta1.QueryFarmerRewardResponse) | FarmerReward returns a specific reward of the plan which is owned by the farmer. | GET|/cosmos/farming/v1beta1/rewards/{farmer}/plans/{plan_id}|
 
  <!-- end services -->
 
