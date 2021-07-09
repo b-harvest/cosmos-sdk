@@ -2,13 +2,11 @@
 
  # State
 
-The farming module `x/farming` keeps track of the staking and rewards states.
+The farming module keeps track of the staking and rewards states.
 
-## Plan
+## Plan Interface
 
-Plan stores information about the farming plan.
-
-Plan type has the following structure.
+The plan interface exposes methods to read and write standard farming plan information. Note that all of these methods operate on a plan struct confirming to the interface and in order to write the plan to the store, the plan keeper will need to be used. 
 
 ```go
 // PlanI is an interface used to store plan records within state.
@@ -49,6 +47,10 @@ type PlanI interface {
 }
 ```
 
+## Base Plan
+
+A base plan is the simplest and most common plan type, which just stores all requisite fields directly in a struct.
+
 ```go
 // BasePlan defines a base plan type. It contains all the necessary fields
 // for basic farming plan functionality. Any custom farming plan type should extend this
@@ -74,7 +76,6 @@ type FixedAmountPlan struct {
 
     EpochAmount      sdk.Coins // distributing amount for each epoch
 }
-
 ```
 
 ```go
@@ -84,8 +85,8 @@ type RatioPlan struct {
 
     EpochRatio            sdk.Dec // distributing amount by ratio
 }
-
 ```
+## Plan Types
 
 ```go
 // PlanType enumerates the valid types of a plan.
@@ -111,73 +112,8 @@ The parameters of the Plan state are:
 - GlobalFarmingPlanIdKey: `[]byte("globalFarmingPlanId") -> LatestPlanId`
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
 
-- An example of `FixedAmountPlan`
 
-    ```json
-    {
-      "base_plan": {
-        "id": 0,
-        "type": 0,
-        "farmingPoolAddress": "cosmos1...",
-        "rewardPoolAddress": "cosmos1...",
-        "stakingReserveAddress": "cosmos1...",
-        "stakingCoinWeights": [
-          {
-            "denom": "xxx",
-            "amount": "0.200000000000000000"
-          },
-          {
-            "denom": "yyy",
-            "amount": "0.300000000000000000"
-          },
-          {
-            "denom": "zzz",
-            "amount": "0.500000000000000000"
-          }
-        ],
-        "startTime": "2021-10-01T00:00:00Z",
-        "endTime": "2022-04-01T00:00:00Z",
-        "epochDays": 1,
-        "terminationAddress": "cosmos1..."
-      },
-      "epochAmount": {
-        "denom": "uatom",
-        "amount": "10000000"
-      }
-    }
-    ```
-
-- An example of `RatioPlan`
-    ```json
-    {
-      "base_plan": {
-        "id": 0,
-        "type": 0,
-        "farmingPoolAddress": "cosmos1...",
-        "rewardPoolAddress": "cosmos1...",
-        "stakingReserveAddress": "cosmos1...",
-        "stakingCoinWeights": [
-          {
-            "denom": "xxx",
-            "amount": "0.200000000000000000"
-          },
-          {
-            "denom": "yyy",
-            "amount": "0.300000000000000000"
-          },
-          {
-            "denom": "zzz",
-            "amount": "0.500000000000000000"
-          }
-        ],
-        "startTime": "2021-10-01T00:00:00Z",
-        "endTime": "2022-04-01T00:00:00Z",
-        "epochDays": 1,
-        "terminationAddress": "cosmos1..."
-      },
-      "epochRatio": "0.01"
-    }
-    ```
+## Staking
 
 ```go
 // Staking defines a farmer's staking information.
@@ -193,6 +129,8 @@ The parameters of the Staking state are:
 
 - Staking: `0x21 | PlanId | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(Staking)`
 
+## Reward
+
 ```go
 // Reward defines a record of farming rewards.
 type Reward struct {
@@ -205,6 +143,78 @@ type Reward struct {
 The parameters of the Reward state are:
 
 - Reward: `0x31 | PlanId | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(Reward)`
+
+## Examples 
+
+An example of `FixedAmountPlan`
+
+```json
+{
+  "base_plan": {
+    "id": 0,
+    "type": 0,
+    "farmingPoolAddress": "cosmos1...",
+    "rewardPoolAddress": "cosmos1...",
+    "stakingReserveAddress": "cosmos1...",
+    "stakingCoinWeights": [
+      {
+        "denom": "xxx",
+        "amount": "0.200000000000000000"
+      },
+      {
+        "denom": "yyy",
+        "amount": "0.300000000000000000"
+      },
+      {
+        "denom": "zzz",
+        "amount": "0.500000000000000000"
+      }
+    ],
+    "startTime": "2021-10-01T00:00:00Z",
+    "endTime": "2022-04-01T00:00:00Z",
+    "epochDays": 1,
+    "terminationAddress": "cosmos1..."
+  },
+  "epochAmount": {
+    "denom": "uatom",
+    "amount": "10000000"
+  }
+}
+```
+
+An example of `RatioPlan`
+
+```json
+{
+  "base_plan": {
+    "id": 0,
+    "type": 0,
+    "farmingPoolAddress": "cosmos1...",
+    "rewardPoolAddress": "cosmos1...",
+    "stakingReserveAddress": "cosmos1...",
+    "stakingCoinWeights": [
+      {
+        "denom": "xxx",
+        "amount": "0.200000000000000000"
+      },
+      {
+        "denom": "yyy",
+        "amount": "0.300000000000000000"
+      },
+      {
+        "denom": "zzz",
+        "amount": "0.500000000000000000"
+      }
+    ],
+    "startTime": "2021-10-01T00:00:00Z",
+    "endTime": "2022-04-01T00:00:00Z",
+    "epochDays": 1,
+    "terminationAddress": "cosmos1..."
+  },
+  "epochRatio": "0.01"
+}
+```
+
 
 
 

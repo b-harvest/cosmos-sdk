@@ -4,7 +4,7 @@
 
 Messages (Msg) are objects that trigger state transitions. Msgs are wrapped in transactions (Txs) that clients submit to the network. The Cosmos SDK wraps and unwraps farming module messages from transactions.
 
-## **MsgCreateFixedAmountPlan**
+## MsgCreateFixedAmountPlan
 
 ```go
 type MsgCreateFixedAmountPlan struct {
@@ -17,7 +17,7 @@ type MsgCreateFixedAmountPlan struct {
 }
 ```
 
-## **MsgCreateRatioPlan**
+## MsgCreateRatioPlan
 
 ```go
 type MsgCreateRatioPlan struct {
@@ -29,10 +29,9 @@ type MsgCreateRatioPlan struct {
     EpochRatio          sdk.Dec
 }
 ```
+## MsgStake
 
-## **MsgStake**
-
-- To become eligible farmer, he/she should stake staking coins into the farming plan
+A farmer must have sufficient coins to stake into a farming plan. The farmer becomes eligible to receive rewards once the farmer stakes some coins.
 
 ```go
 type MsgStake struct {
@@ -41,12 +40,9 @@ type MsgStake struct {
     StakingCoins sdk.Coins
 }
 ```
+## MsgUnstake
 
-## **MsgUnstake**
-
-- If farmer wants to terminate staking, the farmer can unstake the coins at any time
-- There is no unbonding period of time required to unstake coins from the plan
-- All accumulated farming rewards are automatically withdrawn to farmer when unstake event occurs
+A farmer must have some staking coins in the plan to trigger this message. Unlike `x/staking` module, there is no unbonding period of time required to unstake coins from the plan. All accumulated farming rewards are automatically withdrawn to the farmer once unstaking event is triggered.
 
 ```go
 type MsgUnstake struct {
@@ -56,10 +52,9 @@ type MsgUnstake struct {
 }
 
 ```
+## MsgClaim
 
-## **MsgClaim**
-
-- A farmer should claim their farming rewards. This is similar mechanism with claiming rewards from distribution module.
+A farmer should claim their farming rewards. The rewards are not automatically distributed. This is similar mechanism with `x/distribution` module.
 
 ```go
 type MsgClaim struct {
