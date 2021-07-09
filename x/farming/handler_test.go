@@ -4,13 +4,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/farming"
 	"github.com/cosmos/cosmos-sdk/x/farming/keeper"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
+	"github.com/stretchr/testify/require"
 
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
@@ -42,8 +41,7 @@ func TestMsgCreateFixedAmountPlan(t *testing.T) {
 		sdk.DecCoin{Denom: "testFarmStakingCoinDenom", Amount: sdk.MustNewDecFromStr("1.0")},
 	)
 	startTime := time.Now().UTC()
-	endTime, err := time.Parse(time.RFC3339, "2021-11-01T22:08:41+00:00")
-	require.NoError(t, err)
+	endTime := startTime.AddDate(1, 0, 0)
 	epochDays := uint32(1)
 	epochAmount := sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(1)))
 
@@ -57,7 +55,7 @@ func TestMsgCreateFixedAmountPlan(t *testing.T) {
 	)
 
 	handler := farming.NewHandler(app.FarmingKeeper)
-	_, err = handler(ctx, msg)
+	_, err := handler(ctx, msg)
 	require.NoError(t, err)
 
 	plans := app.FarmingKeeper.GetAllPlans(ctx)
@@ -73,8 +71,7 @@ func TestMsgCreateRatioPlan(t *testing.T) {
 		sdk.DecCoin{Denom: "testFarmStakingCoinDenom", Amount: sdk.MustNewDecFromStr("1.0")},
 	)
 	startTime := time.Now().UTC()
-	endTime, err := time.Parse(time.RFC3339, "2021-11-01T22:08:41+00:00")
-	require.NoError(t, err)
+	endTime := startTime.AddDate(1, 0, 0)
 	epochDays := uint32(1)
 	epochAmount := sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(1)))
 
@@ -88,10 +85,22 @@ func TestMsgCreateRatioPlan(t *testing.T) {
 	)
 
 	handler := farming.NewHandler(app.FarmingKeeper)
-	_, err = handler(ctx, msg)
+	_, err := handler(ctx, msg)
 	require.NoError(t, err)
 
 	plans := app.FarmingKeeper.GetAllPlans(ctx)
 	require.Equal(t, 1, len(plans))
 	require.Equal(t, farmingPoolAddr.String(), plans[0].GetFarmingPoolAddress().String())
+}
+
+func TestMsgStake(t *testing.T) {
+	// TODO: not implemented yet
+}
+
+func TestMsgUnstake(t *testing.T) {
+	// TODO: not implemented yet
+}
+
+func TestMsgClaim(t *testing.T) {
+	// TODO: not implemented yet
 }
