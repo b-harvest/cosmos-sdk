@@ -39,7 +39,7 @@ func TestGetSetNewPlan(t *testing.T) {
 	app.FarmingKeeper.Stake(ctx, msgStake)
 
 	stakings := app.FarmingKeeper.GetAllStakings(ctx)
-	stakingsByPlan := app.FarmingKeeper.GetStakingsByPlanId(ctx, fixedPlan.Id)
+	stakingsByPlan := app.FarmingKeeper.GetStakingsByPlanID(ctx, fixedPlan.Id)
 	require.Equal(t, stakings, stakingsByPlan)
 	plansByFarmer := app.FarmingKeeper.GetPlansByFarmerAddrIndex(ctx, farmerAddr)
 

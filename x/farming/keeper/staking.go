@@ -7,14 +7,14 @@ import (
 
 //// NewStaking sets the index to a given staking
 //func (k Keeper) NewStaking(ctx sdk.Context, staking types.Staking) types.Staking {
-//	k.SetPlanIdByFarmerAddrIndex(ctx, staking.PlanId, staking.GetFarmerAddress())
+//	k.SetPlanIDByFarmerAddrIndex(ctx, staking.PlanId, staking.GetFarmerAddress())
 //	return staking
 //}
 
 // GetStaking return a specific staking
-func (k Keeper) GetStaking(ctx sdk.Context, planId uint64, farmerAcc sdk.AccAddress) (staking types.Staking, found bool) {
+func (k Keeper) GetStaking(ctx sdk.Context, planID uint64, farmerAcc sdk.AccAddress) (staking types.Staking, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.GetStakingIndexKey(planId, farmerAcc))
+	bz := store.Get(types.GetStakingIndexKey(planID, farmerAcc))
 	if bz == nil {
 		return staking, false
 	}
@@ -61,9 +61,9 @@ func (k Keeper) IterateAllStakings(ctx sdk.Context, cb func(staking types.Stakin
 	}
 }
 
-// GetStakingsByPlanId reads from kvstore and return a specific Staking indexed by given plan id
-func (k Keeper) GetStakingsByPlanId(ctx sdk.Context, planId uint64) (stakings []types.Staking) {
-	k.IterateStakingsByPlanId(ctx, planId, func(staking types.Staking) bool {
+// GetStakingsByPlanID reads from kvstore and return a specific Staking indexed by given plan id
+func (k Keeper) GetStakingsByPlanID(ctx sdk.Context, planID uint64) (stakings []types.Staking) {
+	k.IterateStakingsByPlanID(ctx, planID, func(staking types.Staking) bool {
 		stakings = append(stakings, staking)
 		return false
 	})
@@ -71,11 +71,11 @@ func (k Keeper) GetStakingsByPlanId(ctx sdk.Context, planId uint64) (stakings []
 	return stakings
 }
 
-// IterateAllStakings iterates over all the stored stakings and performs a callback function.
+// IterateStakingsByPlanID iterates over all the stored stakings and performs a callback function.
 // Stops iteration when callback returns true.
-func (k Keeper) IterateStakingsByPlanId(ctx sdk.Context, planId uint64, cb func(staking types.Staking) (stop bool)) {
+func (k Keeper) IterateStakingsByPlanID(ctx sdk.Context, planID uint64, cb func(staking types.Staking) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.GetStakingPrefix(planId))
+	iterator := sdk.KVStorePrefixIterator(store, types.GetStakingPrefix(planID))
 
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
@@ -102,7 +102,7 @@ func (k Keeper) Stake(ctx sdk.Context, msg *types.MsgStake) (types.Staking, erro
 			StakedCoins: nil,
 			QueuedCoins: msg.StakingCoins,
 		}
-		k.SetPlanIdByFarmerAddrIndex(ctx, staking.PlanId, staking.GetFarmerAddress())
+		k.SetPlanIDByFarmerAddrIndex(ctx, staking.PlanId, staking.GetFarmerAddress())
 	} else {
 		staking.QueuedCoins = staking.QueuedCoins.Add(msg.StakingCoins...)
 	}
@@ -114,4 +114,10 @@ func (k Keeper) Stake(ctx sdk.Context, msg *types.MsgStake) (types.Staking, erro
 // TODO: WIP
 func (k Keeper) Unstake(ctx sdk.Context, msg *types.MsgUnstake) (types.Staking, error) {
 	return types.Staking{}, nil
+}
+
+// UnmarshalStaking unmarshals a Staking from bytes.
+func (k Keeper) UnmarshalStaking(bz []byte) (types.Staking, error) {
+	var staking types.Staking
+	return staking, k.cdc.Unmarshal(bz, &staking)
 }

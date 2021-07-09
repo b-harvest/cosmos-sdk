@@ -129,8 +129,8 @@ func (k Querier) Plan(c context.Context, req *types.QueryPlanRequest) (*types.Qu
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	plan := k.GetPlan(ctx, req.PlanId)
-	if plan == nil {
+	plan, found := k.GetPlan(ctx, req.PlanId)
+	if !found {
 		return nil, status.Errorf(codes.NotFound, "plan %d not found", req.PlanId)
 	}
 
@@ -153,8 +153,8 @@ func (k Querier) PlanStakings(c context.Context, req *types.QueryPlanStakingsReq
 
 	var stakings []*types.Staking
 	pageRes, err := query.Paginate(stakingStore, req.Pagination, func(key []byte, value []byte) error {
-		var staking types.Staking
-		if err := k.cdc.Unmarshal(value, &staking); err != nil {
+		staking, err := k.UnmarshalStaking(value)
+		if err != nil {
 			return err
 		}
 		stakings = append(stakings, &staking)
@@ -179,7 +179,7 @@ func (k Querier) FarmerStakings(c context.Context, req *types.QueryFarmerStaking
 
 	ctx := sdk.UnwrapSDKContext(c)
 	store := ctx.KVStore(k.storeKey)
-	planStore := prefix.NewStore(store, types.GetPlanByFarmerAddrIndexKeyPrefix(farmerAddr))
+	planStore := prefix.NewStore(store, types.GetPlansByFarmerAddrIndexKey(farmerAddr))
 
 	var stakings []*types.Staking
 	pageRes, err := query.Paginate(planStore, req.Pagination, func(key []byte, value []byte) error {
@@ -188,17 +188,9 @@ func (k Querier) FarmerStakings(c context.Context, req *types.QueryFarmerStaking
 			return err
 		}
 		planID := val.GetValue()
-		plan := k.GetPlan(ctx, planID)
-		if plan == nil { // TODO: Remove this check if we can sure that we're cleaning the store correctly.
-			return fmt.Errorf("missing plan %d", planID)
-		}
-		bz := store.Get(types.GetStakingIndexKey(planID, farmerAddr))
-		if bz == nil { // TODO: Remove this check if we can sure that we're cleaning the store correctly.
-			return fmt.Errorf("missing staking")
-		}
-		var staking types.Staking
-		if err := k.cdc.Unmarshal(bz, &staking); err != nil {
-			return err
+		staking, found := k.GetStaking(ctx, planID, farmerAddr)
+		if !found { // TODO: Remove this check if we can sure that we're cleaning the store correctly.
+			return fmt.Errorf("staking not found")
 		}
 		stakings = append(stakings, &staking)
 		return nil
@@ -221,14 +213,9 @@ func (k Querier) FarmerStaking(c context.Context, req *types.QueryFarmerStakingR
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.GetStakingIndexKey(req.PlanId, farmerAddr))
-	if bz == nil {
+	staking, found := k.GetStaking(ctx, req.PlanId, farmerAddr)
+	if !found {
 		return nil, status.Error(codes.NotFound, "staking not found")
-	}
-	var staking types.Staking
-	if err := k.cdc.Unmarshal(bz, &staking); err != nil {
-		return nil, err
 	}
 
 	return &types.QueryFarmerStakingResponse{Staking: &staking}, nil
@@ -245,8 +232,8 @@ func (k Querier) PlanRewards(c context.Context, req *types.QueryPlanRewardsReque
 
 	var rewards []*types.Reward
 	pageRes, err := query.Paginate(rewardStore, req.Pagination, func(key []byte, value []byte) error {
-		var reward types.Reward
-		if err := k.cdc.Unmarshal(value, &reward); err != nil {
+		reward, err := k.UnmarshalReward(value)
+		if err != nil {
 			return err
 		}
 		rewards = append(rewards, &reward)
@@ -271,7 +258,7 @@ func (k Querier) FarmerRewards(c context.Context, req *types.QueryFarmerRewardsR
 
 	ctx := sdk.UnwrapSDKContext(c)
 	store := ctx.KVStore(k.storeKey)
-	planStore := prefix.NewStore(store, types.GetPlanByFarmerAddrIndexKeyPrefix(farmerAddr))
+	planStore := prefix.NewStore(store, types.GetPlansByFarmerAddrIndexKey(farmerAddr))
 
 	var rewards []*types.Reward
 	pageRes, err := query.Paginate(planStore, req.Pagination, func(key []byte, value []byte) error {
@@ -280,17 +267,9 @@ func (k Querier) FarmerRewards(c context.Context, req *types.QueryFarmerRewardsR
 			return err
 		}
 		planID := val.GetValue()
-		plan := k.GetPlan(ctx, planID)
-		if plan == nil { // TODO: Remove this check if we can sure that we're cleaning the store correctly.
-			return fmt.Errorf("missing plan %d", planID)
-		}
-		bz := store.Get(types.GetRewardIndexKey(planID, farmerAddr))
-		if bz == nil { // TODO: Remove this check if we can sure that we're cleaning the store correctly.
-			return fmt.Errorf("missing reward")
-		}
-		var reward types.Reward
-		if err := k.cdc.Unmarshal(bz, &reward); err != nil {
-			return err
+		reward, found := k.GetReward(ctx, planID, farmerAddr)
+		if !found { // TODO: Remove this check if we can sure that we're cleaning the store correctly.
+			return fmt.Errorf("reward not found")
 		}
 		rewards = append(rewards, &reward)
 		return nil
@@ -313,14 +292,9 @@ func (k Querier) FarmerReward(c context.Context, req *types.QueryFarmerRewardReq
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.GetRewardIndexKey(req.PlanId, farmerAddr))
-	if bz == nil {
+	reward, found := k.GetReward(ctx, req.PlanId, farmerAddr)
+	if !found {
 		return nil, status.Error(codes.NotFound, "reward not found")
-	}
-	var reward types.Reward
-	if err := k.cdc.Unmarshal(bz, &reward); err != nil {
-		return nil, err
 	}
 
 	return &types.QueryFarmerRewardResponse{Reward: &reward}, nil
