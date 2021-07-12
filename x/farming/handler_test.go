@@ -66,16 +66,16 @@ func TestMsgCreateFixedAmountPlan(t *testing.T) {
 }
 
 func TestMsgCreateRatioPlan(t *testing.T) {
-	app, ctx, _ := createTestInput()
+	app, ctx, addrs := createTestInput()
 
-	farmingPoolAddr := sdk.AccAddress([]byte("farmingPoolAddr"))
+	farmingPoolAddr := addrs[0]
 	stakingCoinWeights := sdk.NewDecCoins(
 		sdk.DecCoin{Denom: "testFarmStakingCoinDenom", Amount: sdk.MustNewDecFromStr("1.0")},
 	)
 	startTime := time.Now().UTC()
 	endTime := startTime.AddDate(1, 0, 0)
 	epochDays := uint32(1)
-	epochAmount := sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(1)))
+	epochAmount := sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(1)))
 
 	msg := types.NewMsgCreateFixedAmountPlan(
 		farmingPoolAddr,
@@ -96,7 +96,54 @@ func TestMsgCreateRatioPlan(t *testing.T) {
 }
 
 func TestMsgStake(t *testing.T) {
-	// TODO: not implemented yet
+	app, ctx, addrs := createTestInput()
+
+	farmingPoolAddr := addrs[0]
+	stakingCoinWeights := sdk.NewDecCoins(
+		sdk.DecCoin{Denom: "testFarmStakingCoinDenom", Amount: sdk.MustNewDecFromStr("1.0")},
+	)
+	startTime := time.Now().UTC()
+	endTime := startTime.AddDate(1, 0, 0)
+	epochDays := uint32(1)
+	epochAmount := sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(1)))
+
+	msg := types.NewMsgCreateFixedAmountPlan(
+		farmingPoolAddr,
+		stakingCoinWeights,
+		startTime,
+		endTime,
+		epochDays,
+		epochAmount,
+	)
+
+	handler := farming.NewHandler(app.FarmingKeeper)
+	_, err := handler(ctx, msg)
+	require.NoError(t, err)
+
+	plan, found := app.FarmingKeeper.GetPlan(ctx, uint64(1))
+	require.Equal(t, true, found)
+
+	stakingCoins := sdk.NewCoins(
+		sdk.NewCoin("stake", sdk.NewInt(1)),
+		sdk.NewCoin("uatom", sdk.NewInt(1)),
+	)
+
+	msgStake := types.NewMsgStake(
+		plan.GetId(),
+		farmingPoolAddr,
+		stakingCoins,
+	)
+
+	handler = farming.NewHandler(app.FarmingKeeper)
+	_, err = handler(ctx, msgStake)
+	require.NoError(t, err)
+
+	plan, found = app.FarmingKeeper.GetPlan(ctx, uint64(1))
+	require.Equal(t, true, found)
+
+	staking, found := app.FarmingKeeper.GetStaking(ctx, plan.GetId(), farmingPoolAddr)
+	require.Equal(t, true, found)
+	require.Equal(t, stakingCoins, staking.QueuedCoins)
 }
 
 func TestMsgUnstake(t *testing.T) {
