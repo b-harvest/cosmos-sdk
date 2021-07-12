@@ -16,6 +16,7 @@ const (
 	AttributeKeyStakingCoinWeights    = "staking_coin_weights"
 	AttributeKeyStakingCoins          = "staking_coins"
 	AttributeKeyUnstakingCoins        = "unstaking_coins"
+	AttributeKeyRewardCoins           = "reward_coins"
 	AttributeKeyStartTime             = "start_time"
 	AttributeKeyEndTime               = "end_time"
 	AttributeKeyEpochDays             = "epoch_days"

@@ -81,7 +81,26 @@ func (k Keeper) IterateRewardsByPlanId(ctx sdk.Context, planId uint64, cb func(r
 	}
 }
 
-// TODO: WIP
+// Claim claims farming rewards from the reward pool account.
 func (k Keeper) Claim(ctx sdk.Context, msg *types.MsgClaim) (types.Reward, error) {
+	plan, found := k.GetPlan(ctx, msg.PlanId)
+	if !found {
+		return types.Reward{}, types.ErrPlanNotExists
+	}
+
+	farmerAcc, err := sdk.AccAddressFromBech32(msg.Farmer)
+	if err != nil {
+		return types.Reward{}, err
+	}
+
+	reward, found := k.GetReward(ctx, plan.GetId(), farmerAcc)
+	if !found {
+		return types.Reward{}, types.ErrRewardNotExists
+	}
+
+	if err := k.bankKeeper.SendCoins(ctx, plan.GetRewardPoolAddress(), reward.GetFarmerAddress(), reward.RewardCoins); err != nil {
+		panic(err)
+	}
+
 	return types.Reward{}, nil
 }

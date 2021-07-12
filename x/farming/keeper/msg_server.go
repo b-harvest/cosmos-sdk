@@ -81,9 +81,10 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 // Stake defines a method for staking coins to the farming plan.
 func (k msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.MsgStakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	_, error := k.Keeper.Stake(ctx, msg)
-	if error != nil {
-		return &types.MsgStakeResponse{}, error
+
+	_, err := k.Keeper.Stake(ctx, msg)
+	if err != nil {
+		return &types.MsgStakeResponse{}, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -98,13 +99,13 @@ func (k msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.Msg
 	return &types.MsgStakeResponse{}, nil
 }
 
-// TODO: WIP
 // Unstake defines a method for unstaking coins from the farming plan.
 func (k msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types.MsgUnstakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	_, error := k.Keeper.Unstake(ctx, msg)
-	if error != nil {
-		return &types.MsgUnstakeResponse{}, error
+
+	_, err := k.Keeper.Unstake(ctx, msg)
+	if err != nil {
+		return &types.MsgUnstakeResponse{}, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -119,13 +120,23 @@ func (k msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types
 	return &types.MsgUnstakeResponse{}, nil
 }
 
-// TODO: WIP
 // Claim defines a method for claiming farming rewards from the farming plan.
 func (k msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.MsgClaimResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	_, error := k.Keeper.Claim(ctx, msg)
-	if error != nil {
-		return &types.MsgClaimResponse{}, error
+
+	reward, err := k.Keeper.Claim(ctx, msg)
+	if err != nil {
+		return &types.MsgClaimResponse{}, err
 	}
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeClaim,
+			sdk.NewAttribute(types.AttributeKeyPlanId, strconv.FormatUint(msg.GetPlanId(), 10)),
+			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetFarmer()),
+			sdk.NewAttribute(types.AttributeKeyRewardCoins, reward.RewardCoins.String()),
+		),
+	})
+
 	return &types.MsgClaimResponse{}, nil
 }
