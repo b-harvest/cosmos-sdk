@@ -16,7 +16,7 @@ func (k Keeper) NewPlan(ctx sdk.Context, plan types.PlanI) types.PlanI {
 	return plan
 }
 
-// GetPlan implements PlanI.
+// GetPlan returns the plan for a given id.
 func (k Keeper) GetPlan(ctx sdk.Context, id uint64) (plan types.PlanI, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GetPlanKey(id))
@@ -27,7 +27,7 @@ func (k Keeper) GetPlan(ctx sdk.Context, id uint64) (plan types.PlanI, found boo
 	return k.decodePlan(bz), true
 }
 
-// GetAllPlans returns all plans in the Keeper.
+// GetAllPlans returns all the plans.
 func (k Keeper) GetAllPlans(ctx sdk.Context) (plans []types.PlanI) {
 	k.IterateAllPlans(ctx, func(plan types.PlanI) (stop bool) {
 		plans = append(plans, plan)
@@ -37,7 +37,7 @@ func (k Keeper) GetAllPlans(ctx sdk.Context) (plans []types.PlanI) {
 	return plans
 }
 
-// SetPlan implements PlanI.
+// SetPlan sets a plan.
 func (k Keeper) SetPlan(ctx sdk.Context, plan types.PlanI) {
 	id := plan.GetId()
 	store := ctx.KVStore(k.storeKey)
@@ -50,7 +50,7 @@ func (k Keeper) SetPlan(ctx sdk.Context, plan types.PlanI) {
 	store.Set(types.GetPlanKey(id), bz)
 }
 
-// RemovePlan removes an plan for the plan mapper store.
+// RemovePlan removes a plan.
 // NOTE: this will cause supply invariant violation if called
 func (k Keeper) RemovePlan(ctx sdk.Context, plan types.PlanI) {
 	id := plan.GetId()
@@ -58,8 +58,8 @@ func (k Keeper) RemovePlan(ctx sdk.Context, plan types.PlanI) {
 	store.Delete(types.GetPlanKey(id))
 }
 
-// IterateAllPlans iterates over all the stored plans and performs a callback function.
-// Stops iteration when callback returns true.
+// IterateAllPlans iterates over all the plans.
+// Once the callback returns true, it stops the iteration.
 func (k Keeper) IterateAllPlans(ctx sdk.Context, cb func(plan types.PlanI) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.PlanKeyPrefix)
@@ -74,7 +74,7 @@ func (k Keeper) IterateAllPlans(ctx sdk.Context, cb func(plan types.PlanI) (stop
 	}
 }
 
-// GetPlansByFarmerAddrIndex reads from kvstore and return a specific Plan indexed by given farmer address
+// GetPlansByFarmerAddrIndex returns all the plans the farmer is staking to.
 func (k Keeper) GetPlansByFarmerAddrIndex(ctx sdk.Context, farmerAcc sdk.AccAddress) (plans []types.PlanI) {
 	k.IteratePlansByFarmerAddr(ctx, farmerAcc, func(plan types.PlanI) bool {
 		plans = append(plans, plan)
@@ -84,8 +84,8 @@ func (k Keeper) GetPlansByFarmerAddrIndex(ctx sdk.Context, farmerAcc sdk.AccAddr
 	return plans
 }
 
-// IteratePlansByFarmerAddr iterates over all the stored plans and performs a callback function.
-// Stops iteration when callback returns true.
+// IteratePlansByFarmerAddr iterates over all the plans.
+// Once the callback returns true, it stops the iteration.
 func (k Keeper) IteratePlansByFarmerAddr(ctx sdk.Context, farmerAcc sdk.AccAddress, cb func(plan types.PlanI) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.GetPlansByFarmerAddrIndexKey(farmerAcc))
@@ -105,7 +105,7 @@ func (k Keeper) IteratePlansByFarmerAddr(ctx sdk.Context, farmerAcc sdk.AccAddre
 	}
 }
 
-// SetPlanIDByFarmerAddrIndex sets Index by FarmerAddr
+// SetPlanIDByFarmerAddrIndex sets association within a plan and a farmer.
 // TODO: need to gas cost check for existing check or update everytime
 func (k Keeper) SetPlanIDByFarmerAddrIndex(ctx sdk.Context, planID uint64, farmerAcc sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
@@ -113,7 +113,7 @@ func (k Keeper) SetPlanIDByFarmerAddrIndex(ctx sdk.Context, planID uint64, farme
 	store.Set(types.GetPlanByFarmerAddrIndexKey(farmerAcc, planID), b)
 }
 
-// CreateFixedAmountPlan sets fixed amount plan.
+// CreateFixedAmountPlan sets a fixed amount plan from the msg and a given plan type.
 func (k Keeper) CreateFixedAmountPlan(ctx sdk.Context, msg *types.MsgCreateFixedAmountPlan, typ types.PlanType) *types.FixedAmountPlan {
 	nextId := k.GetNextPlanIDWithUpdate(ctx)
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
@@ -137,7 +137,7 @@ func (k Keeper) CreateFixedAmountPlan(ctx sdk.Context, msg *types.MsgCreateFixed
 	return fixedPlan
 }
 
-// CreateRatioPlan sets ratio plan.
+// CreateRatioPlan sets a ratio plan from the msg and a given plan type.
 func (k Keeper) CreateRatioPlan(ctx sdk.Context, msg *types.MsgCreateRatioPlan, typ types.PlanType) *types.RatioPlan {
 	nextId := k.GetNextPlanIDWithUpdate(ctx)
 	farmingPoolAddr := msg.GetFarmingPoolAddress()

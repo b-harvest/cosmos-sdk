@@ -5,7 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
 )
 
-// GetReward return a specific reward
+// GetReward returns a reward owned by the farmer for a given plan.
 func (k Keeper) GetReward(ctx sdk.Context, planID uint64, farmerAcc sdk.AccAddress) (reward types.Reward, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GetRewardIndexKey(planID, farmerAcc))
@@ -16,7 +16,7 @@ func (k Keeper) GetReward(ctx sdk.Context, planID uint64, farmerAcc sdk.AccAddre
 	return reward, true
 }
 
-// GetAllRewards returns all rewards in the Keeper.
+// GetAllRewards returns all the rewards.
 func (k Keeper) GetAllRewards(ctx sdk.Context) (rewards []types.Reward) {
 	k.IterateAllRewards(ctx, func(reward types.Reward) (stop bool) {
 		rewards = append(rewards, reward)
@@ -26,7 +26,7 @@ func (k Keeper) GetAllRewards(ctx sdk.Context) (rewards []types.Reward) {
 	return rewards
 }
 
-// GetRewardsByPlanID reads from kvstore and return a specific Reward indexed by given plan id
+// GetRewardsByPlanID returns all the rewards for a given plan.
 func (k Keeper) GetRewardsByPlanID(ctx sdk.Context, planID uint64) (rewards []types.Reward) {
 	k.IterateRewardsByPlanID(ctx, planID, func(reward types.Reward) bool {
 		rewards = append(rewards, reward)
@@ -36,21 +36,21 @@ func (k Keeper) GetRewardsByPlanID(ctx sdk.Context, planID uint64) (rewards []ty
 	return rewards
 }
 
-// SetReward implements Reward.
+// SetReward sets a reward.
 func (k Keeper) SetReward(ctx sdk.Context, reward types.Reward) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&reward)
 	store.Set(types.GetRewardIndexKey(reward.PlanId, reward.GetFarmerAddress()), bz)
 }
 
-// RemoveReward removes an reward for the reward mapper store.
+// RemoveReward removes a reward.
 func (k Keeper) RemoveReward(ctx sdk.Context, reward types.Reward) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetRewardIndexKey(reward.PlanId, reward.GetFarmerAddress()))
 }
 
-// IterateAllRewards iterates over all the stored rewards and performs a callback function.
-// Stops iteration when callback returns true.
+// IterateAllRewards iterates over all the rewards.
+// Once the callback returns true, it stops the iteration.
 func (k Keeper) IterateAllRewards(ctx sdk.Context, cb func(reward types.Reward) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.RewardKeyPrefix)
@@ -65,8 +65,8 @@ func (k Keeper) IterateAllRewards(ctx sdk.Context, cb func(reward types.Reward) 
 	}
 }
 
-// IterateRewardsByPlanID iterates over all the stored rewards and performs a callback function.
-// Stops iteration when callback returns true.
+// IterateRewardsByPlanID iterates over all the rewards associated with a given plan.
+// Once the callback returns true, it stops the iteration.
 func (k Keeper) IterateRewardsByPlanID(ctx sdk.Context, planID uint64, cb func(reward types.Reward) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.GetRewardPrefix(planID))
@@ -81,7 +81,7 @@ func (k Keeper) IterateRewardsByPlanID(ctx sdk.Context, planID uint64, cb func(r
 	}
 }
 
-// UnmarshalReward unmarshals a Reward from bytes.
+// UnmarshalReward unmarshals a reward from bytes.
 func (k Keeper) UnmarshalReward(bz []byte) (types.Reward, error) {
 	var reward types.Reward
 	return reward, k.cdc.Unmarshal(bz, &reward)
@@ -105,7 +105,7 @@ func (k Keeper) Claim(ctx sdk.Context, msg *types.MsgClaim) (types.Reward, error
 	}
 
 	if err := k.bankKeeper.SendCoins(ctx, plan.GetRewardPoolAddress(), reward.GetFarmerAddress(), reward.RewardCoins); err != nil {
-		panic(err)
+		return types.Reward{}, err
 	}
 
 	return types.Reward{}, nil
