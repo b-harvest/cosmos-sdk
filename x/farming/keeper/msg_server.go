@@ -77,38 +77,35 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 	return &types.MsgCreateRatioPlanResponse{}, nil
 }
 
+// TODO: WIP
 // Stake defines a method for staking coins to the farming plan.
 func (k msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.MsgStakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	plan := k.GetPlan(ctx, msg.PlanId)
-	if plan == nil {
-		return nil, types.ErrPlanNotExists
+	_, error := k.Keeper.Stake(ctx, msg)
+	if error != nil {
+		return &types.MsgStakeResponse{}, error
 	}
-
-	// SetStake
-	// SetUnstake
-	// SetClaim
-	// k.Stake(msg.PlanId, msg.Farmer, msg.StakingCoins)
-
 	return &types.MsgStakeResponse{}, nil
 }
 
+// TODO: WIP
 // Unstake defines a method for unstaking coins from the farming plan.
 func (k msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types.MsgUnstakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	plan := k.GetPlan(ctx, msg.PlanId)
-	if plan == nil {
-		return nil, types.ErrPlanNotExists
+	_, error := k.Keeper.Unstake(ctx, msg)
+	if error != nil {
+		return &types.MsgUnstakeResponse{}, error
 	}
-
 	return &types.MsgUnstakeResponse{}, nil
 }
 
+// TODO: WIP
 // Claim defines a method for claiming farming rewards from the farming plan.
 func (k msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.MsgClaimResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	fmt.Println("ctx: ", ctx)
+	_, error := k.Keeper.Claim(ctx, msg)
+	if error != nil {
+		return &types.MsgClaimResponse{}, error
+	}
 	return &types.MsgClaimResponse{}, nil
 }

@@ -109,7 +109,8 @@ The parameters of the Plan state are:
 - PlanByFarmerAddrIndex: `0x12 | FarmerAddrLen (1 byte) | FarmerAddr -> Id`
     - iterable for several `PlanId` results by indexed `FarmerAddr`
 - LastEpochTime: `0x13 | Id -> time.Time`
-- GlobalFarmingPlanIdKey: `[]byte("globalFarmingPlanId") -> LatestPlanId`
+- GlobalFarmingPlanIdKey: `[]byte("globalFarmingPlanId") -> ProtocolBuffer(uint64)`
+    - store latest plan id
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
 
 
