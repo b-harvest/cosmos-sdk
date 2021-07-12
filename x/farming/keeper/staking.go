@@ -32,6 +32,16 @@ func (k Keeper) GetAllStakings(ctx sdk.Context) (stakings []types.Staking) {
 	return stakings
 }
 
+// GetStakingsByPlanID reads from kvstore and return a specific Staking indexed by given plan id
+func (k Keeper) GetStakingsByPlanID(ctx sdk.Context, planID uint64) (stakings []types.Staking) {
+	k.IterateStakingsByPlanID(ctx, planID, func(staking types.Staking) bool {
+		stakings = append(stakings, staking)
+		return false
+	})
+
+	return stakings
+}
+
 // SetStaking implements Staking.
 func (k Keeper) SetStaking(ctx sdk.Context, staking types.Staking) {
 	store := ctx.KVStore(k.storeKey)
@@ -61,16 +71,6 @@ func (k Keeper) IterateAllStakings(ctx sdk.Context, cb func(staking types.Stakin
 	}
 }
 
-// GetStakingsByPlanID reads from kvstore and return a specific Staking indexed by given plan id
-func (k Keeper) GetStakingsByPlanID(ctx sdk.Context, planID uint64) (stakings []types.Staking) {
-	k.IterateStakingsByPlanID(ctx, planID, func(staking types.Staking) bool {
-		stakings = append(stakings, staking)
-		return false
-	})
-
-	return stakings
-}
-
 // IterateStakingsByPlanID iterates over all the stored stakings and performs a callback function.
 // Stops iteration when callback returns true.
 func (k Keeper) IterateStakingsByPlanID(ctx sdk.Context, planID uint64, cb func(staking types.Staking) (stop bool)) {
@@ -85,6 +85,12 @@ func (k Keeper) IterateStakingsByPlanID(ctx sdk.Context, planID uint64, cb func(
 			break
 		}
 	}
+}
+
+// UnmarshalStaking unmarshals a Staking from bytes.
+func (k Keeper) UnmarshalStaking(bz []byte) (types.Staking, error) {
+	var staking types.Staking
+	return staking, k.cdc.Unmarshal(bz, &staking)
 }
 
 // ReserveStakingCoins sends staking coins to the staking reserve account.
@@ -167,10 +173,4 @@ func (k Keeper) Unstake(ctx sdk.Context, msg *types.MsgUnstake) (types.Staking, 
 	k.ReleaseStakingCoins(ctx, plan.GetStakingReserveAddress(), farmerAcc, msg.UnstakingCoins)
 
 	return types.Staking{}, nil
-}
-
-// UnmarshalStaking unmarshals a Staking from bytes.
-func (k Keeper) UnmarshalStaking(bz []byte) (types.Staking, error) {
-	var staking types.Staking
-	return staking, k.cdc.Unmarshal(bz, &staking)
 }

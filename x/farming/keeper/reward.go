@@ -26,6 +26,16 @@ func (k Keeper) GetAllRewards(ctx sdk.Context) (rewards []types.Reward) {
 	return rewards
 }
 
+// GetRewardsByPlanID reads from kvstore and return a specific Reward indexed by given plan id
+func (k Keeper) GetRewardsByPlanID(ctx sdk.Context, planID uint64) (rewards []types.Reward) {
+	k.IterateRewardsByPlanID(ctx, planID, func(reward types.Reward) bool {
+		rewards = append(rewards, reward)
+		return false
+	})
+
+	return rewards
+}
+
 // SetReward implements Reward.
 func (k Keeper) SetReward(ctx sdk.Context, reward types.Reward) {
 	store := ctx.KVStore(k.storeKey)
@@ -55,16 +65,6 @@ func (k Keeper) IterateAllRewards(ctx sdk.Context, cb func(reward types.Reward) 
 	}
 }
 
-// GetRewardsByPlanID reads from kvstore and return a specific Reward indexed by given plan id
-func (k Keeper) GetRewardsByPlanID(ctx sdk.Context, planID uint64) (rewards []types.Reward) {
-	k.IterateRewardsByPlanID(ctx, planID, func(reward types.Reward) bool {
-		rewards = append(rewards, reward)
-		return false
-	})
-
-	return rewards
-}
-
 // IterateRewardsByPlanID iterates over all the stored rewards and performs a callback function.
 // Stops iteration when callback returns true.
 func (k Keeper) IterateRewardsByPlanID(ctx sdk.Context, planID uint64, cb func(reward types.Reward) (stop bool)) {
@@ -79,6 +79,12 @@ func (k Keeper) IterateRewardsByPlanID(ctx sdk.Context, planID uint64, cb func(r
 			break
 		}
 	}
+}
+
+// UnmarshalReward unmarshals a Reward from bytes.
+func (k Keeper) UnmarshalReward(bz []byte) (types.Reward, error) {
+	var reward types.Reward
+	return reward, k.cdc.Unmarshal(bz, &reward)
 }
 
 // Claim claims farming rewards from the reward pool account.
@@ -103,10 +109,4 @@ func (k Keeper) Claim(ctx sdk.Context, msg *types.MsgClaim) (types.Reward, error
 	}
 
 	return types.Reward{}, nil
-}
-
-// UnmarshalReward unmarshals a Reward from bytes.
-func (k Keeper) UnmarshalReward(bz []byte) (types.Reward, error) {
-	var reward types.Reward
-	return reward, k.cdc.Unmarshal(bz, &reward)
 }
