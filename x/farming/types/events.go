@@ -8,11 +8,14 @@ const (
 	EventTypeUnstake               = "unstake"
 	EventTypeClaim                 = "claim"
 
+	AttributeKeyPlanId                = "plan_id" //nolint:golint
 	AttributeKeyFarmingPoolAddress    = "farming_pool_address"
 	AttributeKeyStakingReserveAddress = "staking_reserve_address"
 	AttributeKeyRewardPoolAddress     = "reward_pool_address"
 	AttributeKeyTerminationAddress    = "termination_address"
 	AttributeKeyStakingCoinWeights    = "staking_coin_weights"
+	AttributeKeyStakingCoins          = "staking_coins"
+	AttributeKeyUnstakingCoins        = "unstaking_coins"
 	AttributeKeyStartTime             = "start_time"
 	AttributeKeyEndTime               = "end_time"
 	AttributeKeyEpochDays             = "epoch_days"

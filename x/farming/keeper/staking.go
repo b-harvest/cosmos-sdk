@@ -87,13 +87,34 @@ func (k Keeper) IterateStakingsByPlanId(ctx sdk.Context, planId uint64, cb func(
 	}
 }
 
-// TODO: WIP
+// ReserveStakingCoins sends staking coins to the staking reserve account.
+func (k Keeper) ReserveStakingCoins(ctx sdk.Context, farmer, reserveAcc sdk.AccAddress, stakingCoins sdk.Coins) error {
+	if err := k.bankKeeper.SendCoins(ctx, farmer, reserveAcc, stakingCoins); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ReleaseStakingCoins sends staking coins back to the farmer.
+func (k Keeper) ReleaseStakingCoins(ctx sdk.Context, reserveAcc, farmer sdk.AccAddress, unstakingCoins sdk.Coins) error {
+	if err := k.bankKeeper.SendCoins(ctx, reserveAcc, farmer, unstakingCoins); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Stake stores staking coins to queued coins and it will be processed in the next epoch.
 func (k Keeper) Stake(ctx sdk.Context, msg *types.MsgStake) (types.Staking, error) {
 	plan, found := k.GetPlan(ctx, msg.PlanId)
 	if !found {
 		return types.Staking{}, types.ErrPlanNotExists
 	}
-	farmerAcc, _ := sdk.AccAddressFromBech32(msg.Farmer)
+
+	farmerAcc, err := sdk.AccAddressFromBech32(msg.Farmer)
+	if err != nil {
+		return types.Staking{}, err
+	}
+
 	staking, found := k.GetStaking(ctx, plan.GetId(), farmerAcc)
 	if !found {
 		staking = types.Staking{
@@ -106,12 +127,44 @@ func (k Keeper) Stake(ctx sdk.Context, msg *types.MsgStake) (types.Staking, erro
 	} else {
 		staking.QueuedCoins = staking.QueuedCoins.Add(msg.StakingCoins...)
 	}
-	// TODO: add validation, check balance, stake to plan.StakingReserveAddress
+
 	k.SetStaking(ctx, staking)
+	k.ReserveStakingCoins(ctx, farmerAcc, plan.GetStakingReserveAddress(), staking.QueuedCoins)
+
 	return staking, nil
 }
 
-// TODO: WIP
+// Unstake unstakes an amount of staking coins from the staking reserve account.
 func (k Keeper) Unstake(ctx sdk.Context, msg *types.MsgUnstake) (types.Staking, error) {
+	plan, found := k.GetPlan(ctx, msg.PlanId)
+	if !found {
+		return types.Staking{}, types.ErrPlanNotExists
+	}
+
+	farmerAcc, err := sdk.AccAddressFromBech32(msg.Farmer)
+	if err != nil {
+		return types.Staking{}, err
+	}
+
+	staking, found := k.GetStaking(ctx, plan.GetId(), farmerAcc)
+	if !found {
+		return types.Staking{}, types.ErrStakingNotExists
+	}
+
+	// TODO: double check with this logic
+	stakedDiff, hasNeg := staking.StakedCoins.SafeSub(msg.UnstakingCoins)
+	if hasNeg {
+		diff := stakedDiff.Add(staking.QueuedCoins...)
+		if diff.IsAnyNegative() {
+			return types.Staking{}, types.ErrInsufficientStakingAmount
+		}
+		staking.StakedCoins = sdk.Coins{}
+		staking.QueuedCoins = diff
+	}
+	staking.StakedCoins = stakedDiff
+
+	k.SetStaking(ctx, staking)
+	k.ReleaseStakingCoins(ctx, plan.GetStakingReserveAddress(), farmerAcc, msg.UnstakingCoins)
+
 	return types.Staking{}, nil
 }

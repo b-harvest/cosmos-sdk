@@ -8,6 +8,7 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
@@ -77,7 +78,6 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 	return &types.MsgCreateRatioPlanResponse{}, nil
 }
 
-// TODO: WIP
 // Stake defines a method for staking coins to the farming plan.
 func (k msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.MsgStakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -85,6 +85,16 @@ func (k msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.Msg
 	if error != nil {
 		return &types.MsgStakeResponse{}, error
 	}
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeStake,
+			sdk.NewAttribute(types.AttributeKeyPlanId, strconv.FormatUint(msg.GetPlanId(), 10)),
+			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetFarmer()),
+			sdk.NewAttribute(types.AttributeKeyStakingCoins, msg.GetStakingCoins().String()),
+		),
+	})
+
 	return &types.MsgStakeResponse{}, nil
 }
 
@@ -96,6 +106,16 @@ func (k msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types
 	if error != nil {
 		return &types.MsgUnstakeResponse{}, error
 	}
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeUnstake,
+			sdk.NewAttribute(types.AttributeKeyPlanId, strconv.FormatUint(msg.GetPlanId(), 10)),
+			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetUnstaker().String()),
+			sdk.NewAttribute(types.AttributeKeyStakingCoins, msg.GetUnstakingCoins().String()),
+		),
+	})
+
 	return &types.MsgUnstakeResponse{}, nil
 }
 

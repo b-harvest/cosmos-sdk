@@ -14,9 +14,9 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
-// createTestInput Returns a simapp with custom StakingKeeper
+// createTestInput returns a simapp with custom FarmingKeeper
 // to avoid messing with the hooks.
-func createTestInput() (*simapp.SimApp, sdk.Context) {
+func createTestInput() (*simapp.SimApp, sdk.Context, []sdk.AccAddress) {
 	app := simapp.Setup(false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
@@ -30,20 +30,22 @@ func createTestInput() (*simapp.SimApp, sdk.Context) {
 		map[string]bool{},
 	)
 
-	return app, ctx
+	addrs := simapp.AddTestAddrs(app, ctx, 1, sdk.NewInt(100000))
+
+	return app, ctx, addrs
 }
 
 func TestMsgCreateFixedAmountPlan(t *testing.T) {
-	app, ctx := createTestInput()
+	app, ctx, addrs := createTestInput()
 
-	farmingPoolAddr := sdk.AccAddress([]byte("farmingPoolAddr"))
+	farmingPoolAddr := addrs[0]
 	stakingCoinWeights := sdk.NewDecCoins(
 		sdk.DecCoin{Denom: "testFarmStakingCoinDenom", Amount: sdk.MustNewDecFromStr("1.0")},
 	)
 	startTime := time.Now().UTC()
 	endTime := startTime.AddDate(1, 0, 0)
 	epochDays := uint32(1)
-	epochAmount := sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(1)))
+	epochAmount := sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(1)))
 
 	msg := types.NewMsgCreateFixedAmountPlan(
 		farmingPoolAddr,
@@ -64,7 +66,7 @@ func TestMsgCreateFixedAmountPlan(t *testing.T) {
 }
 
 func TestMsgCreateRatioPlan(t *testing.T) {
-	app, ctx := createTestInput()
+	app, ctx, _ := createTestInput()
 
 	farmingPoolAddr := sdk.AccAddress([]byte("farmingPoolAddr"))
 	stakingCoinWeights := sdk.NewDecCoins(
