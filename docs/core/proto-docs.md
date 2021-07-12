@@ -321,7 +321,7 @@
     - [GenesisState](#cosmos.farming.v1beta1.GenesisState)
     - [PlanRecord](#cosmos.farming.v1beta1.PlanRecord)
   
-- [cosmos/farming/v1beta1/gov.proto](#cosmos/farming/v1beta1/gov.proto)
+- [cosmos/farming/v1beta1/proposal.proto](#cosmos/farming/v1beta1/proposal.proto)
     - [PublicPlanProposal](#cosmos.farming.v1beta1.PublicPlanProposal)
   
 - [cosmos/farming/v1beta1/query.proto](#cosmos/farming/v1beta1/query.proto)
@@ -4784,10 +4784,10 @@ PlanRecord is used for import/export via genesis json.
 
 
 
-<a name="cosmos/farming/v1beta1/gov.proto"></a>
+<a name="cosmos/farming/v1beta1/proposal.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## cosmos/farming/v1beta1/gov.proto
+## cosmos/farming/v1beta1/proposal.proto
 
 
 
