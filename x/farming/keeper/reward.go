@@ -6,9 +6,9 @@ import (
 )
 
 // GetReward return a specific reward
-func (k Keeper) GetReward(ctx sdk.Context, planId uint64, farmerAcc sdk.AccAddress) (reward types.Reward, found bool) {
+func (k Keeper) GetReward(ctx sdk.Context, planID uint64, farmerAcc sdk.AccAddress) (reward types.Reward, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.GetRewardIndexKey(planId, farmerAcc))
+	bz := store.Get(types.GetRewardIndexKey(planID, farmerAcc))
 	if bz == nil {
 		return reward, false
 	}
@@ -55,9 +55,9 @@ func (k Keeper) IterateAllRewards(ctx sdk.Context, cb func(reward types.Reward) 
 	}
 }
 
-// GetRewardsByPlanId reads from kvstore and return a specific Reward indexed by given plan id
-func (k Keeper) GetRewardsByPlanId(ctx sdk.Context, planId uint64) (rewards []types.Reward) {
-	k.IterateRewardsByPlanId(ctx, planId, func(reward types.Reward) bool {
+// GetRewardsByPlanID reads from kvstore and return a specific Reward indexed by given plan id
+func (k Keeper) GetRewardsByPlanID(ctx sdk.Context, planID uint64) (rewards []types.Reward) {
+	k.IterateRewardsByPlanID(ctx, planID, func(reward types.Reward) bool {
 		rewards = append(rewards, reward)
 		return false
 	})
@@ -65,11 +65,11 @@ func (k Keeper) GetRewardsByPlanId(ctx sdk.Context, planId uint64) (rewards []ty
 	return rewards
 }
 
-// IterateAllRewards iterates over all the stored rewards and performs a callback function.
+// IterateRewardsByPlanID iterates over all the stored rewards and performs a callback function.
 // Stops iteration when callback returns true.
-func (k Keeper) IterateRewardsByPlanId(ctx sdk.Context, planId uint64, cb func(reward types.Reward) (stop bool)) {
+func (k Keeper) IterateRewardsByPlanID(ctx sdk.Context, planID uint64, cb func(reward types.Reward) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.GetRewardPrefix(planId))
+	iterator := sdk.KVStorePrefixIterator(store, types.GetRewardPrefix(planID))
 
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
@@ -103,4 +103,10 @@ func (k Keeper) Claim(ctx sdk.Context, msg *types.MsgClaim) (types.Reward, error
 	}
 
 	return types.Reward{}, nil
+}
+
+// UnmarshalReward unmarshals a Reward from bytes.
+func (k Keeper) UnmarshalReward(bz []byte) (types.Reward, error) {
+	var reward types.Reward
+	return reward, k.cdc.Unmarshal(bz, &reward)
 }

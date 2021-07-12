@@ -9,7 +9,7 @@ import (
 
 // NewPlan sets the next plan number to a given plan interface
 func (k Keeper) NewPlan(ctx sdk.Context, plan types.PlanI) types.PlanI {
-	if err := plan.SetId(k.GetNextPlanIdWithUpdate(ctx)); err != nil {
+	if err := plan.SetId(k.GetNextPlanIDWithUpdate(ctx)); err != nil {
 		panic(err)
 	}
 
@@ -74,7 +74,7 @@ func (k Keeper) IterateAllPlans(ctx sdk.Context, cb func(plan types.PlanI) (stop
 	}
 }
 
-// GetPlanByFarmerAddrIndex reads from kvstore and return a specific Plan indexed by given farmer address
+// GetPlansByFarmerAddrIndex reads from kvstore and return a specific Plan indexed by given farmer address
 func (k Keeper) GetPlansByFarmerAddrIndex(ctx sdk.Context, farmerAcc sdk.AccAddress) (plans []types.PlanI) {
 	k.IteratePlansByFarmerAddr(ctx, farmerAcc, func(plan types.PlanI) bool {
 		plans = append(plans, plan)
@@ -84,7 +84,7 @@ func (k Keeper) GetPlansByFarmerAddrIndex(ctx sdk.Context, farmerAcc sdk.AccAddr
 	return plans
 }
 
-// IterateAllPlans iterates over all the stored plans and performs a callback function.
+// IteratePlansByFarmerAddr iterates over all the stored plans and performs a callback function.
 // Stops iteration when callback returns true.
 func (k Keeper) IteratePlansByFarmerAddr(ctx sdk.Context, farmerAcc sdk.AccAddress, cb func(plan types.PlanI) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
@@ -92,30 +92,30 @@ func (k Keeper) IteratePlansByFarmerAddr(ctx sdk.Context, farmerAcc sdk.AccAddre
 
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		planId := gogotypes.UInt64Value{}
+		planID := gogotypes.UInt64Value{}
 
-		err := k.cdc.Unmarshal(iterator.Value(), &planId)
+		err := k.cdc.Unmarshal(iterator.Value(), &planID)
 		if err != nil {
 			panic(err)
 		}
-		plan, _ := k.GetPlan(ctx, planId.GetValue())
+		plan, _ := k.GetPlan(ctx, planID.GetValue())
 		if cb(plan) {
 			break
 		}
 	}
 }
 
+// SetPlanIDByFarmerAddrIndex sets Index by FarmerAddr
 // TODO: need to gas cost check for existing check or update everytime
-// SetPlanByFarmerAddrIndex sets Index by FarmerAddr
-func (k Keeper) SetPlanIdByFarmerAddrIndex(ctx sdk.Context, planId uint64, farmerAcc sdk.AccAddress) {
+func (k Keeper) SetPlanIDByFarmerAddrIndex(ctx sdk.Context, planID uint64, farmerAcc sdk.AccAddress) {
 	store := ctx.KVStore(k.storeKey)
-	b := k.cdc.MustMarshal(&gogotypes.UInt64Value{Value: planId})
-	store.Set(types.GetPlanByFarmerAddrIndexKey(farmerAcc, planId), b)
+	b := k.cdc.MustMarshal(&gogotypes.UInt64Value{Value: planID})
+	store.Set(types.GetPlanByFarmerAddrIndexKey(farmerAcc, planID), b)
 }
 
 // CreateFixedAmountPlan sets fixed amount plan.
 func (k Keeper) CreateFixedAmountPlan(ctx sdk.Context, msg *types.MsgCreateFixedAmountPlan, typ types.PlanType) *types.FixedAmountPlan {
-	nextId := k.GetNextPlanIdWithUpdate(ctx)
+	nextId := k.GetNextPlanIDWithUpdate(ctx)
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
 	terminationAddr := farmingPoolAddr
 
@@ -139,7 +139,7 @@ func (k Keeper) CreateFixedAmountPlan(ctx sdk.Context, msg *types.MsgCreateFixed
 
 // CreateRatioPlan sets ratio plan.
 func (k Keeper) CreateRatioPlan(ctx sdk.Context, msg *types.MsgCreateRatioPlan, typ types.PlanType) *types.RatioPlan {
-	nextId := k.GetNextPlanIdWithUpdate(ctx)
+	nextId := k.GetNextPlanIDWithUpdate(ctx)
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
 	terminationAddr := farmingPoolAddr
 
