@@ -33,12 +33,12 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 		return nil, err
 	}
 
-	nextId := k.GetNextPlanIdWithUpdate(ctx)
+	nextID := k.GetNextPlanIDWithUpdate(ctx)
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
 	terminationAddr := farmingPoolAddr
 
 	basePlan := types.NewBasePlan(
-		nextId,
+		nextID,
 		types.PlanTypePrivate,
 		farmingPoolAddr,
 		terminationAddr,
@@ -76,12 +76,12 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 		return nil, err
 	}
 
-	nextId := k.GetNextPlanIdWithUpdate(ctx)
+	nextID := k.GetNextPlanIDWithUpdate(ctx)
 	farmingPoolAddr := msg.GetFarmingPoolAddress()
 	terminationAddr := farmingPoolAddr
 
 	basePlan := types.NewBasePlan(
-		nextId,
+		nextID,
 		types.PlanTypePrivate,
 		farmingPoolAddr,
 		terminationAddr,
@@ -111,35 +111,35 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 	return &types.MsgCreateRatioPlanResponse{}, nil
 }
 
-// TODO: WIP
 // Stake defines a method for staking coins to the farming plan.
+// TODO: WIP
 func (k msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.MsgStakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	_, error := k.Keeper.Stake(ctx, msg)
-	if error != nil {
-		return &types.MsgStakeResponse{}, error
+	_, err := k.Keeper.Stake(ctx, msg)
+	if err != nil {
+		return &types.MsgStakeResponse{}, err
 	}
 	return &types.MsgStakeResponse{}, nil
 }
 
-// TODO: WIP
 // Unstake defines a method for unstaking coins from the farming plan.
+// TODO: WIP
 func (k msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types.MsgUnstakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	_, error := k.Keeper.Unstake(ctx, msg)
-	if error != nil {
-		return &types.MsgUnstakeResponse{}, error
+	_, err := k.Keeper.Unstake(ctx, msg)
+	if err != nil {
+		return &types.MsgUnstakeResponse{}, err
 	}
 	return &types.MsgUnstakeResponse{}, nil
 }
 
-// TODO: WIP
 // Claim defines a method for claiming farming rewards from the farming plan.
+// TODO: WIP
 func (k msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.MsgClaimResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	_, error := k.Keeper.Claim(ctx, msg)
-	if error != nil {
-		return &types.MsgClaimResponse{}, error
+	_, err := k.Keeper.Claim(ctx, msg)
+	if err != nil {
+		return &types.MsgClaimResponse{}, err
 	}
 	return &types.MsgClaimResponse{}, nil
 }
