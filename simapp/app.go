@@ -58,6 +58,7 @@ import (
 	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
 	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	"github.com/cosmos/cosmos-sdk/x/farming"
+	farmingclient "github.com/cosmos/cosmos-sdk/x/farming/client"
 	farmingkeeper "github.com/cosmos/cosmos-sdk/x/farming/keeper"
 	farmingtypes "github.com/cosmos/cosmos-sdk/x/farming/types"
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
@@ -110,9 +111,7 @@ var (
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
 			paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler,
-			upgradeclient.CancelProposalHandler,
-			// todo: farming proposal handler
-			// farmingclient.ProposalHandler,
+			upgradeclient.CancelProposalHandler, farmingclient.ProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -288,7 +287,6 @@ func NewSimApp(
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		// todo: implementing...
 		AddRoute(farmingtypes.RouterKey, farming.NewPublicPlanProposal(app.FarmingKeeper))
 
 	govKeeper := govkeeper.NewKeeper(

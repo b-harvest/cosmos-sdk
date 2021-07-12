@@ -1,0 +1,24 @@
+package cli
+
+import (
+	"io/ioutil"
+
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/x/farming/types"
+)
+
+// ParsePublicPlanProposal reads and parses a PublicPlanProposal from a file.
+func ParsePublicPlanProposal(cdc codec.JSONCodec, proposalFile string) (types.PublicPlanProposal, error) {
+	proposal := types.PublicPlanProposal{}
+
+	contents, err := ioutil.ReadFile(proposalFile)
+	if err != nil {
+		return proposal, err
+	}
+
+	if err = cdc.UnmarshalJSON(contents, &proposal); err != nil {
+		return proposal, err
+	}
+
+	return proposal, nil
+}

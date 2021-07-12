@@ -1,6 +1,7 @@
 package farming
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -72,8 +73,7 @@ func (AppModuleBasic) RegisterRESTRoutes(clientCtx sdkclient.Context, rtr *mux.R
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the farming module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx sdkclient.Context, mux *runtime.ServeMux) {
-	// TODO: unimplemented
-	//types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
+	types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
 }
 
 // GetTxCmd returns the root tx command for the farming module.

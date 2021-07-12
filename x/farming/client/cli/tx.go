@@ -12,6 +12,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
+	"github.com/cosmos/cosmos-sdk/x/gov/client/cli"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 // GetTxCmd returns a root CLI command handler for all x/farming transaction commands.
@@ -243,6 +245,120 @@ $ %s tx %s claim --from mykey
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
+
+	return cmd
+}
+
+// GetCmdSubmitProposal implements a command handler for submitting a public farming plan creation transaction.
+func GetCmdSubmitProposal() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "public-farming-plan [proposal-file] [flags]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Submit a public farming plan creation",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Submit a a public farming plan creation along with an initial deposit.
+The proposal details must be supplied via a JSON file.
+
+Example:
+$ %s tx gov submit-proposal public-farming-plan <path/to/proposal.json> --from=<key_or_address> --deposit=<deposit_amount>
+
+Where proposal.json contains:
+
+{
+	"title": "Public Farming Plan",
+	"description": "Here goes first farming plan!",
+	"plans": [
+		{
+			"base_plan": {
+				"id": 0,
+				"type": 0,
+				"farmingPoolAddress": "",
+				"rewardPoolAddress": "",
+				"stakingReserveAddress": "",
+				"terminationAddress": "",
+				"stakingCoinWeights": [
+				{
+					"denom": "uatom",
+					"amount": "0.200000000000000000"
+				},
+				{
+					"denom": "ukava",
+					"amount": "0.300000000000000000"
+				},
+				{
+					"denom": "uiris",
+					"amount": "0.500000000000000000"
+				}
+				],
+				"startTime": "2021-10-01T00:00:00Z",
+				"endTime": "2022-04-01T00:00:00Z",
+				"epochDays": 1,
+			},
+			"epochAmount": {
+				"denom": "uatom",
+				"amount": "10000000"
+			}
+		}
+	]
+}
+`,
+				version.AppName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			depositStr, err := cmd.Flags().GetString(cli.FlagDeposit)
+			if err != nil {
+				return err
+			}
+
+			deposit, err := sdk.ParseCoinsNormalized(depositStr)
+			if err != nil {
+				return err
+			}
+
+			// TODO: how about implementing this with flags?
+			// proposal.json should contain the following args
+			// 1. stakingCoinsWeights
+			// 2. startTime
+			// 3. endTime
+			// 4. epochDays
+			// 5. epochAmount --epochRatio
+			proposal, err := ParsePublicPlanProposal(clientCtx.Codec, args[0])
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("proposal: ", proposal)
+
+			plans, err := types.UnpackPlans(proposal.Plans)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("plans: ", plans)
+
+			content, err := types.NewPublicPlanProposal(proposal.Title, proposal.Description, plans)
+			if err != nil {
+				return err
+			}
+
+			from := clientCtx.GetFromAddress()
+
+			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
+			if err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().String(cli.FlagDeposit, "", "deposit of proposal")
 
 	return cmd
 }
