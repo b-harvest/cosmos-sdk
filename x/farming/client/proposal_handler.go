@@ -6,7 +6,7 @@ package client
 // 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 // )
 
-// // ProposalHandler is the plan creation handler.
+// // ProposalHandler is the public plan creation handler.
 // var (
 // 	ProposalHandler = govclient.NewProposalHandler(cli.GetCmdSubmitProposal, rest.ProposalRESTHandler)
 // )

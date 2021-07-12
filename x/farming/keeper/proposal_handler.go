@@ -51,13 +51,5 @@ func HandlePublicPlanProposal(ctx sdk.Context, k Keeper, plansAny []*codectypes.
 		}
 	}
 
-	// get plan
-	// plan id + 1
-	// set plan
-
-	logger := k.Logger(ctx)
-	logger.Info("HandleFixedAmountPlanProposal")
-	// logger.Info("transferred from the community pool to recipient", "amount", p.Amount.String(), "recipient", p.Recipient)
-
 	return nil
 }
