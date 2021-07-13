@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"io/ioutil"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -19,6 +20,8 @@ func ParsePublicPlanProposal(cdc codec.JSONCodec, proposalFile string) (types.Pu
 	if err = cdc.UnmarshalJSON(contents, &proposal); err != nil {
 		return proposal, err
 	}
+
+	fmt.Println("contents: ", string(contents))
 
 	return proposal, nil
 }

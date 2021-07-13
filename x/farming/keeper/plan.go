@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	gogotypes "github.com/gogo/protobuf/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -131,6 +133,8 @@ func (k Keeper) CreateFixedAmountPlan(ctx sdk.Context, msg *types.MsgCreateFixed
 	)
 
 	fixedPlan := types.NewFixedAmountPlan(basePlan, msg.EpochAmount)
+
+	fmt.Println("fixedPlan: ", fixedPlan)
 
 	k.SetPlan(ctx, fixedPlan)
 

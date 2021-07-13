@@ -321,13 +321,6 @@ Where proposal.json contains:
 				return err
 			}
 
-			// TODO: how about implementing this with flags?
-			// proposal.json should contain the following args
-			// 1. stakingCoinsWeights
-			// 2. startTime
-			// 3. endTime
-			// 4. epochDays
-			// 5. epochAmount --epochRatio
 			proposal, err := ParsePublicPlanProposal(clientCtx.Codec, args[0])
 			if err != nil {
 				return err
@@ -339,6 +332,11 @@ Where proposal.json contains:
 			if err != nil {
 				return err
 			}
+
+			// TODO: validation
+			// 1. plan type should only allow public
+			// 2. staking coin weights
+			// 3.
 
 			fmt.Println("plans: ", plans)
 

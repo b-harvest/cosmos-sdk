@@ -82,6 +82,20 @@ func PackPlans(plans []PlanI) ([]*types.Any, error) {
 	return plansAny, nil
 }
 
+func PackPlan(plan PlanI) (*types.Any, error) {
+	msg, ok := plan.(proto.Message)
+	if !ok {
+		return nil, fmt.Errorf("cannot proto marshal %T", plan)
+	}
+
+	any, err := types.NewAnyWithValue(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	return any, nil
+}
+
 // UnpackPlans converts Any slice to PlanIs.
 func UnpackPlans(plansAny []*types.Any) ([]PlanI, error) {
 	plans := make([]PlanI, len(plansAny))
