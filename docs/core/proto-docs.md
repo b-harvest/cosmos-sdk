@@ -517,6 +517,24 @@
   
     - [Msg](#cosmos.staking.v1beta1.Msg)
   
+- [cosmos/tax/v1beta1/tax.proto](#cosmos/tax/v1beta1/tax.proto)
+    - [Params](#cosmos.tax.v1beta1.Params)
+    - [Tax](#cosmos.tax.v1beta1.Tax)
+  
+- [cosmos/tax/v1beta1/genesis.proto](#cosmos/tax/v1beta1/genesis.proto)
+    - [GenesisState](#cosmos.tax.v1beta1.GenesisState)
+  
+- [cosmos/tax/v1beta1/gov.proto](#cosmos/tax/v1beta1/gov.proto)
+    - [SetTaxesProposal](#cosmos.tax.v1beta1.SetTaxesProposal)
+  
+- [cosmos/tax/v1beta1/query.proto](#cosmos/tax/v1beta1/query.proto)
+    - [QueryParamsRequest](#cosmos.tax.v1beta1.QueryParamsRequest)
+    - [QueryParamsResponse](#cosmos.tax.v1beta1.QueryParamsResponse)
+    - [QueryTaxesRequest](#cosmos.tax.v1beta1.QueryTaxesRequest)
+    - [QueryTaxesResponse](#cosmos.tax.v1beta1.QueryTaxesResponse)
+  
+    - [Query](#cosmos.tax.v1beta1.Query)
+  
 - [cosmos/tx/signing/v1beta1/signing.proto](#cosmos/tx/signing/v1beta1/signing.proto)
     - [SignatureDescriptor](#cosmos.tx.signing.v1beta1.SignatureDescriptor)
     - [SignatureDescriptor.Data](#cosmos.tx.signing.v1beta1.SignatureDescriptor.Data)
@@ -7321,6 +7339,205 @@ Msg defines the staking Msg service.
 | `Delegate` | [MsgDelegate](#cosmos.staking.v1beta1.MsgDelegate) | [MsgDelegateResponse](#cosmos.staking.v1beta1.MsgDelegateResponse) | Delegate defines a method for performing a delegation of coins from a delegator to a validator. | |
 | `BeginRedelegate` | [MsgBeginRedelegate](#cosmos.staking.v1beta1.MsgBeginRedelegate) | [MsgBeginRedelegateResponse](#cosmos.staking.v1beta1.MsgBeginRedelegateResponse) | BeginRedelegate defines a method for performing a redelegation of coins from a delegator and source validator to a destination validator. | |
 | `Undelegate` | [MsgUndelegate](#cosmos.staking.v1beta1.MsgUndelegate) | [MsgUndelegateResponse](#cosmos.staking.v1beta1.MsgUndelegateResponse) | Undelegate defines a method for performing an undelegation from a delegate and a validator. | |
+
+ <!-- end services -->
+
+
+
+<a name="cosmos/tax/v1beta1/tax.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## cosmos/tax/v1beta1/tax.proto
+
+
+
+<a name="cosmos.tax.v1beta1.Params"></a>
+
+### Params
+Params defines the set of params for the tax module.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `taxes` | [Tax](#cosmos.tax.v1beta1.Tax) | repeated |  |
+
+
+
+
+
+
+<a name="cosmos.tax.v1beta1.Tax"></a>
+
+### Tax
+Tax defines
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [string](#string) |  | name defines the name of the tax |
+| `rate` | [string](#string) |  | rate specifies the distributing amount by ratio of total tax source |
+| `pool_address` | [string](#string) |  | pool_address defines the bech32-encoded address of the tax pool to distribute |
+| `tax_source_address` | [string](#string) |  | tax_source_address defines the bech32-encoded address that source of the tax |
+| `start_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | start_time specifies the start time of the tax |
+| `end_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | end_time specifies the end time of the tax |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="cosmos/tax/v1beta1/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## cosmos/tax/v1beta1/genesis.proto
+
+
+
+<a name="cosmos.tax.v1beta1.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the tax module's genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#cosmos.tax.v1beta1.Params) |  | params defines all the parameters for the tax module |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="cosmos/tax/v1beta1/gov.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## cosmos/tax/v1beta1/gov.proto
+
+
+
+<a name="cosmos.tax.v1beta1.SetTaxesProposal"></a>
+
+### SetTaxesProposal
+SetTaxesProposal details a proposal for update taxes.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `title` | [string](#string) |  |  |
+| `description` | [string](#string) |  |  |
+| `taxes` | [Tax](#cosmos.tax.v1beta1.Tax) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="cosmos/tax/v1beta1/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## cosmos/tax/v1beta1/query.proto
+
+
+
+<a name="cosmos.tax.v1beta1.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+QueryParamsRequest is the request type for the Query/Params RPC method.
+
+
+
+
+
+
+<a name="cosmos.tax.v1beta1.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+QueryParamsResponse is the response type for the Query/Params RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#cosmos.tax.v1beta1.Params) |  |  |
+
+
+
+
+
+
+<a name="cosmos.tax.v1beta1.QueryTaxesRequest"></a>
+
+### QueryTaxesRequest
+QueryTaxesRequest is the request type for the Query/Taxes RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `name` | [string](#string) |  |  |
+| `pool_address` | [string](#string) |  |  |
+| `tax_source_address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="cosmos.tax.v1beta1.QueryTaxesResponse"></a>
+
+### QueryTaxesResponse
+QueryTaxesResponse is the response type for the Query/Taxes RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `taxes` | [Tax](#cosmos.tax.v1beta1.Tax) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="cosmos.tax.v1beta1.Query"></a>
+
+### Query
+Query defines the gRPC query service for the tax module.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `Params` | [QueryParamsRequest](#cosmos.tax.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#cosmos.tax.v1beta1.QueryParamsResponse) | Params returns parameters of the tax module. | GET|/cosmos/tax/v1beta1/params|
+| `Taxes` | [QueryTaxesRequest](#cosmos.tax.v1beta1.QueryTaxesRequest) | [QueryTaxesResponse](#cosmos.tax.v1beta1.QueryTaxesResponse) | Taxes returns all taxes. | GET|/cosmos/tax/v1beta1/taxes|
 
  <!-- end services -->
 
