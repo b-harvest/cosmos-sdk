@@ -12,7 +12,6 @@ type MsgCreateFixedAmountPlan struct {
     StakingCoinWeights  sdk.DecCoins
     StartTime           time.Time
     EndTime             time.Time
-    EpochDays           uint32
     EpochAmount         sdk.Coins
 }
 ```
@@ -25,7 +24,6 @@ type MsgCreateRatioPlan struct {
     StakingCoinWeights  sdk.DecCoins
     StartTime           time.Time
     EndTime             time.Time
-    EpochDays           uint32
     EpochRatio          sdk.Dec
 }
 ```
@@ -35,7 +33,6 @@ A farmer must have sufficient coins to stake into a farming plan. The farmer bec
 
 ```go
 type MsgStake struct {
-    PlanId       uint64
     Farmer       string
     StakingCoins sdk.Coins
 }
@@ -46,7 +43,6 @@ A farmer must have some staking coins in the plan to trigger this message. Unlik
 
 ```go
 type MsgUnstake struct {
-    PlanId         uint64
     Farmer         string
     UnstakingCoins sdk.Coins
 }
@@ -58,7 +54,7 @@ A farmer should claim their farming rewards. The rewards are not automatically d
 
 ```go
 type MsgClaim struct {
-	PlanId uint64
-	Farmer string
+    StakingId                uint64
+    StakingPositionId        uint64
 }
 ```
