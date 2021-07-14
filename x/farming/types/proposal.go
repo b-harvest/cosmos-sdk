@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/codec/types"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	proto "github.com/gogo/protobuf/proto"
@@ -64,6 +65,19 @@ func (p PublicPlanProposal) String() string {
 `, p.Title, p.Description, p.Plans)
 }
 
+// UnpackInterfaces implements the UnpackTerfaceMessages.UnpackInterfaced method.
+func (p *PublicPlanProposal) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
+	for _, any := range p.Plans {
+		var planI PlanI
+		err := unpacker.UnpackAny(any, &planI)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // PackPlans converts PlanIs to Any slice.
 func PackPlans(plans []PlanI) ([]*types.Any, error) {
 	plansAny := make([]*types.Any, len(plans))
@@ -80,20 +94,6 @@ func PackPlans(plans []PlanI) ([]*types.Any, error) {
 	}
 
 	return plansAny, nil
-}
-
-func PackPlan(plan PlanI) (*types.Any, error) {
-	msg, ok := plan.(proto.Message)
-	if !ok {
-		return nil, fmt.Errorf("cannot proto marshal %T", plan)
-	}
-
-	any, err := types.NewAnyWithValue(msg)
-	if err != nil {
-		return nil, err
-	}
-
-	return any, nil
 }
 
 // UnpackPlans converts Any slice to PlanIs.

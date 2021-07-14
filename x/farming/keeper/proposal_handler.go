@@ -14,6 +14,8 @@ func HandlePublicPlanProposal(ctx sdk.Context, k Keeper, plansAny []*codectypes.
 		return err
 	}
 
+	// TODO: validator basic
+
 	for _, plan := range plans {
 		switch p := plan.(type) {
 		case *types.FixedAmountPlan:

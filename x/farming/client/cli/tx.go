@@ -265,41 +265,36 @@ $ %s tx gov submit-proposal public-farming-plan <path/to/proposal.json> --from=<
 Where proposal.json contains:
 
 {
-	"title": "Public Farming Plan",
-	"description": "Here goes first farming plan!",
-	"plans": [
-		{
-			"base_plan": {
-				"id": 0,
-				"type": 0,
-				"farmingPoolAddress": "",
-				"rewardPoolAddress": "",
-				"stakingReserveAddress": "",
-				"terminationAddress": "",
-				"stakingCoinWeights": [
-				{
-					"denom": "uatom",
-					"amount": "0.200000000000000000"
-				},
-				{
-					"denom": "ukava",
-					"amount": "0.300000000000000000"
-				},
-				{
-					"denom": "uiris",
-					"amount": "0.500000000000000000"
-				}
-				],
-				"startTime": "2021-10-01T00:00:00Z",
-				"endTime": "2022-04-01T00:00:00Z",
-				"epochDays": 1,
-			},
-			"epochAmount": {
-				"denom": "uatom",
-				"amount": "10000000"
-			}
-		}
-	]
+    "title": "Public Farming Plan",
+    "description": "Here goes first public farming plan!",
+    "plans": [
+        {
+            "@type": "/cosmos.farming.v1beta1.FixedAmountPlan",
+            "base_plan": {
+                "id": "1",
+                "type": "PLAN_TYPE_PUBLIC",
+                "farming_pool_address": "",
+                "reward_pool_address": "",
+                "termination_address": "",
+                "staking_reserve_address": "",
+                "staking_coin_weights": [
+	                {
+	                    "denom": "poolCoinDenom",
+	                    "amount": "1.000000000000000000"
+	                }
+                ],
+                "start_time": "2021-07-15T08:41:21.662422Z",
+                "end_time": "2022-07-16T08:41:21.662422Z",
+                "epoch_days": 1
+            },
+            "epoch_amount": [
+                {
+	                "denom": "uatom",
+	                "amount": "1"
+                }
+            ]
+        }
+    ]
 }
 `,
 				version.AppName,
@@ -326,19 +321,19 @@ Where proposal.json contains:
 				return err
 			}
 
-			fmt.Println("proposal: ", proposal)
-
 			plans, err := types.UnpackPlans(proposal.Plans)
 			if err != nil {
 				return err
 			}
 
-			// TODO: validation
-			// 1. plan type should only allow public
-			// 2. staking coin weights
-			// 3.
-
-			fmt.Println("plans: ", plans)
+			for _, plan := range plans {
+				if plan.GetType() != types.PlanTypePublic {
+					return types.ErrPlanTypeNotAllowed
+				}
+				// TODO: farming module account.
+				// plan.SetFarmingPoolAddress(modAcc)
+				// plan.SetTerminationAddress(modAcc)
+			}
 
 			content, err := types.NewPublicPlanProposal(proposal.Title, proposal.Description, plans)
 			if err != nil {
