@@ -65,7 +65,6 @@ type BasePlan struct {
     StakingCoinWeights       sdk.DecCoins // coin weights for the plan
     StartTime                time.Time    // start time of the plan
     EndTime                  time.Time    // end time of the plan
-    EpochDays                uint32       // distributing epoch measuring in days
 }
 ```
 
@@ -113,13 +112,23 @@ The parameters of the Plan state are:
     - store latest plan id
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
 
-
 ## Staking
 
 ```go
-// Staking defines a farmer's staking information.
+// Staking provides index table for farming plans and staking coin denoms.
 type Staking struct {
+    StakingId                uint64
     PlanId                   uint64
+    StakingCoinDenom         string
+}
+```
+
+## StakingPosition
+
+```go
+// StakingPosition stores farmer's staking position status.
+type StakingPosition struct {
+    StakingPositionId        uint64
     Farmer                   string
     StakedCoins              sdk.Coins
     QueuedCoins              sdk.Coins
@@ -128,22 +137,22 @@ type Staking struct {
 
 The parameters of the Staking state are:
 
-- Staking: `0x21 | PlanId | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(Staking)`
+- Staking: `0x21 | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(Staking)`
 
 ## Reward
 
 ```go
 // Reward defines a record of farming rewards.
 type Reward struct {
-    PlanId                   uint64
-    Farmer                   string
+    StakingId                uint64
+    StakingPositionId        uint64
     RewardCoins              sdk.Coins
 }
 ```
 
 The parameters of the Reward state are:
 
-- Reward: `0x31 | PlanId | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(Reward)`
+- Reward: `0x31 | StakingId | StakingPositionId`
 
 ## Examples 
 
@@ -173,7 +182,6 @@ An example of `FixedAmountPlan`
     ],
     "startTime": "2021-10-01T00:00:00Z",
     "endTime": "2022-04-01T00:00:00Z",
-    "epochDays": 1,
     "terminationAddress": "cosmos1..."
   },
   "epochAmount": {
@@ -209,7 +217,6 @@ An example of `RatioPlan`
     ],
     "startTime": "2021-10-01T00:00:00Z",
     "endTime": "2022-04-01T00:00:00Z",
-    "epochDays": 1,
     "terminationAddress": "cosmos1..."
   },
   "epochRatio": "0.01"
