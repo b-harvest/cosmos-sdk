@@ -108,5 +108,8 @@ func (k Keeper) Claim(ctx sdk.Context, msg *types.MsgClaim) (types.Reward, error
 		panic(err)
 	}
 
+	reward.RewardCoins = sdk.NewCoins()
+	k.SetReward(ctx, reward)
+
 	return types.Reward{}, nil
 }

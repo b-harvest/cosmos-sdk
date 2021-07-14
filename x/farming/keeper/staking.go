@@ -121,12 +121,16 @@ func (k Keeper) Stake(ctx sdk.Context, msg *types.MsgStake) (types.Staking, erro
 		return types.Staking{}, err
 	}
 
+	if err := k.ReserveStakingCoins(ctx, farmerAcc, plan.GetStakingReserveAddress(), msg.StakingCoins); err != nil {
+		return types.Staking{}, err
+	}
+
 	staking, found := k.GetStaking(ctx, plan.GetId(), farmerAcc)
 	if !found {
 		staking = types.Staking{
 			PlanId:      plan.GetId(),
 			Farmer:      msg.Farmer,
-			StakedCoins: nil,
+			StakedCoins: sdk.NewCoins(),
 			QueuedCoins: msg.StakingCoins,
 		}
 		k.SetPlanIDByFarmerAddrIndex(ctx, staking.PlanId, staking.GetFarmerAddress())
@@ -135,7 +139,6 @@ func (k Keeper) Stake(ctx sdk.Context, msg *types.MsgStake) (types.Staking, erro
 	}
 
 	k.SetStaking(ctx, staking)
-	k.ReserveStakingCoins(ctx, farmerAcc, plan.GetStakingReserveAddress(), staking.QueuedCoins)
 
 	return staking, nil
 }
@@ -157,20 +160,33 @@ func (k Keeper) Unstake(ctx sdk.Context, msg *types.MsgUnstake) (types.Staking, 
 		return types.Staking{}, types.ErrStakingNotExists
 	}
 
-	// TODO: double check with this logic
-	stakedDiff, hasNeg := staking.StakedCoins.SafeSub(msg.UnstakingCoins)
-	if hasNeg {
-		diff := stakedDiff.Add(staking.QueuedCoins...)
-		if diff.IsAnyNegative() {
-			return types.Staking{}, types.ErrInsufficientStakingAmount
-		}
-		staking.StakedCoins = sdk.Coins{}
-		staking.QueuedCoins = diff
+	totalCoins := staking.StakedCoins.Add(staking.QueuedCoins...)
+	if !msg.UnstakingCoins.IsAllLTE(totalCoins) {
+		return types.Staking{}, types.ErrInsufficientStakingAmount
 	}
-	staking.StakedCoins = stakedDiff
+
+	if err := k.ReleaseStakingCoins(ctx, plan.GetStakingReserveAddress(), farmerAcc, msg.UnstakingCoins); err != nil {
+		return types.Staking{}, err
+	}
+
+	var hasNeg bool
+	staking.QueuedCoins, hasNeg = staking.QueuedCoins.SafeSub(msg.UnstakingCoins)
+	if hasNeg {
+		negativeCoins := sdk.NewCoins()
+		for _, coin := range staking.QueuedCoins {
+			if coin.IsNegative() {
+				negativeCoins = negativeCoins.Add(coin)
+				staking.QueuedCoins = staking.QueuedCoins.Add(sdk.NewCoin(coin.Denom, coin.Amount.Neg()))
+				staking.StakedCoins = staking.StakedCoins.Add(coin)
+			}
+		}
+		staking.QueuedCoins = staking.QueuedCoins.Sub(negativeCoins)
+		staking.StakedCoins = staking.QueuedCoins.Add(negativeCoins...)
+	}
+
+	// TODO: remove staking when there is no staked coins
 
 	k.SetStaking(ctx, staking)
-	k.ReleaseStakingCoins(ctx, plan.GetStakingReserveAddress(), farmerAcc, msg.UnstakingCoins)
 
-	return types.Staking{}, nil
+	return staking, nil
 }
