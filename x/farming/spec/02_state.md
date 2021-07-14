@@ -40,9 +40,6 @@ type PlanI interface {
     GetEndTime() time.Time
     SetEndTime(time.Time) error
 
-    GetEpochDays() uint32
-    SetEpochDays(uint32) error
-
     String() string
 }
 ```
