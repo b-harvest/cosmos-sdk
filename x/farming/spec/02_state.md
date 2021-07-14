@@ -102,10 +102,10 @@ The parameters of the Plan state are:
 
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
 - Plan: `0x11 | Id -> ProtocolBuffer(Plan)`
-- PlanByFarmerAddrIndex: `0x12 | FarmerAddrLen (1 byte) | FarmerAddr -> Id`
+- PlanByFarmerAddrIndex: `0x12 | FarmerAddrLen (1 byte) | FarmerAddr -> Id` (can be deprecated)
     - iterable for several `PlanId` results by indexed `FarmerAddr`
-- LastEpochTime: `0x13 | Id -> time.Time`
-- GlobalFarmingPlanIdKey: `[]byte("globalFarmingPlanId") -> ProtocolBuffer(uint64)`
+- LastEpochTime: `0x13 | Id -> time.Time` (can be GlobalLastEpochTime)
+- GlobalPlanIdKey: `[]byte("globalPlanId") -> ProtocolBuffer(uint64)`
     - store latest plan id
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
 
@@ -114,18 +114,22 @@ The parameters of the Plan state are:
 ```go
 // Staking provides index table for farming plans and staking coin denoms.
 type Staking struct {
-    StakingId                uint64
+    Id                       uint64
     PlanId                   uint64
-    StakingCoinDenom         string
+    Denom                    string
 }
 ```
+
+- Staking: `0x21 | StakingId -> ProtocolBuffer(Staking)`
+- StakingByPlanIdIndex: `0x22 | PlanId -> Denom` or `0x22 | PlanId | Denom -> Id` 
+- StakingByDenomIndex: `0x23 | Denom -> PlanId` or `0x23 | Denom | PlanId -> Id`
 
 ## StakingPosition
 
 ```go
 // StakingPosition stores farmer's staking position status.
 type StakingPosition struct {
-    StakingPositionId        uint64
+    Id                       uint64
     Farmer                   string
     StakedCoins              sdk.Coins
     QueuedCoins              sdk.Coins
@@ -134,22 +138,28 @@ type StakingPosition struct {
 
 The parameters of the Staking state are:
 
-- Staking: `0x21 | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(Staking)`
+- GlobalStakingPositionIdKey: `[]byte("globalStakingPositionId") -> ProtocolBuffer(uint64)`
+    - store latest staking position id
 
+- StakingPosition: `0x31 | Id -> ProtocolBuffer(StakingPosition)`
+- StakingPositionByFarmerAddrIndex: `0x32 | FarmerAddrLen (1 byte) | FarmerAddr -> Id`
+- StakingPositionByStakingIdIndex: `0x33 | stakingId | -> Id`
+    - iterable for several `StakingPositionId` results by indexed `stakingId`, It also used for iterating farmers and rewards by `stakingId`
+ 
 ## Reward
 
 ```go
 // Reward defines a record of farming rewards.
 type Reward struct {
+    StakingPositionId        uint64    
     StakingId                uint64
-    StakingPositionId        uint64
     RewardCoins              sdk.Coins
 }
 ```
 
 The parameters of the Reward state are:
 
-- Reward: `0x31 | StakingId | StakingPositionId`
+- Reward: `0x41 | StakingPositionId | StakingId | -> ProtocolBuffer(Reward)`
 
 ## Examples 
 
