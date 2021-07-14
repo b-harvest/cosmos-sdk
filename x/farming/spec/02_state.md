@@ -6,16 +6,16 @@ The farming module keeps track of the staking and rewards states.
 
 ## Plan Interface
 
-The plan interface exposes methods to read and write standard farming plan information. Note that all of these methods operate on a plan struct confirming to the interface and in order to write the plan to the store, the plan keeper will need to be used. 
+The plan interface exposes methods to read and write standard farming plan information. Note that all of these methods operate on a plan struct confirming to the interface and in order to write the plan to the store, the plan keeper will need to be used.
 
 ```go
 // PlanI is an interface used to store plan records within state.
 type PlanI interface {
     proto.Message
-    
+
     GetId() uint64
     SetId(uint64) error
-    
+
     GetType() int32
     SetType(int32) error
 
@@ -27,13 +27,13 @@ type PlanI interface {
 
     GetTerminationAddress() sdk.AccAddress
     SetTerminationAddress(sdk.AccAddress) error
-    
+
     GetStakingReserveAddress() sdk.AccAddress
     SetStakingReserveAddress(sdk.AccAddress) error
-        
+
     GetStakingCoinsWeight() sdk.DecCoins
     SetStakingCoinsWeight(sdk.DecCoins) error
-    
+
     GetStartTime() time.Time
     SetStartTime(time.Time) error
 
@@ -82,6 +82,7 @@ type RatioPlan struct {
     EpochRatio            sdk.Dec // distributing amount by ratio
 }
 ```
+
 ## Plan Types
 
 ```go
@@ -102,11 +103,10 @@ The parameters of the Plan state are:
 
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
 - Plan: `0x11 | Id -> ProtocolBuffer(Plan)`
-- PlanByFarmerAddrIndex: `0x12 | FarmerAddrLen (1 byte) | FarmerAddr -> Id` (can be deprecated)
-    - iterable for several `PlanId` results by indexed `FarmerAddr`
+- PlanByFarmerAddrIndex: `0x12 | FarmerAddrLen (1 byte) | FarmerAddr -> iterable Id` (can be deprecated)
 - LastEpochTime: `0x13 | Id -> time.Time` (can be GlobalLastEpochTime)
 - GlobalPlanIdKey: `[]byte("globalPlanId") -> ProtocolBuffer(uint64)`
-    - store latest plan id
+  - store latest plan id
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
 
 ## Staking
@@ -121,8 +121,8 @@ type Staking struct {
 ```
 
 - Staking: `0x21 | StakingId -> ProtocolBuffer(Staking)`
-- StakingByPlanIdIndex: `0x22 | PlanId -> Denom` or `0x22 | PlanId | Denom -> Id` 
-- StakingByDenomIndex: `0x23 | Denom -> PlanId` or `0x23 | Denom | PlanId -> Id`
+- StakingByPlanIdIndex: `0x22 | PlanId -> iterable Denoms` or `0x22 | PlanId | Denom -> iterable Ids`
+- StakingByDenomIndex: `0x23 | Denom -> iterable PlanIds` or `0x23 | Denom | PlanId -> iterable Ids`
 
 ## StakingPosition
 
@@ -139,19 +139,20 @@ type StakingPosition struct {
 The parameters of the Staking state are:
 
 - GlobalStakingPositionIdKey: `[]byte("globalStakingPositionId") -> ProtocolBuffer(uint64)`
-    - store latest staking position id
+
+  - store latest staking position id
 
 - StakingPosition: `0x31 | Id -> ProtocolBuffer(StakingPosition)`
 - StakingPositionByFarmerAddrIndex: `0x32 | FarmerAddrLen (1 byte) | FarmerAddr -> Id`
-- StakingPositionByStakingIdIndex: `0x33 | stakingId | -> Id`
-    - iterable for several `StakingPositionId` results by indexed `stakingId`, It also used for iterating farmers and rewards by `stakingId`
- 
+- StakingPositionByStakingIdIndex: `0x33 | stakingId -> iterable Ids`
+  - iterable for several `StakingPositionId` results by indexed `stakingId`, It also used for iterating farmers and rewards by `stakingId`
+
 ## Reward
 
 ```go
 // Reward defines a record of farming rewards.
 type Reward struct {
-    StakingPositionId        uint64    
+    StakingPositionId        uint64
     StakingId                uint64
     RewardCoins              sdk.Coins
 }
@@ -161,7 +162,7 @@ The parameters of the Reward state are:
 
 - Reward: `0x41 | StakingPositionId | StakingId | -> ProtocolBuffer(Reward)`
 
-## Examples 
+## Examples
 
 An example of `FixedAmountPlan`
 
@@ -229,7 +230,3 @@ An example of `RatioPlan`
   "epochRatio": "0.01"
 }
 ```
-
-
-
-

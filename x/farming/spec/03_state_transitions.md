@@ -2,7 +2,7 @@
 
  # State Transitions
 
-This document describes the state transaction operations pertaining to the farming module. 
+This document describes the state transaction operations pertaining to the farming module.
 
 ## Plan
 
@@ -23,28 +23,26 @@ const (
 ```
 
 - Staking Coins for Farming
-    - Each `farmingPlan` predefines list of `stakingCoinWeights` using `sdk.DecCoins`
-    - `weight` mean that each group of stakers with each coin `denom` will receive each predefined `weight` of the total rewards
+  - Each `farmingPlan` predefines list of `stakingCoinWeights` using `sdk.DecCoins`
+  - `weight` mean that each group of stakers with each coin `denom` will receive each predefined `weight` of the total rewards
 - Multiple Farming Coins within a `farmingPoolAddress`
-    - If `farmingPoolAddress` has multiple kinds of coins, then all coins are identically distributed following the given `farmingPlan`
+  - If `farmingPoolAddress` has multiple kinds of coins, then all coins are identically distributed following the given `farmingPlan`
 - Time Parameters
-    - Each `farmingPlan` has its own `startTime` and `endTime`
+  - Each `farmingPlan` has its own `startTime` and `endTime`
 - Distribution Method
-    - `FixedAmountPlan`
-        - fixed amount of coins are distributed for each `epochDays`
-        - amount in `sdk.Coins`
-    - `RatioPlan`
-        - `epochRatio` of total assets in `farmingPoolAddress` is distributed for each `epochDays`
-        - `epochRatio` in percentage
+  - `FixedAmountPlan`
+    - fixed amount of coins are distributed for each `epochDays`
+    - amount in `sdk.Coins`
+  - `RatioPlan`
+    - `epochRatio` of total assets in `farmingPoolAddress` is distributed for each `epochDays`
+    - `epochRatio` in percentage
 - Termination Address
-    - When the plan ends after the `endTime`, transfer the balance of `farmingPoolAddress` to  `terminationAddress`.
-
+  - When the plan ends after the `endTime`, transfer the balance of `farmingPoolAddress` to `terminationAddress`.
 
 ## Staking
 
-- New `Staking` objects are created when new `Plan` is created, with each `StakingCoinDenom` in the new `Plan`.
+- New `Staking` objects are created when new `Plan` is created, with each staking coin `Denom` in the new `Plan`.
 - `Staking` objects are removed when a `Plan` is removed.
-
 
 ## StakingPosition
 
@@ -58,5 +56,5 @@ const (
 
 - At every end of epoch, `Reward` are created or updated by the calculation from each `Plan` and corresponding `StakingPosition`.
 - Every `StakedCoins` in `StakingPosition` which is eligible for any alive `Plan` accumulates rewards in `RewardCoins`.
-- Reward for specific `Plan` and `StakingCoinDenom` = total_reward_of_the_plan_for_this_epoch * weight_for_this_staking_coin * (this_denom_staked_coins_for_this_farmer)/(this_denom_total_staked_coins)
+- Reward for specific `Plan` and staking coin `Denom` = total_reward_of_the_plan_for_this_epoch _ weight_for_this_staking_coin _ (this_denom_staked_coins_for_this_farmer)/(this_denom_total_staked_coins)
 - Accumulated `RewardCoins` are withdrawable anytime when the farmer request the withdrawal from the `Reward`.
