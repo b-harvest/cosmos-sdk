@@ -4,11 +4,11 @@
 
 The farming module contains the following parameters:
 
-| Key                         | Type      | Example                                  |
-| ----------------------      | --------- | ---------------------------------------- |
-| PrivatePlanCreationFee      | sdk.Coins | [{"denom":"stake","amount":"100000000"}] |
-| StakingPositionCreationFee  | sdk.Coins | [{"denom":"stake","amount":"100000000"}] |
-| EpochDays                   | uint64    | 1                                        |
+| Key                        | Type      | Example                                  |
+| -------------------------- | --------- | ---------------------------------------- |
+| PrivatePlanCreationFee     | sdk.Coins | [{"denom":"stake","amount":"100000000"}] |
+| StakingPositionCreationFee | sdk.Coins | [{"denom":"stake","amount":"100000"}]    |
+| EpochDays                  | uint64    | 1                                        |
 
 ## PrivatePlanCreationFee
 
