@@ -139,8 +139,8 @@ The parameters of the Staking state are:
 // Reward defines a record of farming rewards for query result and exported state.
 type Reward struct {
     Farmer                string
-    StakingCoinDenom       string
-    RewardCoins              sdk.DecCoins
+    StakingCoinDenom      string
+    RewardCoins           sdk.DecCoins
 }
 ```
 

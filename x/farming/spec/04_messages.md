@@ -56,7 +56,7 @@ type MsgUnstake struct {
 A farmer should harvest their farming rewards. The rewards are not automatically distributed. This is similar mechanism with `x/distribution` module.
 
 ```go
-type MsgClaim struct {
+type MsgHarvest struct {
     Farmer             string
     StakingCoinDenom   string
 }

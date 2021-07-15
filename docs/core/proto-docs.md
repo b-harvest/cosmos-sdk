@@ -347,12 +347,12 @@
     - [Query](#cosmos.farming.v1beta1.Query)
   
 - [cosmos/farming/v1beta1/tx.proto](#cosmos/farming/v1beta1/tx.proto)
-    - [MsgClaim](#cosmos.farming.v1beta1.MsgClaim)
-    - [MsgClaimResponse](#cosmos.farming.v1beta1.MsgClaimResponse)
     - [MsgCreateFixedAmountPlan](#cosmos.farming.v1beta1.MsgCreateFixedAmountPlan)
     - [MsgCreateFixedAmountPlanResponse](#cosmos.farming.v1beta1.MsgCreateFixedAmountPlanResponse)
     - [MsgCreateRatioPlan](#cosmos.farming.v1beta1.MsgCreateRatioPlan)
     - [MsgCreateRatioPlanResponse](#cosmos.farming.v1beta1.MsgCreateRatioPlanResponse)
+    - [MsgHarvest](#cosmos.farming.v1beta1.MsgHarvest)
+    - [MsgHarvestResponse](#cosmos.farming.v1beta1.MsgHarvestResponse)
     - [MsgStake](#cosmos.farming.v1beta1.MsgStake)
     - [MsgStakeResponse](#cosmos.farming.v1beta1.MsgStakeResponse)
     - [MsgUnstake](#cosmos.farming.v1beta1.MsgUnstake)
@@ -4620,7 +4620,6 @@ type for additional functionality (e.g. fixed amount plan, ratio plan).
 | `staking_coin_weights` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | staking_coin_weights specifies coin weights for the plan |
 | `start_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | start_time specifies the start time of the plan |
 | `end_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | end_time specifies the end time of the plan |
-| `epoch_days` | [uint32](#uint32) |  | epoch_days specifies a period of time that triggers the distribution plan; it is measured in days |
 
 
 
@@ -4652,6 +4651,8 @@ Params defines the set of params for the farming module.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `private_plan_creation_fee` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | private_plan_creation_fee specifies the fee for plan creation this fee prevents from spamming and it is collected in the community pool |
+| `staking_position_creation_fee` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | When a farmer creates new staking_position, the farmer needs to pay staking_position_creation_fee to prevent spam on the staking_position struct. |
+| `epoch_days` | [uint32](#uint32) |  | The universal epoch length in number of days. Every process for staking and reward distribution is executed with this epoch_days frequency. |
 
 
 
@@ -4682,9 +4683,9 @@ Reward defines a record of farming rewards.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `plan_id` | [uint64](#uint64) |  | plan_id specifies index of the target farming plan |
 | `farmer` | [string](#string) |  | farmer defines the bech32-encoded address of the staker for the plan |
-| `reward_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | reward_coins specifies rewards amount at this point in time when farmers receive them from the farming plan |
+| `staking_coin_denom` | [uint64](#uint64) |  | staking_coin_denom is denom of staked coin as a source of the reward |
+| `reward_coins` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | reward_coins specifies rewards amount at this point in time when farmers receive them from the farming plan |
 
 
 
@@ -4699,7 +4700,7 @@ Staking defines a farmer's staking information.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `plan_id` | [uint64](#uint64) |  | plan_id specifies index of the target farming plan |
+| `id` | [uint64](#uint64) |  | id specifies index of the staking |
 | `farmer` | [string](#string) |  | farmer defines the bech32-encoded address of the staker for the plan |
 | `staked_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | staked_coins specifies the staking amount for the plan of farmer |
 | `queued_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | queued_coins specifies the coins on standby before current epoch passes and gets staked. |
@@ -5140,32 +5141,6 @@ Query defines the gRPC query service for the farming module.
 
 
 
-<a name="cosmos.farming.v1beta1.MsgClaim"></a>
-
-### MsgClaim
-MsgClaim defines a SDK message for claiming rewards from the farming plan.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `plan_id` | [uint64](#uint64) |  | plan_id specifies the farming plan id |
-| `farmer` | [string](#string) |  | farmer defines the bech32-encoded address of the farmer |
-
-
-
-
-
-
-<a name="cosmos.farming.v1beta1.MsgClaimResponse"></a>
-
-### MsgClaimResponse
-MsgClaimResponse defines the Msg/MsgClaimResponse response type.
-
-
-
-
-
-
 <a name="cosmos.farming.v1beta1.MsgCreateFixedAmountPlan"></a>
 
 ### MsgCreateFixedAmountPlan
@@ -5178,7 +5153,6 @@ MsgCreateFixedAmountPlan defines a SDK message for creating a new fixed amount f
 | `staking_coin_weights` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | staking_coin_weights specifies coins weight for the plan |
 | `start_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | start_time specifies the start time of the plan |
 | `end_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | end_time specifies the end time of the plan |
-| `epoch_days` | [uint32](#uint32) |  | epoch_days specifies a period of time that triggers the distribution plan; it is measured in days |
 | `epoch_amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | epoch_amount specifies the distributing amount for each epoch |
 
 
@@ -5208,7 +5182,6 @@ MsgCreateRatioPlan defines a SDK message for creating a new ratio farming plan.
 | `staking_coin_weights` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | staking_coin_weights specifies coins weight for the plan |
 | `start_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | start_time specifies the start time of the plan |
 | `end_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | end_time specifies the end time of the plan |
-| `epoch_days` | [uint32](#uint32) |  | epoch_days specifies a period of time that triggers the distribution plan; it is measured in days |
 | `epoch_ratio` | [string](#string) |  | epoch_ratio specifies the distributing amount by ratio |
 
 
@@ -5226,6 +5199,32 @@ MsgCreateRatioPlanResponse  defines the Msg/MsgCreateRatioPlanResponse  response
 
 
 
+<a name="cosmos.farming.v1beta1.MsgHarvest"></a>
+
+### MsgHarvest
+MsgHarvest defines a SDK message for claiming rewards from the farming plan.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `farmer` | [string](#string) |  | farmer defines the bech32-encoded address of the farmer |
+| `staking_coin_denom` | [uint64](#uint64) |  | staking_coin_denom is denom of staked coin as a source of the reward for harvesting |
+
+
+
+
+
+
+<a name="cosmos.farming.v1beta1.MsgHarvestResponse"></a>
+
+### MsgHarvestResponse
+MsgHarvestResponse defines the Msg/MsgHarvestResponse response type.
+
+
+
+
+
+
 <a name="cosmos.farming.v1beta1.MsgStake"></a>
 
 ### MsgStake
@@ -5234,7 +5233,6 @@ MsgStake defines a SDK message for staking coins into the farming plan.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `plan_id` | [uint64](#uint64) |  | plan_id specifies the farming plan id |
 | `farmer` | [string](#string) |  | farmer defines the bech32-encoded address of the farmer |
 | `staking_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | staking_coins specifies coins to stake |
 
@@ -5261,7 +5259,6 @@ MsgUnstake defines a SDK message for performing unstaking of coins from the farm
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `plan_id` | [uint64](#uint64) |  | plan_id specifies the farming plan id |
 | `farmer` | [string](#string) |  | farmer defines the bech32-encoded address of the farmer |
 | `unstaking_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | unstaking_coins specifies coins to stake |
 
@@ -5297,7 +5294,7 @@ Msg defines the farming Msg service.
 | `CreateRatioPlan` | [MsgCreateRatioPlan](#cosmos.farming.v1beta1.MsgCreateRatioPlan) | [MsgCreateRatioPlanResponse](#cosmos.farming.v1beta1.MsgCreateRatioPlanResponse) | CreateRatioPlan defines a method for creating a new ratio farming plan | |
 | `Stake` | [MsgStake](#cosmos.farming.v1beta1.MsgStake) | [MsgStakeResponse](#cosmos.farming.v1beta1.MsgStakeResponse) | Stake defines a method for staking coins into the farming plan | |
 | `Unstake` | [MsgUnstake](#cosmos.farming.v1beta1.MsgUnstake) | [MsgUnstakeResponse](#cosmos.farming.v1beta1.MsgUnstakeResponse) | Unstake defines a method for unstaking coins from the farming plan | |
-| `Claim` | [MsgClaim](#cosmos.farming.v1beta1.MsgClaim) | [MsgClaimResponse](#cosmos.farming.v1beta1.MsgClaimResponse) | Claim defines a method for claiming farming rewards | |
+| `Harvest` | [MsgHarvest](#cosmos.farming.v1beta1.MsgHarvest) | [MsgHarvestResponse](#cosmos.farming.v1beta1.MsgHarvestResponse) | harvest defines a method for claiming farming rewards | |
 
  <!-- end services -->
 
