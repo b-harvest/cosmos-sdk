@@ -41,20 +41,15 @@ const (
 
 ## Staking
 
-- New `Staking` objects are created when new `Plan` is created, with each staking coin `Denom` in the new `Plan`.
-- `Staking` objects are removed when a `Plan` is removed.
-
-## StakingPosition
-
-- New `StakingPosition` object is created when a farmer creates a staking position, and when the farmer does not have existing `StakingPosition`.
-- When a farmer creates new staking position, the farmer should pay `StakingPositionCreationFee` to prevent spamming.
-- When a farmer add/remove staking positions to/from existing `StakingPosition`, `StakedCoins` and `QueuedCoins` are updated in the corresponding `StakingPosition`.
+- New `Staking` object is created when a farmer creates a staking, and when the farmer does not have existing `Staking`.
+- When a farmer creates new staking, the farmer should pay `StakingCreationFee` to prevent spamming.
+- When a farmer add/remove stakings to/from existing `Staking`, `StakedCoins` and `QueuedCoins` are updated in the corresponding `Staking`.
 - `QueuedCoins` : newly staked coins are in this status until end of current epoch, and then migrated to `StakedCoins` at the end of current epoch.
 - When a farmer unstakes, `QueuedCoins` are unstaked first, and then `StakedCoins`.
 
 ## Reward
 
-- At every end of epoch, `Reward` are created or updated by the calculation from each `Plan` and corresponding `StakingPosition`.
-- Every `StakedCoins` in `StakingPosition` which is eligible for any alive `Plan` accumulates rewards in `RewardCoins`.
-- Reward for specific `Plan` and staking coin `Denom` = total_reward_of_the_plan_for_this_epoch _ weight_for_this_staking_coin _ (this_denom_staked_coins_for_this_farmer)/(this_denom_total_staked_coins)
+- At every end of epoch, `Reward` are created or updated by the calculation from each `Plan` and corresponding `Staking`.
+- Every `StakedCoins` in `Staking` which is eligible for any alive `Plan` accumulates rewards in `RewardCoins`.
+- Reward for specific `Plan` and `StakingCoinDenom` = total_reward_of_the_plan_for_this_epoch _ weight_for_this_staking_coin _ (this_denom_staked_coins_for_this_farmer)/(this_denom_total_staked_coins)
 - Accumulated `RewardCoins` are withdrawable anytime when the farmer request the withdrawal from the `Reward`.

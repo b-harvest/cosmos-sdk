@@ -1,6 +1,6 @@
 <!-- order: 2 -->
 
- # State
+# State
 
 The farming module keeps track of the staking and rewards states.
 
@@ -103,8 +103,10 @@ The parameters of the Plan state are:
 
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
 - Plan: `0x11 | Id -> ProtocolBuffer(Plan)`
-- PlanByFarmerAddrIndex: `0x12 | FarmerAddrLen (1 byte) | FarmerAddr -> iterable Id` (can be deprecated)
-- LastEpochTime: `0x13 | Id -> time.Time` (can be GlobalLastEpochTime)
+- PlanByFarmerAddrIndex: `0x12 | FarmerAddrLen (1 byte) | FarmerAddr -> Id -> nil` (can be deprecated)
+- LastDistributedTime: `0x13 | Id -> time.Time`
+- GlobalLastEpochTime: `0x14 | Id -> time.Time`
+- TotalDistributedRewardCoins: `0x15 | PlanId | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom → ProtocolBuffer(sdk.DecCoins)`
 - GlobalPlanIdKey: `[]byte("globalPlanId") -> ProtocolBuffer(uint64)`
   - store latest plan id
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
@@ -112,23 +114,8 @@ The parameters of the Plan state are:
 ## Staking
 
 ```go
-// Staking provides index table for farming plans and staking coin denoms.
-type Staking struct {
-    Id                       uint64
-    PlanId                   uint64
-    Denom                    string
-}
-```
-
-- Staking: `0x21 | StakingId -> ProtocolBuffer(Staking)`
-- StakingByPlanIdIndex: `0x22 | PlanId -> iterable Denoms` or `0x22 | PlanId | Denom -> iterable Ids`
-- StakingByDenomIndex: `0x23 | Denom -> iterable PlanIds` or `0x23 | Denom | PlanId -> iterable Ids`
-
-## StakingPosition
-
-```go
 // StakingPosition stores farmer's staking position status.
-type StakingPosition struct {
+type Staking struct {
     Id                       uint64
     Farmer                   string
     StakedCoins              sdk.Coins
@@ -142,25 +129,25 @@ The parameters of the Staking state are:
 
   - store latest staking position id
 
-- StakingPosition: `0x31 | Id -> ProtocolBuffer(StakingPosition)`
-- StakingPositionByFarmerAddrIndex: `0x32 | FarmerAddrLen (1 byte) | FarmerAddr -> Id`
-- StakingPositionByStakingIdIndex: `0x33 | stakingId -> iterable Ids`
-  - iterable for several `StakingPositionId` results by indexed `stakingId`, It also used for iterating farmers and rewards by `stakingId`
+- StakingPosition: `0x21 | Id -> ProtocolBuffer(StakingPosition)`
+- StakingPositionByFarmerAddrIndex: `0x22 | FarmerAddrLen (1 byte) | FarmerAddr -> Id`
+- StakingPositionByStakingCoinDenomIdIndex: `0x23 | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom | Id -> nil`
 
 ## Reward
 
 ```go
-// Reward defines a record of farming rewards.
+// Reward defines a record of farming rewards for query result and exported state.
 type Reward struct {
-    StakingPositionId        uint64
-    StakingId                uint64
-    RewardCoins              sdk.Coins
+    Farmer                string
+    StakingCoinDenom       string
+    RewardCoins              sdk.DecCoins
 }
 ```
 
 The parameters of the Reward state are:
 
-- Reward: `0x41 | StakingPositionId | StakingId | -> ProtocolBuffer(Reward)`
+- Reward: `0x31 | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(sdk.DecCoins) RewardCoins`
+- RewardByFarmerAddrIndex: `0x32 | FarmerAddrLen (1 byte) | FarmerAddr | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom -> nil`
 
 ## Examples
 

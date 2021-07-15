@@ -8,7 +8,7 @@ The farming module contains the following parameters:
 | -------------------------- | --------- | ---------------------------------------- |
 | PrivatePlanCreationFee     | sdk.Coins | [{"denom":"stake","amount":"100000000"}] |
 | StakingPositionCreationFee | sdk.Coins | [{"denom":"stake","amount":"100000"}]    |
-| EpochDays                  | uint64    | 1                                        |
+| EpochDays                  | uint32    | 1                                        |
 
 ## PrivatePlanCreationFee
 
