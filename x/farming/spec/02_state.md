@@ -106,7 +106,7 @@ The parameters of the Plan state are:
 - PlanByFarmerAddrIndex: `0x12 | FarmerAddrLen (1 byte) | FarmerAddr -> Id -> nil` (can be deprecated)
 - LastDistributedTime: `0x13 | Id -> time.Time`
 - GlobalLastEpochTime: `0x14 | Id -> time.Time`
-- TotalDistributedRewardCoins: `0x15 | PlanId | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom → ProtocolBuffer(sdk.DecCoins)`
+- TotalDistributedRewardCoins: `0x15 | PlanId | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom → ProtocolBuffer(sdk.Coins)`
 - GlobalPlanIdKey: `[]byte("globalPlanId") -> ProtocolBuffer(uint64)`
   - store latest plan id
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
@@ -140,13 +140,13 @@ The parameters of the Staking state are:
 type Reward struct {
     Farmer                string
     StakingCoinDenom      string
-    RewardCoins           sdk.DecCoins
+    RewardCoins           sdk.Coins
 }
 ```
 
 The parameters of the Reward state are:
 
-- Reward: `0x31 | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(sdk.DecCoins) RewardCoins`
+- Reward: `0x31 | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom | FarmerAddrLen (1 byte) | FarmerAddr -> ProtocolBuffer(sdk.Coins) RewardCoins`
 - RewardByFarmerAddrIndex: `0x32 | FarmerAddrLen (1 byte) | FarmerAddr | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom -> nil`
 
 ## Examples

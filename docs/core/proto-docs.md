@@ -4685,7 +4685,7 @@ Reward defines a record of farming rewards.
 | ----- | ---- | ----- | ----------- |
 | `farmer` | [string](#string) |  | farmer defines the bech32-encoded address of the staker for the plan |
 | `staking_coin_denom` | [uint64](#uint64) |  | staking_coin_denom is denom of staked coin as a source of the reward |
-| `reward_coins` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | reward_coins specifies rewards amount at this point in time when farmers receive them from the farming plan |
+| `reward_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | reward_coins specifies rewards amount at this point in time when farmers receive them from the farming plan |
 
 
 
