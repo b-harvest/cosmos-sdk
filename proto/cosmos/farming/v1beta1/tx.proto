@@ -114,7 +114,7 @@ message MsgHarvest {
   string farmer = 1;
 
   // staking_coin_denom is denom of staked coin as a source of the reward for harvesting
-  uint64 staking_coin_denom = 2 [(gogoproto.moretags) = "yaml:\"staking_coin_denom\""];
+  string staking_coin_denom = 2 [(gogoproto.moretags) = "yaml:\"staking_coin_denom\""];
 }
 
 // MsgCreateFixedAmountPlanResponse defines the Msg/CreateFixedAmountPlanResponse response type.

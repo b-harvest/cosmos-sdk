@@ -19,7 +19,7 @@ const (
 	OpWeightMsgCreateRatioPlan       = "op_weight_msg_create_ratio_plan"
 	OpWeightMsgStake                 = "op_weight_msg_stake"
 	OpWeightMsgUnstake               = "op_weight_msg_unstake"
-	OpWeightMsgClaim                 = "op_weight_msg_claim"
+	OpWeightMsgHarvest               = "op_weight_msg_claim"
 )
 
 // WeightedOperations returns all the operations from the module with their respective weights
@@ -56,10 +56,10 @@ func WeightedOperations(
 		},
 	)
 
-	var weightMsgClaim int
-	appParams.GetOrGenerate(cdc, OpWeightMsgClaim, &weightMsgClaim, nil,
+	var weightMsgHarvest int
+	appParams.GetOrGenerate(cdc, OpWeightMsgHarvest, &weightMsgHarvest, nil,
 		func(_ *rand.Rand) {
-			weightMsgClaim = params.DefaultWeightMsgClaim
+			weightMsgHarvest = params.DefaultWeightMsgHarvest
 		},
 	)
 
@@ -81,8 +81,8 @@ func WeightedOperations(
 			SimulateMsgUnstake(ak, bk, k),
 		),
 		simulation.NewWeightedOperation(
-			weightMsgClaim,
-			SimulateMsgClaim(ak, bk, k),
+			weightMsgHarvest,
+			SimulateMsgHarvest(ak, bk, k),
 		),
 	}
 }
@@ -131,9 +131,9 @@ func SimulateMsgUnstake(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Ke
 	}
 }
 
-// SimulateMsgClaim generates a MsgClaim with random values
+// SimulateMsgHarvest generates a MsgHarvest with random values
 // nolint: interfacer
-func SimulateMsgClaim(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgHarvest(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {

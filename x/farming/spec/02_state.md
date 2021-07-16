@@ -28,9 +28,6 @@ type PlanI interface {
     GetTerminationAddress() sdk.AccAddress
     SetTerminationAddress(sdk.AccAddress) error
 
-    GetStakingReserveAddress() sdk.AccAddress
-    SetStakingReserveAddress(sdk.AccAddress) error
-
     GetStakingCoinsWeight() sdk.DecCoins
     SetStakingCoinsWeight(sdk.DecCoins) error
 
@@ -58,7 +55,6 @@ type BasePlan struct {
     FarmingPoolAddress       string       // bech32-encoded farming pool address
     RewardPoolAddress        string       // bech32-encoded reward pool address
     TerminationAddress       string       // bech32-encoded termination address
-    StakingReserveAddress    string       // bech32-encoded staking reserve address
     StakingCoinWeights       sdk.DecCoins // coin weights for the plan
     StartTime                time.Time    // start time of the plan
     EndTime                  time.Time    // end time of the plan
@@ -160,7 +156,6 @@ An example of `FixedAmountPlan`
     "type": 0,
     "farmingPoolAddress": "cosmos1...",
     "rewardPoolAddress": "cosmos1...",
-    "stakingReserveAddress": "cosmos1...",
     "stakingCoinWeights": [
       {
         "denom": "xxx",
@@ -195,7 +190,6 @@ An example of `RatioPlan`
     "type": 0,
     "farmingPoolAddress": "cosmos1...",
     "rewardPoolAddress": "cosmos1...",
-    "stakingReserveAddress": "cosmos1...",
     "stakingCoinWeights": [
       {
         "denom": "xxx",

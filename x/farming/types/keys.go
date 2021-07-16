@@ -42,6 +42,8 @@ var (
 
 	RewardKeyPrefix                  = []byte{0x31}
 	RewardByFarmerAddrIndexKeyPrefix = []byte{0x32}
+
+	StakingReserveAcc = sdk.AccAddress(address.Module(ModuleName, []byte("StakingReserveAcc")))
 )
 
 // GetPlanKey returns kv indexing key of the plan
@@ -100,16 +102,22 @@ func MustLengthPrefixString(str string) []byte {
 	return append([]byte{byte(bzLen)}, bz...)
 }
 
-// GetRewardPrefix returns prefix of reward records in the plan
-func GetRewardPrefix(planID uint64) []byte {
-	key := make([]byte, 9)
-	key[0] = RewardKeyPrefix[0]
-	copy(key[1:9], sdk.Uint64ToBigEndian(planID))
-	return key
+// GetRewardKey returns key for staking coin denomination's reward of corresponding the farmer
+func GetRewardKey(stakingCoinDenom string, farmerAcc sdk.AccAddress) []byte {
+	return append(append(RewardKeyPrefix, MustLengthPrefixString(stakingCoinDenom)...), address.MustLengthPrefix(farmerAcc.Bytes())...)
 }
 
-// GetRewardIndexKey returns key for farmer's reward of corresponding the plan id
-func GetRewardIndexKey(planID uint64, farmerAcc sdk.AccAddress) []byte {
-	// TODO: review for addrLen,  <addrLen (1 Byte)><addrBytes>
-	return append(append(RewardKeyPrefix, sdk.Uint64ToBigEndian(planID)...), address.MustLengthPrefix(farmerAcc.Bytes())...)
+// GetRewardByFarmerAddrIndexKey returns key for farmer's reward of corresponding the staking coin denomination
+func GetRewardByFarmerAddrIndexKey(farmerAcc sdk.AccAddress, stakingCoinDenom string) []byte {
+	return append(append(RewardByFarmerAddrIndexKeyPrefix, address.MustLengthPrefix(farmerAcc.Bytes())...), MustLengthPrefixString(stakingCoinDenom)...)
+}
+
+// GetRewardKey returns prefix for staking coin denomination's reward list
+func GetRewardByStakingCoinDenomPrefix(stakingCoinDenom string) []byte {
+	return append(RewardKeyPrefix, MustLengthPrefixString(stakingCoinDenom)...)
+}
+
+// GetRewardByFarmerAddrIndexPrefix returns prefix for farmer's reward list
+func GetRewardByFarmerAddrIndexPrefix(farmerAcc sdk.AccAddress) []byte {
+	return append(RewardByFarmerAddrIndexKeyPrefix, address.MustLengthPrefix(farmerAcc.Bytes())...)
 }

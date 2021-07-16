@@ -4616,7 +4616,6 @@ type for additional functionality (e.g. fixed amount plan, ratio plan).
 | `farming_pool_address` | [string](#string) |  | farming_pool_address defines the bech32-encoded address of the farming pool |
 | `reward_pool_address` | [string](#string) |  | reward_pool_address defines the bech32-encoded address that distributes reward amount of coins to farmers |
 | `termination_address` | [string](#string) |  | termination_address defines the bech32-encoded address that terminates plan when the plan ends after the end time, the balance of farming pool address is transferred to the termination address |
-| `staking_reserve_address` | [string](#string) |  | staking_reserve_address defines the bech32-encoded address that stores staking reserves |
 | `staking_coin_weights` | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated | staking_coin_weights specifies coin weights for the plan |
 | `start_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | start_time specifies the start time of the plan |
 | `end_time` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | end_time specifies the end time of the plan |
@@ -4684,7 +4683,7 @@ Reward defines a record of farming rewards.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `farmer` | [string](#string) |  | farmer defines the bech32-encoded address of the staker for the plan |
-| `staking_coin_denom` | [uint64](#uint64) |  | staking_coin_denom is denom of staked coin as a source of the reward |
+| `staking_coin_denom` | [string](#string) |  | staking_coin_denom is denom of staked coin as a source of the reward |
 | `reward_coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | reward_coins specifies rewards amount at this point in time when farmers receive them from the farming plan |
 
 
@@ -5208,7 +5207,7 @@ MsgHarvest defines a SDK message for claiming rewards from the farming plan.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `farmer` | [string](#string) |  | farmer defines the bech32-encoded address of the farmer |
-| `staking_coin_denom` | [uint64](#uint64) |  | staking_coin_denom is denom of staked coin as a source of the reward for harvesting |
+| `staking_coin_denom` | [string](#string) |  | staking_coin_denom is denom of staked coin as a source of the reward for harvesting |
 
 
 

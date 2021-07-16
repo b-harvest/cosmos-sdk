@@ -237,24 +237,24 @@ func TestMsgUnstake(t *testing.T) {
 	}
 }
 
-func TestMsgClaim(t *testing.T) {
+func TestMsgHarvest(t *testing.T) {
 	planId := uint64(1)
 	farmingPoolAddr := sdk.AccAddress(crypto.AddressHash([]byte("farmingPoolAddr")))
 
 	testCases := []struct {
 		expectedErr string
-		msg         *types.MsgClaim
+		msg         *types.MsgHarvest
 	}{
 		{
 			"", // empty means no error expected
-			types.NewMsgClaim(planId, farmingPoolAddr),
+			types.NewMsgHarvest(planId, farmingPoolAddr),
 		},
 		// TODO" not implemented yet
 	}
 
 	for _, tc := range testCases {
-		require.IsType(t, &types.MsgClaim{}, tc.msg)
-		require.Equal(t, types.TypeMsgClaim, tc.msg.Type())
+		require.IsType(t, &types.MsgHarvest{}, tc.msg)
+		require.Equal(t, types.TypeMsgHarvest, tc.msg.Type())
 		require.Equal(t, types.RouterKey, tc.msg.Route())
 		require.Equal(t, sdk.MustSortJSON(types.ModuleCdc.MustMarshalJSON(tc.msg)), tc.msg.GetSignBytes())
 

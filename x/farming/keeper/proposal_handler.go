@@ -22,7 +22,6 @@ func HandlePublicPlanProposal(ctx sdk.Context, k Keeper, plansAny []*codectypes.
 				p.GetStakingCoinWeights(),
 				p.GetStartTime(),
 				p.GetEndTime(),
-				p.GetEpochDays(),
 				p.EpochAmount,
 			)
 
@@ -37,7 +36,6 @@ func HandlePublicPlanProposal(ctx sdk.Context, k Keeper, plansAny []*codectypes.
 				p.GetStakingCoinWeights(),
 				p.GetStartTime(),
 				p.GetEndTime(),
-				p.GetEpochDays(),
 				p.EpochRatio,
 			)
 
