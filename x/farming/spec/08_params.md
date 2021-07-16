@@ -7,16 +7,16 @@ The farming module contains the following parameters:
 | Key                        | Type      | Example                                  |
 | -------------------------- | --------- | ---------------------------------------- |
 | PrivatePlanCreationFee     | sdk.Coins | [{"denom":"stake","amount":"100000000"}] |
-| StakingPositionCreationFee | sdk.Coins | [{"denom":"stake","amount":"100000"}]    |
+| StakingCreationFee         | sdk.Coins | [{"denom":"stake","amount":"100000"}]    |
 | EpochDays                  | uint32    | 1                                        |
 
 ## PrivatePlanCreationFee
 
 Fee paid for to create a Private type Farming plan. This fee prevents spamming and is collected in in the community pool of the distribution module.
 
-## StakingPositionCreationFee
+## StakingCreationFee
 
-When a farmer creates new `StakingPosition`, the farmer needs to pay `StakingPositionCreationFee` to prevent spam on the `StakingPosition` struct.
+When a farmer creates new `Staking`, the farmer needs to pay `StakingCreationFee` to prevent spam on the `Staking` struct.
 
 ## EpochDays
 

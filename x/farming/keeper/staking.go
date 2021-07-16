@@ -12,9 +12,20 @@ import (
 //}
 
 // GetStaking return a specific staking
-func (k Keeper) GetStaking(ctx sdk.Context, planID uint64, farmerAcc sdk.AccAddress) (staking types.Staking, found bool) {
+func (k Keeper) GetStaking(ctx sdk.Context, id uint64) (staking types.Staking, found bool) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.GetStakingIndexKey(planID, farmerAcc))
+	bz := store.Get(types.GetStakingKey(id))
+	if bz == nil {
+		return staking, false
+	}
+	k.cdc.MustUnmarshal(bz, &staking)
+	return staking, true
+}
+
+// GetStaking return a specific staking
+func (k Keeper) GetStakingByFarmer(ctx sdk.Context, farmerAcc sdk.AccAddress) (staking types.Staking, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(types.GetStakingByFarmerAddrIndexKey(farmerAcc))
 	if bz == nil {
 		return staking, false
 	}
@@ -111,20 +122,14 @@ func (k Keeper) ReleaseStakingCoins(ctx sdk.Context, reserveAcc, farmer sdk.AccA
 
 // Stake stores staking coins to queued coins and it will be processed in the next epoch.
 func (k Keeper) Stake(ctx sdk.Context, msg *types.MsgStake) (types.Staking, error) {
-	plan, found := k.GetPlan(ctx, msg.PlanId)
-	if !found {
-		return types.Staking{}, types.ErrPlanNotExists
-	}
-
 	farmerAcc, err := sdk.AccAddressFromBech32(msg.Farmer)
 	if err != nil {
 		return types.Staking{}, err
 	}
 
-	staking, found := k.GetStaking(ctx, plan.GetId(), farmerAcc)
+	staking, found := k.GetStakingByFarmer(ctx, farmerAcc)
 	if !found {
 		staking = types.Staking{
-			PlanId:      plan.GetId(),
 			Farmer:      msg.Farmer,
 			StakedCoins: nil,
 			QueuedCoins: msg.StakingCoins,

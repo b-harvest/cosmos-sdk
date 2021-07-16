@@ -105,16 +105,16 @@ The parameters of the Plan state are:
 - Plan: `0x11 | Id -> ProtocolBuffer(Plan)`
 - PlanByFarmerAddrIndex: `0x12 | FarmerAddrLen (1 byte) | FarmerAddr -> Id -> nil` (can be deprecated)
 - LastDistributedTime: `0x13 | Id -> time.Time`
-- GlobalLastEpochTime: `0x14 | Id -> time.Time`
-- TotalDistributedRewardCoins: `0x15 | PlanId | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom → ProtocolBuffer(sdk.Coins)`
+- TotalDistributedRewardCoins: `0x14 | PlanId | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom → ProtocolBuffer(sdk.Coins)`
 - GlobalPlanIdKey: `[]byte("globalPlanId") -> ProtocolBuffer(uint64)`
   - store latest plan id
+- GlobalLastEpochTime: `[]byte("globalLastEpochTime") | Id -> time.Time`
 - ModuleName, RouterKey, StoreKey, QuerierRoute: `farming`
 
 ## Staking
 
 ```go
-// StakingPosition stores farmer's staking position status.
+// Staking stores farmer's staking position status.
 type Staking struct {
     Id                       uint64
     Farmer                   string
@@ -125,13 +125,13 @@ type Staking struct {
 
 The parameters of the Staking state are:
 
-- GlobalStakingPositionIdKey: `[]byte("globalStakingPositionId") -> ProtocolBuffer(uint64)`
+- GlobalStakingIdKey: `[]byte("globalStakingId") -> ProtocolBuffer(uint64)`
 
-  - store latest staking position id
+  - store latest staking id
 
-- StakingPosition: `0x21 | Id -> ProtocolBuffer(StakingPosition)`
-- StakingPositionByFarmerAddrIndex: `0x22 | FarmerAddrLen (1 byte) | FarmerAddr -> Id`
-- StakingPositionByStakingCoinDenomIdIndex: `0x23 | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom | Id -> nil`
+- Staking: `0x21 | Id -> ProtocolBuffer(Staking)`
+- StakingByFarmerAddrIndex: `0x22 | FarmerAddrLen (1 byte) | FarmerAddr -> Id`
+- StakingByStakingCoinDenomIdIndex: `0x23 | StakingCoinDenomAddrLen (1 byte) | StakingCoinDenom | Id -> nil`
 
 ## Reward
 

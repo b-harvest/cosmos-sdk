@@ -20,10 +20,10 @@ message Params {
     (gogoproto.nullable)     = false
   ];
 
-  // When a farmer creates new staking_position, the farmer needs to pay staking_position_creation_fee to prevent spam
-  // on the staking_position struct.
-  repeated cosmos.base.v1beta1.Coin staking_position_creation_fee = 2 [
-    (gogoproto.moretags)     = "yaml:\"staking_position_creation_fee\"",
+  // When a farmer creates new staking, the farmer needs to pay staking_creation_fee to prevent spam
+  // on the staking struct.
+  repeated cosmos.base.v1beta1.Coin staking_creation_fee = 2 [
+    (gogoproto.moretags)     = "yaml:\"staking_creation_fee\"",
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
     (gogoproto.nullable)     = false
   ];

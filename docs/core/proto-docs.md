@@ -4651,7 +4651,7 @@ Params defines the set of params for the farming module.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `private_plan_creation_fee` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | private_plan_creation_fee specifies the fee for plan creation this fee prevents from spamming and it is collected in the community pool |
-| `staking_position_creation_fee` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | When a farmer creates new staking_position, the farmer needs to pay staking_position_creation_fee to prevent spam on the staking_position struct. |
+| `staking_creation_fee` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | When a farmer creates new staking, the farmer needs to pay staking_creation_fee to prevent spam on the staking struct. |
 | `epoch_days` | [uint32](#uint32) |  | The universal epoch length in number of days. Every process for staking and reward distribution is executed with this epoch_days frequency. |
 
 
