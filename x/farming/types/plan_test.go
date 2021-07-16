@@ -40,9 +40,7 @@ func TestGetPoolInformation(t *testing.T) {
 	for _, tc := range testCases {
 		planName := types.PlanName(tc.planId, tc.planType, tc.farmingPoolAddr)
 		rewardPoolAcc := types.GenerateRewardPoolAcc(planName)
-		stakingReserveAcc := types.GenerateStakingReserveAcc(planName)
 		basePlan := types.NewBasePlan(tc.planId, tc.planType, tc.farmingPoolAddr, commonTerminationAcc.String(), commonCoinWeights, commonStartTime, commonEndTime, commonEpochDays)
 		require.Equal(t, basePlan.RewardPoolAddress, rewardPoolAcc.String())
-		require.Equal(t, basePlan.StakingReserveAddress, stakingReserveAcc.String())
 	}
 }

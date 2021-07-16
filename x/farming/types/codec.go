@@ -16,7 +16,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateRatioPlan{}, "cosmos-sdk/MsgCreateRatioPlan", nil)
 	cdc.RegisterConcrete(&MsgStake{}, "cosmos-sdk/MsgStake", nil)
 	cdc.RegisterConcrete(&MsgUnstake{}, "cosmos-sdk/MsgUnstake", nil)
-	cdc.RegisterConcrete(&MsgClaim{}, "cosmos-sdk/MsgClaim", nil)
+	cdc.RegisterConcrete(&MsgHarvest{}, "cosmos-sdk/MsgHarvest", nil)
 }
 
 // RegisterInterfaces registers the x/farming interfaces types with the interface registry
@@ -27,7 +27,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgCreateRatioPlan{},
 		&MsgStake{},
 		&MsgUnstake{},
-		&MsgClaim{},
+		&MsgHarvest{},
 	)
 
 	registry.RegisterImplementations(

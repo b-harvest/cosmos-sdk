@@ -8,7 +8,6 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/farming/types"
@@ -41,10 +40,8 @@ func (k msgServer) CreateFixedAmountPlan(goCtx context.Context, msg *types.MsgCr
 			types.EventTypeCreateFixedAmountPlan,
 			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetFarmingPoolAddress()),
 			sdk.NewAttribute(types.AttributeKeyRewardPoolAddress, fixedPlan.RewardPoolAddress),
-			sdk.NewAttribute(types.AttributeKeyStakingReserveAddress, fixedPlan.StakingReserveAddress),
 			sdk.NewAttribute(types.AttributeKeyStartTime, msg.StartTime.String()),
 			sdk.NewAttribute(types.AttributeKeyEndTime, msg.EndTime.String()),
-			sdk.NewAttribute(types.AttributeKeyEpochDays, fmt.Sprint(msg.GetEpochDays())),
 			sdk.NewAttribute(types.AttributeKeyEpochAmount, fmt.Sprint(msg.GetEpochAmount())),
 		),
 	})
@@ -67,10 +64,8 @@ func (k msgServer) CreateRatioPlan(goCtx context.Context, msg *types.MsgCreateRa
 			types.EventTypeCreateRatioPlan,
 			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetFarmingPoolAddress()),
 			sdk.NewAttribute(types.AttributeKeyRewardPoolAddress, ratioPlan.RewardPoolAddress),
-			sdk.NewAttribute(types.AttributeKeyStakingReserveAddress, ratioPlan.StakingReserveAddress),
 			sdk.NewAttribute(types.AttributeKeyStartTime, msg.StartTime.String()),
 			sdk.NewAttribute(types.AttributeKeyEndTime, msg.EndTime.String()),
-			sdk.NewAttribute(types.AttributeKeyEpochDays, fmt.Sprint(msg.GetEpochDays())),
 			sdk.NewAttribute(types.AttributeKeyEpochRatio, fmt.Sprint(msg.EpochRatio)),
 		),
 	})
@@ -90,7 +85,6 @@ func (k msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.Msg
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeStake,
-			sdk.NewAttribute(types.AttributeKeyPlanId, strconv.FormatUint(msg.GetPlanId(), 10)),
 			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetFarmer()),
 			sdk.NewAttribute(types.AttributeKeyStakingCoins, msg.GetStakingCoins().String()),
 		),
@@ -111,7 +105,6 @@ func (k msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeUnstake,
-			sdk.NewAttribute(types.AttributeKeyPlanId, strconv.FormatUint(msg.GetPlanId(), 10)),
 			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetUnstaker().String()),
 			sdk.NewAttribute(types.AttributeKeyStakingCoins, msg.GetUnstakingCoins().String()),
 		),
@@ -120,23 +113,22 @@ func (k msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types
 	return &types.MsgUnstakeResponse{}, nil
 }
 
-// Claim defines a method for claiming farming rewards from the farming plan.
-func (k msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.MsgClaimResponse, error) {
+// Harvest defines a method for claiming farming rewards from the farming plan.
+func (k msgServer) Harvest(goCtx context.Context, msg *types.MsgHarvest) (*types.MsgHarvestResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	reward, err := k.Keeper.Claim(ctx, msg)
+	reward, err := k.Keeper.Harvest(ctx, msg)
 	if err != nil {
-		return &types.MsgClaimResponse{}, err
+		return &types.MsgHarvestResponse{}, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeClaim,
-			sdk.NewAttribute(types.AttributeKeyPlanId, strconv.FormatUint(msg.GetPlanId(), 10)),
 			sdk.NewAttribute(types.AttributeKeyFarmingPoolAddress, msg.GetFarmer()),
 			sdk.NewAttribute(types.AttributeKeyRewardCoins, reward.RewardCoins.String()),
 		),
 	})
 
-	return &types.MsgClaimResponse{}, nil
+	return &types.MsgHarvestResponse{}, nil
 }

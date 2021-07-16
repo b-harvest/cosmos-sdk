@@ -103,6 +103,6 @@ func TestMsgUnstake(t *testing.T) {
 	// TODO: not implemented yet
 }
 
-func TestMsgClaim(t *testing.T) {
+func TestMsgHarvest(t *testing.T) {
 	// TODO: not implemented yet
 }
