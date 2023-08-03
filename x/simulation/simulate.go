@@ -2,6 +2,7 @@ package simulation
 
 import (
 	"fmt"
+	tmtypes "github.com/tendermint/tendermint/types"
 	"io"
 	"math/rand"
 	"os"
@@ -32,11 +33,26 @@ func initChain(
 	cdc codec.JSONCodec,
 ) (mockValidators, time.Time, []simulation.Account, string) {
 	appState, accounts, chainID, genesisTimestamp := appStateFn(r, accounts, config)
-	consensusParams := randomConsensusParams(r, appState, cdc)
+	cantoDefaultConsensusParams := &abci.ConsensusParams{
+		Block: &abci.BlockParams{
+			MaxBytes: 200000,
+			MaxGas:   -1, // no limit
+		},
+		Evidence: &tmproto.EvidenceParams{
+			MaxAgeNumBlocks: 302400,
+			MaxAgeDuration:  504 * time.Hour, // 3 weeks is the max duration
+			MaxBytes:        10000,
+		},
+		Validator: &tmproto.ValidatorParams{
+			PubKeyTypes: []string{
+				tmtypes.ABCIPubKeyTypeEd25519,
+			},
+		},
+	}
 	req := abci.RequestInitChain{
 		AppStateBytes:   appState,
 		ChainId:         chainID,
-		ConsensusParams: consensusParams,
+		ConsensusParams: cantoDefaultConsensusParams,
 		Time:            genesisTimestamp,
 	}
 	res := app.InitChain(req)

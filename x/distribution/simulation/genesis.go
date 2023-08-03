@@ -42,38 +42,15 @@ func GenWithdrawEnabled(r *rand.Rand) bool {
 
 // RandomizedGenState generates a random GenesisState for distribution
 func RandomizedGenState(simState *module.SimulationState) {
-	var communityTax sdk.Dec
-	simState.AppParams.GetOrGenerate(
-		simState.Cdc, CommunityTax, &communityTax, simState.Rand,
-		func(r *rand.Rand) { communityTax = GenCommunityTax(r) },
-	)
-
-	var baseProposerReward sdk.Dec
-	simState.AppParams.GetOrGenerate(
-		simState.Cdc, BaseProposerReward, &baseProposerReward, simState.Rand,
-		func(r *rand.Rand) { baseProposerReward = GenBaseProposerReward(r) },
-	)
-
-	var bonusProposerReward sdk.Dec
-	simState.AppParams.GetOrGenerate(
-		simState.Cdc, BonusProposerReward, &bonusProposerReward, simState.Rand,
-		func(r *rand.Rand) { bonusProposerReward = GenBonusProposerReward(r) },
-	)
-
-	var withdrawEnabled bool
-	simState.AppParams.GetOrGenerate(
-		simState.Cdc, WithdrawEnabled, &withdrawEnabled, simState.Rand,
-		func(r *rand.Rand) { withdrawEnabled = GenWithdrawEnabled(r) },
-	)
-
+	cantoMainnetParams := types.Params{
+		CommunityTax:        sdk.ZeroDec(),
+		BaseProposerReward:  sdk.ZeroDec(),
+		BonusProposerReward: sdk.ZeroDec(),
+		WithdrawAddrEnabled: true,
+	}
 	distrGenesis := types.GenesisState{
 		FeePool: types.InitialFeePool(),
-		Params: types.Params{
-			CommunityTax:        communityTax,
-			BaseProposerReward:  baseProposerReward,
-			BonusProposerReward: bonusProposerReward,
-			WithdrawAddrEnabled: withdrawEnabled,
-		},
+		Params:  cantoMainnetParams,
 	}
 
 	bz, err := json.MarshalIndent(&distrGenesis, "", " ")
