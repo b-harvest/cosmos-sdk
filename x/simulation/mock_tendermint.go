@@ -88,10 +88,9 @@ func updateValidators(
 ) map[string]mockValidator {
 	for _, update := range updates {
 		str := fmt.Sprintf("%X", update.PubKey.GetEd25519())
-
 		if update.Power == 0 {
-			if _, ok := current[str]; !ok {
-				tb.Fatalf("tried to delete a nonexistent validator: %s", str)
+			if i, ok := current[str]; !ok {
+				tb.Fatalf("tried to delete a nonexistent validator: %s(i: %d)", str, i)
 			}
 
 			event("end_block", "validator_updates", "kicked")

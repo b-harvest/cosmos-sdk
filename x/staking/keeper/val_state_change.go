@@ -196,6 +196,8 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx sdk.Context) (updates []ab
 		amtFromBondedToNotBonded = amtFromBondedToNotBonded.Add(validator.GetTokens())
 		k.DeleteLastValidatorPower(ctx, validator.GetOperator())
 		updates = append(updates, validator.ABCIValidatorUpdateZero())
+		pubKey, _ := validator.TmConsPublicKey()
+		fmt.Printf("validator %X no longer bonded\n", pubKey.GetEd25519())
 	}
 
 	// Update the pools based on the recent updates in the validator set:
