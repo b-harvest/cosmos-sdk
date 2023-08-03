@@ -83,7 +83,7 @@ func SimulateFromSeed(
 	params := RandomParams(r)
 	fmt.Fprintf(w, "Randomized simulation params: \n%s\n", mustMarshalJSONIndent(params))
 
-	timeDiff := maxTimePerBlock - minTimePerBlock
+	//timeDiff := maxTimePerBlock - minTimePerBlock
 	accs := randAccFn(r, params.NumKeys())
 	eventStats := NewEventStats()
 
@@ -200,10 +200,11 @@ func SimulateFromSeed(
 
 		res := app.EndBlock(abci.RequestEndBlock{})
 		header.Height++
-		header.Time = header.Time.Add(
-			time.Duration(minTimePerBlock) * time.Second)
-		header.Time = header.Time.Add(
-			time.Duration(int64(r.Intn(int(timeDiff)))) * time.Second)
+		//header.Time = header.Time.Add(
+		//	time.Duration(minTimePerBlock) * time.Second)
+		//header.Time = header.Time.Add(
+		//	time.Duration(int64(r.Intn(int(timeDiff)))) * time.Second)
+		header.Time = header.Time.Add(time.Hour * 24)
 		header.ProposerAddress = validators.randomProposer(r)
 
 		logWriter.AddEntry(EndBlockEntry(int64(height)))
