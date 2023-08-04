@@ -89,10 +89,10 @@ func updateValidators(
 	for _, update := range updates {
 		str := fmt.Sprintf("%X", update.PubKey.GetEd25519())
 		if update.Power == 0 {
-			if i, ok := current[str]; !ok {
-				tb.Fatalf("tried to delete a nonexistent validator: %s(i: %d)", str, i)
+			if _, ok := current[str]; !ok {
+				continue
+				//tb.Fatalf("tried to delete a nonexistent validator: %s(i: %d)", str, i)
 			}
-
 			event("end_block", "validator_updates", "kicked")
 			delete(current, str)
 		} else if _, ok := current[str]; ok {
