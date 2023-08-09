@@ -75,6 +75,9 @@ func RandomFees(r *rand.Rand, ctx sdk.Context, spendableCoins sdk.Coins) (sdk.Co
 	var randCoin sdk.Coin
 	for _, index := range perm {
 		randCoin = spendableCoins[index]
+		if randCoin.Denom == sdk.DefaultBondDenom {
+			continue
+		}
 		if !randCoin.Amount.IsZero() {
 			break
 		}
@@ -88,6 +91,8 @@ func RandomFees(r *rand.Rand, ctx sdk.Context, spendableCoins sdk.Coins) (sdk.Co
 	if err != nil {
 		return nil, err
 	}
+	// 1/10
+	amt = amt.Quo(sdk.NewInt(10))
 
 	// Create a random fee and verify the fees are within the account's spendable
 	// balance.
