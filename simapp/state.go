@@ -146,10 +146,15 @@ func AppStateRandomizedFn(
 
 	// generate a random amount of initial stake coins and a random initial
 	// number of bonded accounts
-	var initialStake, numInitiallyBonded int64
+	var initialStake sdk.Int
+	var numInitiallyBonded int64
 	appParams.GetOrGenerate(
 		cdc, simappparams.StakePerAccount, &initialStake, r,
-		func(r *rand.Rand) { initialStake = r.Int63n(1e12) },
+		func(r *rand.Rand) {
+			sdkReductionInt := sdk.NewInt(r.Int63n(1e12))
+			// ethermint reduction is 1e18 and cosmos is 1e6, so we need to multiply by 1e12(=1e18 - 1e6)
+			initialStake = sdkReductionInt.Mul(sdk.NewInt(1e12))
+		},
 	)
 	appParams.GetOrGenerate(
 		cdc, simappparams.InitiallyBondedValidators, &numInitiallyBonded, r,

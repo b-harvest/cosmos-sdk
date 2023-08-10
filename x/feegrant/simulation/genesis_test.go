@@ -28,7 +28,7 @@ func TestRandomizedGenState(t *testing.T) {
 		Rand:         r,
 		NumBonded:    3,
 		Accounts:     accounts,
-		InitialStake: 1000,
+		InitialStake: sdk.NewInt(1000),
 		GenState:     make(map[string]json.RawMessage),
 	}
 

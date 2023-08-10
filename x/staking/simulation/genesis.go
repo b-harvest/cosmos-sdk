@@ -65,11 +65,11 @@ func RandomizedGenState(simState *module.SimulationState) {
 		if err != nil {
 			panic(err)
 		}
-		validator.Tokens = sdk.NewInt(simState.InitialStake)
-		validator.DelegatorShares = sdk.NewDec(simState.InitialStake)
+		validator.Tokens = simState.InitialStake
+		validator.DelegatorShares = simState.InitialStake.ToDec()
 		validator.Commission = commission
 
-		delegation := types.NewDelegation(simState.Accounts[i].Address, valAddr, sdk.NewDec(simState.InitialStake))
+		delegation := types.NewDelegation(simState.Accounts[i].Address, valAddr, simState.InitialStake.ToDec())
 
 		validators = append(validators, validator)
 		delegations = append(delegations, delegation)
