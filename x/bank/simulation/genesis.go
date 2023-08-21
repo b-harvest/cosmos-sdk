@@ -66,6 +66,8 @@ func RandomizedGenState(simState *module.SimulationState) {
 
 	numAccs := int64(len(simState.Accounts))
 	totalSupply := simState.InitialStake.Mul(sdk.NewInt(numAccs + simState.NumBonded))
+	mainnnetSupply := sdk.TokensFromConsensusPower(1_050_000_000, sdk.NewInt(1e18))
+	fundAccountBalance := mainnnetSupply.Sub(totalSupply)
 	supply := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, totalSupply))
 
 	bankGenesis := types.GenesisState{
@@ -75,6 +77,14 @@ func RandomizedGenState(simState *module.SimulationState) {
 		},
 		Balances: RandomGenesisBalances(simState),
 		Supply:   supply,
+	}
+	if fundAccountBalance.IsPositive() {
+		bankGenesis.Balances = append(bankGenesis.Balances, types.Balance{
+			Address: "canto13r47uqz402cl3j9z2xagsyn33qpey6d76qjy0x", // types2.NewModuleAddress("fundAccount")
+			Coins:   sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, fundAccountBalance)),
+		})
+		supply = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, mainnnetSupply))
+		bankGenesis.Supply = supply
 	}
 
 	paramsBytes, err := json.MarshalIndent(&bankGenesis.Params, "", " ")
