@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"fmt"
-	"time"
 
 	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
 
@@ -39,25 +38,28 @@ func (k Keeper) SendBlsSig(ctx sdk.Context, epochNum uint64, lch types.LastCommi
 		return err
 	}
 
-	// create MsgAddBlsSig message
-	msg := types.NewMsgAddBlsSig(k.clientCtx.GetFromAddress(), epochNum, lch, blsSig, addr)
+	fmt.Println(blsSig)
 
-	// keep sending the message to Tendermint until success or timeout
-	// TODO should read the parameters from config file
-	var res *sdk.TxResponse
-	err = retry.Do(1*time.Second, 1*time.Minute, func() error {
-		res, err = tx.SendMsgToTendermint(k.clientCtx, msg)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
-		ctx.Logger().Error(fmt.Sprintf("Failed to send the BLS sig tx for epoch %v: %v", epochNum, err))
-		return err
-	}
-
-	ctx.Logger().Info(fmt.Sprintf("Successfully sent BLS-sig tx for epoch %d, tx hash: %s, gas used: %d, gas wanted: %d", epochNum, res.TxHash, res.GasUsed, res.GasWanted))
+	// TODO: CDK fix to vote extension
+	//// create MsgAddBlsSig message
+	//msg := types.NewMsgAddBlsSig(k.clientCtx.GetFromAddress(), epochNum, lch, blsSig, addr)
+	//
+	//// keep sending the message to Tendermint until success or timeout
+	//// TODO should read the parameters from config file
+	//var res *sdk.TxResponse
+	//err = retry.Do(1*time.Second, 1*time.Minute, func() error {
+	//	res, err = tx.SendMsgToTendermint(k.clientCtx, msg)
+	//	if err != nil {
+	//		return err
+	//	}
+	//	return nil
+	//})
+	//if err != nil {
+	//	ctx.Logger().Error(fmt.Sprintf("Failed to send the BLS sig tx for epoch %v: %v", epochNum, err))
+	//	return err
+	//}
+	//
+	//ctx.Logger().Info(fmt.Sprintf("Successfully sent BLS-sig tx for epoch %d, tx hash: %s, gas used: %d, gas wanted: %d", epochNum, res.TxHash, res.GasUsed, res.GasWanted))
 
 	return nil
 }

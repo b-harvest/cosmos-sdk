@@ -1,12 +1,14 @@
 package keeper
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
+	"cosmossdk.io/core/store"
 	txformat "github.com/babylonchain/babylon/btctxformatter"
 
-	"github.com/cometbft/cometbft/libs/log"
+	"cosmossdk.io/log"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -22,6 +24,8 @@ import (
 
 type (
 	Keeper struct {
+		// TODO:
+		storeService   store.KVStoreService
 		cdc            codec.BinaryCodec
 		storeKey       storetypes.StoreKey
 		memKey         storetypes.StoreKey
@@ -34,13 +38,20 @@ type (
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
+	storeService store.KVStoreService,
 	storeKey,
 	memKey storetypes.StoreKey,
 	signer BlsSigner,
 	ek types.EpochingKeeper,
 	clientCtx client.Context,
 ) Keeper {
+
+	// TODO:
+	//sb := collections.NewSchemaBuilder(storeService)
+	//Params:           collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.Params](cdc)),
+	//	FeePool:          collections.NewItem(sb, types.FeePoolKey, "fee_pool", codec.CollValue[types.FeePool](cdc)),
 	return Keeper{
+		storeService:   storeService,
 		cdc:            cdc,
 		storeKey:       storeKey,
 		memKey:         memKey,
@@ -51,8 +62,10 @@ func NewKeeper(
 	}
 }
 
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
-	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+// Logger returns a module-specific logger.
+func (k Keeper) Logger(ctx context.Context) log.Logger {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	return sdkCtx.Logger().With(log.ModuleKey, "x/"+types.ModuleName)
 }
 
 // SetHooks sets the validator hooks

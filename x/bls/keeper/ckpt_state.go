@@ -10,6 +10,10 @@ import (
 type CheckpointsState struct {
 	cdc         codec.BinaryCodec
 	checkpoints sdk.KVStore
+
+	// TOOD:
+	// store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+
 }
 
 func (k Keeper) CheckpointsState(ctx sdk.Context) CheckpointsState {

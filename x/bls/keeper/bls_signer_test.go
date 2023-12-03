@@ -3,8 +3,6 @@ package keeper_test
 import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-
 	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
@@ -15,7 +13,7 @@ var (
 	pk2   = ed25519.GenPrivKey().PubKey()
 	addr1 = sdk.ValAddress(pk1.Address())
 	addr2 = sdk.ValAddress(pk2.Address())
-	val1  = stakingtypes.Validator{
+	val1  = epochingtypes.Validator{
 		Addr:  addr1,
 		Power: 10,
 	}
