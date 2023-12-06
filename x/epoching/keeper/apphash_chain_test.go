@@ -4,8 +4,9 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/babylonchain/babylon/testutil/datagen"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
 
 	"github.com/cosmos/cosmos-sdk/x/epoching/keeper"
 	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching"

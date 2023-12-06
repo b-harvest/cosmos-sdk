@@ -2,10 +2,11 @@ package testepoching
 
 import (
 	"cosmossdk.io/math"
-	"github.com/babylonchain/babylon/testutil/datagen"
 	tmcrypto "github.com/cometbft/cometbft/crypto"
 	tmtypes "github.com/cometbft/cometbft/types"
+
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
+	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
@@ -29,19 +30,19 @@ func ToTmValidator(v stakingtypes.Validator, r math.Int) (*tmtypes.Validator, er
 	return tmtypes.NewValidator(tmPk, v.ConsensusPower(r)), nil
 }
 
-// ToTmValidators casts all validators to the corresponding tendermint type.
-func ToTmValidators(v stakingtypes.Validators, r math.Int) ([]*tmtypes.Validator, error) {
-	validators := make([]*tmtypes.Validator, len(v))
-	var err error
-	for i, val := range v {
-		validators[i], err = ToTmValidator(val, r)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return validators, nil
-}
+//// ToTmValidators casts all validators to the corresponding tendermint type.
+//func ToTmValidators(v stakingtypes.Validators, r math.Int) ([]*tmtypes.Validator, error) {
+//	validators := make([]*tmtypes.Validator, len(v))
+//	var err error
+//	for i, val := range v {
+//		validators[i], err = ToTmValidator(val, r)
+//		if err != nil {
+//			return nil, err
+//		}
+//	}
+//
+//	return validators, nil
+//}
 
 // GenTmValidatorSet generates a set with `numVals` Tendermint validators
 func GenTmValidatorSet(numVals int) (*tmtypes.ValidatorSet, error) {

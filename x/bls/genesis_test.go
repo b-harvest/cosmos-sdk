@@ -3,8 +3,11 @@ package bls_test
 import (
 	"testing"
 
-	"github.com/babylonchain/babylon/privval"
 	"github.com/cometbft/cometbft/crypto/ed25519"
+
+	"github.com/cosmos/cosmos-sdk/privval"
+	"github.com/cosmos/cosmos-sdk/x/bls"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
@@ -13,8 +16,9 @@ import (
 	cosmosed "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	simapp "github.com/babylonchain/babylon/app"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+
+	"github.com/cosmos/cosmos-sdk/simapp"
 
 	"github.com/cosmos/cosmos-sdk/x/bls/types"
 )
@@ -44,7 +48,7 @@ func TestInitGenesis(t *testing.T) {
 		GenesisKeys: genKeys,
 	}
 
-	checkpointing.InitGenesis(ctx, ckptKeeper, genesisState)
+	bls.InitGenesis(ctx, ckptKeeper, genesisState)
 	for i := 0; i < valNum; i++ {
 		addr, err := sdk.ValAddressFromBech32(genKeys[i].ValidatorAddress)
 		require.NoError(t, err)

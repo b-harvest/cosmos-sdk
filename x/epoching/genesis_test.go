@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/x/epoching"
 
-	simapp "github.com/babylonchain/babylon/app"
+	simapp "github.com/cosmos/cosmos-sdk/app"
 
 	"github.com/cosmos/cosmos-sdk/x/epoching/types"
 )

@@ -5,7 +5,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/babylonchain/babylon/testutil/datagen"
+	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
 
 	"github.com/stretchr/testify/require"
 

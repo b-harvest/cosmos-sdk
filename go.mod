@@ -67,6 +67,7 @@ require (
 	gotest.tools/v3 v3.5.1
 	pgregory.net/rapid v1.1.0
 	sigs.k8s.io/yaml v1.3.0
+	github.com/boljen/go-bitmap v0.0.0-20151001105940-23cd2fb0ce7d
 )
 
 require (

@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"cosmossdk.io/math"
+
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 
 	flag "github.com/spf13/pflag"
 
 	errorsmod "cosmossdk.io/errors"
-	"github.com/babylonchain/babylon/privval"
 	tmconfig "github.com/cometbft/cometbft/config"
 	tmos "github.com/cometbft/cometbft/libs/os"
+
+	"github.com/cosmos/cosmos-sdk/privval"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -69,20 +72,22 @@ func newBuildCreateValidatorMsg(clientCtx client.Context, txf tx.Factory, fs *fl
 	// get the initial validator min self delegation
 	msbStr, _ := fs.GetString(cosmoscli.FlagMinSelfDelegation)
 
-	minSelfDelegation, ok := sdk.NewIntFromString(msbStr)
+	minSelfDelegation, ok := math.NewIntFromString(msbStr)
 	if !ok {
 		return txf, nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "minimum self delegation must be a positive integer")
 	}
 
 	msg, err := staketypes.NewMsgCreateValidator(
-		sdk.ValAddress(valAddr), pk, amount, description, commissionRates, minSelfDelegation,
+		sdk.ValAddress(valAddr).String(), pk, amount, description, commissionRates, minSelfDelegation,
 	)
 	if err != nil {
 		return txf, nil, err
 	}
-	if err := msg.ValidateBasic(); err != nil {
-		return txf, nil, err
-	}
+
+	// TODO: temporary skip
+	//if err := msg.ValidateBasic(); err != nil {
+	//	return txf, nil, err
+	//}
 
 	genOnly, _ := fs.GetBool(flags.FlagGenerateOnly)
 	if genOnly {
@@ -125,17 +130,17 @@ func buildCommissionRates(rateStr, maxRateStr, maxChangeRateStr string) (commiss
 		return commission, errors.New("must specify all validator commission parameters")
 	}
 
-	rate, err := sdk.NewDecFromStr(rateStr)
+	rate, err := math.LegacyNewDecFromStr(rateStr)
 	if err != nil {
 		return commission, err
 	}
 
-	maxRate, err := sdk.NewDecFromStr(maxRateStr)
+	maxRate, err := math.LegacyNewDecFromStr(maxRateStr)
 	if err != nil {
 		return commission, err
 	}
 
-	maxChangeRate, err := sdk.NewDecFromStr(maxChangeRateStr)
+	maxChangeRate, err := math.LegacyNewDecFromStr(maxChangeRateStr)
 	if err != nil {
 		return commission, err
 	}

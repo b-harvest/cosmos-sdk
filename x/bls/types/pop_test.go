@@ -3,8 +3,8 @@ package types_test
 import (
 	"testing"
 
-	"github.com/babylonchain/babylon/privval"
 	"github.com/cometbft/cometbft/crypto/ed25519"
+	"github.com/cosmos/cosmos-sdk/privval"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/crypto/codec"

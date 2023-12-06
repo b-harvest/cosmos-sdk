@@ -3,8 +3,9 @@ package types_test
 import (
 	"testing"
 
-	"github.com/babylonchain/babylon/testutil/datagen"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
 )
 
 func TestValidatorSet_FindValidatorWithIndex(t *testing.T) {

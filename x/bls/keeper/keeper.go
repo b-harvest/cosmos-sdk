@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"cosmossdk.io/core/store"
-	txformat "github.com/babylonchain/babylon/btctxformatter"
 
 	"cosmossdk.io/log"
 
@@ -185,7 +184,7 @@ func (k Keeper) BuildRawCheckpoint(ctx sdk.Context, epochNum uint64, lch types.L
 // the raw checkpoint and decides whether it is an invalid checkpoint or a
 // conflicting checkpoint. A conflicting checkpoint indicates the existence
 // of a fork
-func (k Keeper) VerifyCheckpoint(ctx sdk.Context, checkpoint txformat.RawBtcCheckpoint) error {
+func (k Keeper) VerifyCheckpoint(ctx sdk.Context, checkpoint types.RawCheckpoint) error {
 	_, err := k.verifyCkptBytes(ctx, &checkpoint)
 	if err != nil {
 		if errors.Is(err, types.ErrConflictingCheckpoint) {
@@ -201,7 +200,7 @@ func (k Keeper) VerifyCheckpoint(ctx sdk.Context, checkpoint txformat.RawBtcChec
 // the raw checkpoint and decides whether it is an invalid checkpoint or a
 // conflicting checkpoint. A conflicting checkpoint indicates the existence
 // of a fork
-func (k Keeper) verifyCkptBytes(ctx sdk.Context, rawCheckpoint *txformat.RawBtcCheckpoint) (*types.RawCheckpointWithMeta, error) {
+func (k Keeper) verifyCkptBytes(ctx sdk.Context, rawCheckpoint *types.RawCheckpoint) (*types.RawCheckpointWithMeta, error) {
 	ckpt, err := types.FromBTCCkptToRawCkpt(rawCheckpoint)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode raw checkpoint from BTC raw checkpoint: %w", err)

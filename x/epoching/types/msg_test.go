@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	appparams "github.com/babylonchain/babylon/app/params"
+	appparams "github.com/cosmos/cosmos-sdk/app/params"
 
 	"github.com/stretchr/testify/require"
 
@@ -69,7 +69,7 @@ func TestMsgDecode(t *testing.T) {
 	var qmsgUnmarshaled sdk.Msg
 	var msgCreateValUnmarshaled sdk.Msg
 
-	commission1 := stakingtypes.NewCommissionRates(sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec())
+	commission1 := stakingtypes.NewCommissionRates(math.LegacyZeroDec(), math.LegacyZeroDec(), math.LegacyZeroDec())
 	msgcreateval1, err := stakingtypes.NewMsgCreateValidator(valAddr1, pk1, coinPos, stakingtypes.Description{}, commission1, sdk.OneInt())
 	require.NoError(t, err)
 	qmsg, err := types.NewQueuedMessage(1, time.Now(), []byte("tx id 1"), msgcreateval1)

@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"testing"
 
-	testkeeper "github.com/babylonchain/babylon/testutil/keeper"
+	testkeeper "github.com/cosmos/cosmos-sdk/testutil/keeper"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/x/epoching/types"

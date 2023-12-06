@@ -8,7 +8,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/babylonchain/babylon/btctxformatter"
+	"github.com/cosmos/cosmos-sdk/btctxformatter"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
 )

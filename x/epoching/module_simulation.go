@@ -1,7 +1,7 @@
 package epoching
 
 import (
-	simappparams "github.com/babylonchain/babylon/app/params"
+	simappparams "github.com/cosmos/cosmos-sdk/app/params"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"

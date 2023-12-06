@@ -6,7 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/babylonchain/babylon/btctxformatter"
+	"github.com/cosmos/cosmos-sdk/btctxformatter"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
 
@@ -15,9 +15,10 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 
-	"github.com/babylonchain/babylon/testutil/datagen"
-	testkeeper "github.com/babylonchain/babylon/testutil/keeper"
-	"github.com/babylonchain/babylon/testutil/mocks"
+	testkeeper "github.com/cosmos/cosmos-sdk/testutil/keeper"
+	"github.com/cosmos/cosmos-sdk/testutil/mocks"
+
+	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
 
 	"github.com/cosmos/cosmos-sdk/x/bls/types"
 )

@@ -25,7 +25,7 @@ import (
 //   - record the sealer header for the previous epoch
 //
 // NOTE: we follow Cosmos SDK's slashing/evidence modules for MVP. No need to modify them at the moment.
-func BeginBlocker(ctx sdk.Context, k keeper.Keeper, req abci.RequestBeginBlock) {
+func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyBeginBlocker)
 
 	// record the current AppHash

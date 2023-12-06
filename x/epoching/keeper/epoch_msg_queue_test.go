@@ -4,9 +4,9 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/babylonchain/babylon/testutil/datagen"
+	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
 
-	appparams "github.com/babylonchain/babylon/app/params"
+	appparams "github.com/cosmos/cosmos-sdk/app/params"
 
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 

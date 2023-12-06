@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"cosmossdk.io/math"
 	"github.com/golang/mock/gomock"
 
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
@@ -32,10 +33,12 @@ import (
 	coretypes "github.com/cometbft/cometbft/rpc/core/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 
-	"github.com/babylonchain/babylon/app"
-	"github.com/babylonchain/babylon/app/params"
-	"github.com/babylonchain/babylon/privval"
-	testutilcli "github.com/babylonchain/babylon/testutil/cli"
+	"github.com/cosmos/cosmos-sdk/app"
+	"github.com/cosmos/cosmos-sdk/app/params"
+
+	"github.com/cosmos/cosmos-sdk/privval"
+
+	testutilcli "github.com/cosmos/cosmos-sdk/testutil/cli"
 
 	checkpointcli "github.com/cosmos/cosmos-sdk/x/bls/client/cli"
 )
@@ -151,7 +154,7 @@ func (s *CLITestSuite) TestCmdWrappedCreateValidator() {
 				fmt.Sprintf("--%s=%s", flags.FlagFrom, s.addrs[0]),
 				fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 				fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-				fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10))).String()),
+				fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, math.NewInt(10))).String()),
 				fmt.Sprintf("--%s=%s", flags.FlagHome, homeDir),
 			},
 			true, 0, nil,
@@ -171,7 +174,7 @@ func (s *CLITestSuite) TestCmdWrappedCreateValidator() {
 				fmt.Sprintf("--%s=%s", flags.FlagFrom, s.addrs[0]),
 				fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 				fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-				fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10))).String()),
+				fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, math.NewInt(10))).String()),
 				fmt.Sprintf("--%s=%s", flags.FlagHome, homeDir),
 			},
 			true, 0, nil,
@@ -192,7 +195,7 @@ func (s *CLITestSuite) TestCmdWrappedCreateValidator() {
 				fmt.Sprintf("--%s=%s", flags.FlagFrom, s.addrs[0]),
 				fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 				fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-				fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10))).String()),
+				fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, math.NewInt(10))).String()),
 				fmt.Sprintf("--%s=%s", flags.FlagHome, homeDir),
 			},
 			true, 0, nil,
@@ -214,7 +217,7 @@ func (s *CLITestSuite) TestCmdWrappedCreateValidator() {
 				fmt.Sprintf("--%s=%s", flags.FlagFrom, s.addrs[0]),
 				fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 				fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-				fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10))).String()),
+				fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, math.NewInt(10))).String()),
 				fmt.Sprintf("--%s=%s", flags.FlagHome, homeDir),
 			},
 			false, 0, &sdk.TxResponse{},

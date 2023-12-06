@@ -12,7 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"github.com/babylonchain/babylon/app"
+	"github.com/cosmos/cosmos-sdk/app"
 
 	"github.com/cosmos/cosmos-sdk/x/epoching/simulation"
 	"github.com/cosmos/cosmos-sdk/x/epoching/types"

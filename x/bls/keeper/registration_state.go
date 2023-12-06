@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	store "cosmossdk.io/store/types"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -12,9 +14,9 @@ import (
 type RegistrationState struct {
 	cdc codec.BinaryCodec
 	// addrToBlsKeys maps validator addresses to BLS public keys
-	addrToBlsKeys sdk.KVStore
+	addrToBlsKeys store.KVStore
 	// blsKeysToAddr maps BLS public keys to validator addresses
-	blsKeysToAddr sdk.KVStore
+	blsKeysToAddr store.KVStore
 }
 
 func (k Keeper) RegistrationState(ctx sdk.Context) RegistrationState {

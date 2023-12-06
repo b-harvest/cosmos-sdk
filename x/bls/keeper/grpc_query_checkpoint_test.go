@@ -13,7 +13,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/babylonchain/babylon/testutil/mocks"
+	"github.com/cosmos/cosmos-sdk/testutil/mocks"
 
 	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
 
@@ -23,8 +23,9 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 
-	"github.com/babylonchain/babylon/testutil/datagen"
-	testkeeper "github.com/babylonchain/babylon/testutil/keeper"
+	testkeeper "github.com/cosmos/cosmos-sdk/testutil/keeper"
+
+	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
 )
 
 func FuzzQueryEpoch(f *testing.F) {

@@ -9,8 +9,9 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 
-	"github.com/babylonchain/babylon/testutil/datagen"
-	testkeeper "github.com/babylonchain/babylon/testutil/keeper"
+	testkeeper "github.com/cosmos/cosmos-sdk/testutil/keeper"
+
+	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
 
 	"github.com/cosmos/cosmos-sdk/x/bls/types"
 )

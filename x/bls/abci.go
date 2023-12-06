@@ -8,8 +8,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/x/bls/keeper"
 
-	abci "github.com/cometbft/cometbft/abci/types"
-
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -19,7 +17,7 @@ import (
 // - extract the LastCommitHash from the block
 // - create a raw checkpoint with the status of ACCUMULATING
 // - start a BLS signer which creates a BLS sig transaction and distributes it to the network
-func BeginBlocker(ctx sdk.Context, k keeper.Keeper, req abci.RequestBeginBlock) {
+func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyBeginBlocker)
 
 	// if this block is the second block of an epoch

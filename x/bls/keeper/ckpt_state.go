@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	store "cosmossdk.io/store/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -9,7 +11,7 @@ import (
 
 type CheckpointsState struct {
 	cdc         codec.BinaryCodec
-	checkpoints sdk.KVStore
+	checkpoints store.KVStore
 
 	// TOOD:
 	// store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
