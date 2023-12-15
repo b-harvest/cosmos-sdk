@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"errors"
 
+	"github.com/boljen/go-bitmap"
+
 	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -23,6 +25,8 @@ type LastCommitHash []byte
 type BlsSigHash []byte
 
 type RawCkptHash []byte
+
+// TODO: btc checkpoint format to EVM format
 
 func NewCheckpoint(epochNum uint64, lch LastCommitHash) *RawCheckpoint {
 	return &RawCheckpoint{

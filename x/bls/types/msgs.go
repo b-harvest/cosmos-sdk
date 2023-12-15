@@ -78,6 +78,7 @@ func (m *MsgWrappedCreateValidator) ValidateBasic() error {
 	if m.MsgCreateValidator == nil {
 		return errors.New("MsgCreateValidator is nil")
 	}
+	// TODO: interface wiring
 	err := m.MsgCreateValidator.ValidateBasic()
 	if err != nil {
 		return err
@@ -96,6 +97,7 @@ func (m *MsgWrappedCreateValidator) ValidateBasic() error {
 }
 
 func (m *MsgWrappedCreateValidator) GetSigners() []sdk.AccAddress {
+	// TODO: interface wiring
 	return m.MsgCreateValidator.GetSigners()
 }
 

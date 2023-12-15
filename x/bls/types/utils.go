@@ -6,11 +6,10 @@ import (
 
 	"github.com/cometbft/cometbft/crypto/tmhash"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/cosmos/cosmos-sdk/btctxformatter"
-
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	//"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
 )
 
 func (m BlsSig) Hash() BlsSigHash {
@@ -71,6 +70,7 @@ func FromStringToCkptHash(s string) (RawCkptHash, error) {
 	return hex.DecodeString(s)
 }
 
+// TODO: BTC to EVM
 func FromBTCCkptBytesToRawCkpt(btcCkptBytes []byte) (*RawCheckpoint, error) {
 	btcCkpt, err := btctxformatter.DecodeRawCheckpoint(btctxformatter.CurrentVersion, btcCkptBytes)
 	if err != nil {

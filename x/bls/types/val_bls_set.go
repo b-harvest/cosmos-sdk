@@ -3,6 +3,8 @@ package types
 import (
 	"fmt"
 
+	"github.com/boljen/go-bitmap"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
 )

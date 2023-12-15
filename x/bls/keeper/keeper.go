@@ -9,6 +9,7 @@ import (
 
 	"cosmossdk.io/log"
 
+	"github.com/cosmos/cosmos-sdk/btctxformatter"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -184,7 +185,7 @@ func (k Keeper) BuildRawCheckpoint(ctx sdk.Context, epochNum uint64, lch types.L
 // the raw checkpoint and decides whether it is an invalid checkpoint or a
 // conflicting checkpoint. A conflicting checkpoint indicates the existence
 // of a fork
-func (k Keeper) VerifyCheckpoint(ctx sdk.Context, checkpoint types.RawCheckpoint) error {
+func (k Keeper) VerifyCheckpoint(ctx sdk.Context, checkpoint btctxformatter.RawBtcCheckpoint) error {
 	_, err := k.verifyCkptBytes(ctx, &checkpoint)
 	if err != nil {
 		if errors.Is(err, types.ErrConflictingCheckpoint) {
@@ -195,12 +196,13 @@ func (k Keeper) VerifyCheckpoint(ctx sdk.Context, checkpoint types.RawCheckpoint
 	return nil
 }
 
+// TODO: btc to EVM
 // verifyCkptBytes verifies checkpoint from BTC. A checkpoint is valid if
 // it equals to the existing raw checkpoint. Otherwise, it further verifies
 // the raw checkpoint and decides whether it is an invalid checkpoint or a
 // conflicting checkpoint. A conflicting checkpoint indicates the existence
 // of a fork
-func (k Keeper) verifyCkptBytes(ctx sdk.Context, rawCheckpoint *types.RawCheckpoint) (*types.RawCheckpointWithMeta, error) {
+func (k Keeper) verifyCkptBytes(ctx sdk.Context, rawCheckpoint *btctxformatter.RawBtcCheckpoint) (*types.RawCheckpointWithMeta, error) {
 	ckpt, err := types.FromBTCCkptToRawCkpt(rawCheckpoint)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode raw checkpoint from BTC raw checkpoint: %w", err)
