@@ -1,7 +1,11 @@
 package keeper
 
 import (
-	checkpointingtypes "github.com/cosmos/cosmos-sdk/x/checkpointing/types"
+	"context"
+
+	"cosmossdk.io/math"
+
+	blstypes "github.com/cosmos/cosmos-sdk/x/bls/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/epoching/types"
@@ -37,24 +41,26 @@ type Hooks struct {
 	k Keeper
 }
 
+// TODO: bump 50
 // ensures Hooks implements StakingHooks and CheckpointingHooks interfaces
 var _ stakingtypes.StakingHooks = Hooks{}
-var _ checkpointingtypes.CheckpointingHooks = Hooks{}
+var _ blstypes.CheckpointingHooks = Hooks{}
 
 // Create new distribution hooks
 func (k Keeper) Hooks() Hooks { return Hooks{k} }
 
 // BeforeValidatorSlashed records the slash event
-func (h Hooks) BeforeValidatorSlashed(ctx sdk.Context, valAddr sdk.ValAddress, fraction sdk.Dec) error {
+func (h Hooks) BeforeValidatorSlashed(ctx context.Context, valAddr sdk.ValAddress, fraction math.LegacyDec) error {
 	thresholds := []float64{float64(1) / float64(3), float64(2) / float64(3)}
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
-	epochNumber := h.k.GetEpoch(ctx).EpochNumber
-	totalVotingPower := h.k.GetTotalVotingPower(ctx, epochNumber)
+	epochNumber := h.k.GetEpoch(sdkCtx).EpochNumber
+	totalVotingPower := h.k.GetTotalVotingPower(sdkCtx, epochNumber)
 
 	// calculate total slashed voting power
-	slashedVotingPower := h.k.GetSlashedVotingPower(ctx, epochNumber)
+	slashedVotingPower := h.k.GetSlashedVotingPower(sdkCtx, epochNumber)
 	// voting power of this validator
-	thisVotingPower, err := h.k.GetValidatorVotingPower(ctx, epochNumber, valAddr)
+	thisVotingPower, err := h.k.GetValidatorVotingPower(sdkCtx, epochNumber, valAddr)
 	thisVal := types.Validator{Addr: valAddr, Power: thisVotingPower}
 	if err != nil {
 		// It's possible that the most powerful validator outside the validator set enrols to the validator after this validator is slashed.
@@ -66,18 +72,18 @@ func (h Hooks) BeforeValidatorSlashed(ctx sdk.Context, valAddr sdk.ValAddress, f
 	for _, threshold := range thresholds {
 		// if a certain threshold voting power is slashed in a single epoch, emit event and trigger hook
 		if float64(slashedVotingPower) < float64(totalVotingPower)*threshold && float64(totalVotingPower)*threshold <= float64(slashedVotingPower+thisVotingPower) {
-			slashedVals := h.k.GetSlashedValidators(ctx, epochNumber)
+			slashedVals := h.k.GetSlashedValidators(sdkCtx, epochNumber)
 			slashedVals = append(slashedVals, thisVal)
 			event := types.NewEventSlashThreshold(slashedVotingPower, totalVotingPower, slashedVals)
-			if err := ctx.EventManager().EmitTypedEvent(&event); err != nil {
+			if err := sdkCtx.EventManager().EmitTypedEvent(&event); err != nil {
 				panic(err)
 			}
-			h.k.BeforeSlashThreshold(ctx, slashedVals)
+			h.k.BeforeSlashThreshold(sdkCtx, slashedVals)
 		}
 	}
 
 	// add the validator address to the set
-	if err := h.k.AddSlashedValidator(ctx, valAddr); err != nil {
+	if err := h.k.AddSlashedValidator(sdkCtx, valAddr); err != nil {
 		// same as above error case
 		return err
 	}
@@ -85,57 +91,63 @@ func (h Hooks) BeforeValidatorSlashed(ctx sdk.Context, valAddr sdk.ValAddress, f
 	return nil
 }
 
-func (h Hooks) AfterValidatorCreated(ctx sdk.Context, valAddr sdk.ValAddress) error {
-	return h.k.RecordNewValState(ctx, valAddr, types.BondState_CREATED)
+func (h Hooks) AfterValidatorCreated(ctx context.Context, valAddr sdk.ValAddress) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	return h.k.RecordNewValState(sdkCtx, valAddr, types.BondState_CREATED)
 }
 
-func (h Hooks) AfterValidatorRemoved(ctx sdk.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) error {
-	return h.k.RecordNewValState(ctx, valAddr, types.BondState_REMOVED)
+func (h Hooks) AfterValidatorRemoved(ctx context.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	return h.k.RecordNewValState(sdkCtx, valAddr, types.BondState_REMOVED)
 }
 
-func (h Hooks) AfterValidatorBonded(ctx sdk.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) error {
-	return h.k.RecordNewValState(ctx, valAddr, types.BondState_BONDED)
+func (h Hooks) AfterValidatorBonded(ctx context.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	return h.k.RecordNewValState(sdkCtx, valAddr, types.BondState_BONDED)
 }
 
-func (h Hooks) AfterValidatorBeginUnbonding(ctx sdk.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) error {
-	return h.k.RecordNewValState(ctx, valAddr, types.BondState_UNBONDING)
+func (h Hooks) AfterValidatorBeginUnbonding(ctx context.Context, consAddr sdk.ConsAddress, valAddr sdk.ValAddress) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	return h.k.RecordNewValState(sdkCtx, valAddr, types.BondState_UNBONDING)
 }
 
-func (h Hooks) BeforeDelegationRemoved(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) error {
-	return h.k.RecordNewDelegationState(ctx, delAddr, valAddr, types.BondState_REMOVED)
+func (h Hooks) BeforeDelegationRemoved(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	return h.k.RecordNewDelegationState(sdkCtx, delAddr, valAddr, types.BondState_REMOVED)
 }
 
-func (h Hooks) AfterRawCheckpointFinalized(ctx sdk.Context, epoch uint64) error {
+func (h Hooks) AfterRawCheckpointFinalized(ctx context.Context, epoch uint64) error {
 	// finalise all unbonding validators/delegations in this epoch
-	h.k.ApplyMatureUnbonding(ctx, epoch)
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	h.k.ApplyMatureUnbonding(sdkCtx, epoch)
 	return nil
 }
 
 // Other hooks that are not used in the epoching module
-func (h Hooks) BeforeValidatorModified(ctx sdk.Context, valAddr sdk.ValAddress) error {
+func (h Hooks) BeforeValidatorModified(ctx context.Context, valAddr sdk.ValAddress) error {
 	return nil
 }
-func (h Hooks) BeforeDelegationCreated(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) error {
+func (h Hooks) BeforeDelegationCreated(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) error {
 	return nil
 }
-func (h Hooks) BeforeDelegationSharesModified(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) error {
+func (h Hooks) BeforeDelegationSharesModified(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) error {
 	return nil
 }
-func (h Hooks) AfterDelegationModified(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) error {
+func (h Hooks) AfterDelegationModified(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) error {
 	return nil
 }
-func (h Hooks) AfterBlsKeyRegistered(ctx sdk.Context, valAddr sdk.ValAddress) error { return nil }
+func (h Hooks) AfterBlsKeyRegistered(ctx context.Context, valAddr sdk.ValAddress) error { return nil }
 
-func (h Hooks) AfterRawCheckpointConfirmed(ctx sdk.Context, epoch uint64) error { return nil }
+func (h Hooks) AfterRawCheckpointConfirmed(ctx context.Context, epoch uint64) error { return nil }
 
-func (h Hooks) AfterRawCheckpointForgotten(ctx sdk.Context, ckpt *checkpointingtypes.RawCheckpoint) error {
-	return nil
-}
-
-func (h Hooks) AfterRawCheckpointBlsSigVerified(ctx sdk.Context, ckpt *checkpointingtypes.RawCheckpoint) error {
+func (h Hooks) AfterRawCheckpointForgotten(ctx context.Context, ckpt *blstypes.RawCheckpoint) error {
 	return nil
 }
 
-func (h Hooks) AfterUnbondingInitiated(ctx sdk.Context, id uint64) error {
+func (h Hooks) AfterRawCheckpointBlsSigVerified(ctx context.Context, ckpt *blstypes.RawCheckpoint) error {
+	return nil
+}
+
+func (h Hooks) AfterUnbondingInitiated(ctx context.Context, id uint64) error {
 	return nil
 }

@@ -1,6 +1,9 @@
 package bls12381
 
 import (
+	"encoding/hex"
+	"fmt"
+	"math/big"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -16,7 +19,23 @@ func TestVerifyBlsSig(t *testing.T) {
 	require.Equal(t, 48, len(sig))
 	// a byte size of a public key (compressed) is 96
 	require.Equal(t, 96, len(pk))
+
 	res, err := Verify(sig, pk, msga)
+
+	fmt.Println(hex.EncodeToString(pk))
+
+	s := hex.EncodeToString(pk)
+	i := new(big.Int)
+	i.SetString(s, 16)
+	fmt.Println(i)
+
+	fmt.Println(sig.String())
+
+	s = hex.EncodeToString(sig)
+	i = new(big.Int)
+	i.SetString(s, 16)
+	fmt.Println(i)
+
 	require.True(t, res)
 	require.Nil(t, err)
 	res, err = Verify(sig, pk, msgb)

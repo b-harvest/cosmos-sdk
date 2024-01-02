@@ -60,7 +60,7 @@ func (k Keeper) CheckMsgCreateValidator(ctx sdk.Context, msg *stakingtypes.MsgCr
 
 	// ensure public key type is supported
 	cp := ctx.ConsensusParams()
-	if cp != nil && cp.Validator != nil {
+	if cp.Validator != nil {
 		pkType := pk.Type()
 		hasKeyType := false
 		for _, keyType := range cp.Validator.PubKeyTypes {
@@ -78,7 +78,7 @@ func (k Keeper) CheckMsgCreateValidator(ctx sdk.Context, msg *stakingtypes.MsgCr
 	}
 
 	// check validator
-	validator, err := stakingtypes.NewValidator(valAddr, pk, msg.Description)
+	validator, err := stakingtypes.NewValidator(valAddr.String(), pk, msg.Description)
 	if err != nil {
 		return err
 	}

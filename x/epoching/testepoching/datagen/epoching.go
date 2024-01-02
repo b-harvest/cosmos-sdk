@@ -2,8 +2,6 @@ package datagen
 
 import (
 	"math/rand"
-
-	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
 )
 
 // getFirstBlockHeight returns the height of the first block of a given epoch and epoch interval
@@ -26,17 +24,17 @@ func GenRandomEpochInterval(r *rand.Rand) uint64 {
 	return uint64(epochInterval)
 }
 
-func GenRandomEpoch(r *rand.Rand) *epochingtypes.Epoch {
-	epochNum := GenRandomEpochNum(r)
-	epochInterval := GenRandomEpochInterval(r)
-	firstBlockHeight := getFirstBlockHeight(epochNum, epochInterval)
-	lastBlockHeader := GenRandomTMHeader(r, "test-chain", firstBlockHeight+epochInterval-1)
-	epoch := epochingtypes.NewEpoch(
-		epochNum,
-		epochInterval,
-		firstBlockHeight,
-		lastBlockHeader,
-	)
-	epoch.SealerHeader = GenRandomTMHeader(r, "test-chain", firstBlockHeight+epochInterval+1) // 2nd block in the next epoch
-	return &epoch
-}
+//func GenRandomEpoch(r *rand.Rand) *epochingtypes.Epoch {
+//	epochNum := GenRandomEpochNum(r)
+//	epochInterval := GenRandomEpochInterval(r)
+//	firstBlockHeight := getFirstBlockHeight(epochNum, epochInterval)
+//	lastBlockHeader := GenRandomTMHeader(r, "test-chain", firstBlockHeight+epochInterval-1)
+//	epoch := epochingtypes.NewEpoch(
+//		epochNum,
+//		epochInterval,
+//		firstBlockHeight,
+//		lastBlockHeader,
+//	)
+//	epoch.SealerHeader = GenRandomTMHeader(r, "test-chain", firstBlockHeight+epochInterval+1) // 2nd block in the next epoch
+//	return &epoch
+//}

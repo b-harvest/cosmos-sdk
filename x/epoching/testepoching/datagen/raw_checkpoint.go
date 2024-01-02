@@ -7,8 +7,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/btctxformatter"
 	txformat "github.com/cosmos/cosmos-sdk/btctxformatter"
-	"github.com/cosmos/cosmos-sdk/crypto/bls12381"
-	"github.com/cosmos/cosmos-sdk/x/checkpointing/types"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
+	"github.com/cosmos/cosmos-sdk/x/bls/types"
 )
 
 // GenRandomBitmap generates a random bitmap for the validator set

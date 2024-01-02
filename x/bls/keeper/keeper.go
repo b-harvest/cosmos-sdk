@@ -9,10 +9,11 @@ import (
 
 	"cosmossdk.io/log"
 
+	storetypes "cosmossdk.io/store/types"
+
 	"github.com/cosmos/cosmos-sdk/btctxformatter"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"

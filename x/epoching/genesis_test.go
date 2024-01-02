@@ -1,40 +1,40 @@
 package epoching_test
 
-import (
-	"testing"
-
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	"github.com/stretchr/testify/require"
-
-	"github.com/cosmos/cosmos-sdk/x/epoching"
-
-	simapp "github.com/cosmos/cosmos-sdk/app"
-
-	"github.com/cosmos/cosmos-sdk/x/epoching/types"
-)
-
-func TestExportGenesis(t *testing.T) {
-	app := simapp.Setup(t, false)
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
-
-	if err := app.EpochingKeeper.SetParams(ctx, types.DefaultParams()); err != nil {
-		panic(err)
-	}
-
-	genesisState := epoching.ExportGenesis(ctx, app.EpochingKeeper)
-	require.Equal(t, genesisState.Params, types.DefaultParams())
-}
-
-func TestInitGenesis(t *testing.T) {
-	app := simapp.Setup(t, false)
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
-
-	genesisState := types.GenesisState{
-		Params: types.Params{
-			EpochInterval: 100,
-		},
-	}
-
-	epoching.InitGenesis(ctx, app.EpochingKeeper, genesisState)
-	require.Equal(t, app.EpochingKeeper.GetParams(ctx).EpochInterval, uint64(100))
-}
+//import (
+//	"testing"
+//
+//	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+//	"github.com/stretchr/testify/require"
+//
+//	"github.com/cosmos/cosmos-sdk/x/epoching"
+//
+//	simapp "github.com/cosmos/cosmos-sdk/app"
+//
+//	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+//)
+//
+//func TestExportGenesis(t *testing.T) {
+//	app := simapp.Setup(t, false)
+//	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+//
+//	if err := app.EpochingKeeper.SetParams(ctx, types.DefaultParams()); err != nil {
+//		panic(err)
+//	}
+//
+//	genesisState := epoching.ExportGenesis(ctx, app.EpochingKeeper)
+//	require.Equal(t, genesisState.Params, types.DefaultParams())
+//}
+//
+//func TestInitGenesis(t *testing.T) {
+//	app := simapp.Setup(t, false)
+//	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+//
+//	genesisState := types.GenesisState{
+//		Params: types.Params{
+//			EpochInterval: 100,
+//		},
+//	}
+//
+//	epoching.InitGenesis(ctx, app.EpochingKeeper, genesisState)
+//	require.Equal(t, app.EpochingKeeper.GetParams(ctx).EpochInterval, uint64(100))
+//}

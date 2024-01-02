@@ -1,6 +1,10 @@
 package types
 
 import (
+	"context"
+
+	"cosmossdk.io/core/address"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
@@ -10,6 +14,7 @@ import (
 // AccountKeeper defines the expected account keeper used for simulations (noalias)
 type AccountKeeper interface {
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) types.AccountI
+	AddressCodec() address.Codec
 	// Methods imported from account should be defined here
 }
 
@@ -36,9 +41,10 @@ type EpochingKeeper interface {
 
 // CheckpointingHooks event hooks for raw checkpoint object (noalias)
 type CheckpointingHooks interface {
-	AfterBlsKeyRegistered(ctx sdk.Context, valAddr sdk.ValAddress) error         // Must be called when a BLS key is registered
-	AfterRawCheckpointConfirmed(ctx sdk.Context, epoch uint64) error             // Must be called when a raw checkpoint is CONFIRMED
-	AfterRawCheckpointForgotten(ctx sdk.Context, ckpt *RawCheckpoint) error      // Must be called when a raw checkpoint is FORGOTTEN
-	AfterRawCheckpointFinalized(ctx sdk.Context, epoch uint64) error             // Must be called when a raw checkpoint is FINALIZED
-	AfterRawCheckpointBlsSigVerified(ctx sdk.Context, ckpt *RawCheckpoint) error // Must be called when a raw checkpoint's multi-sig is verified
+	// TODO: bump 50 , sdk -> context
+	AfterBlsKeyRegistered(ctx context.Context, valAddr sdk.ValAddress) error         // Must be called when a BLS key is registered
+	AfterRawCheckpointConfirmed(ctx context.Context, epoch uint64) error             // Must be called when a raw checkpoint is CONFIRMED
+	AfterRawCheckpointForgotten(ctx context.Context, ckpt *RawCheckpoint) error      // Must be called when a raw checkpoint is FORGOTTEN
+	AfterRawCheckpointFinalized(ctx context.Context, epoch uint64) error             // Must be called when a raw checkpoint is FINALIZED
+	AfterRawCheckpointBlsSigVerified(ctx context.Context, ckpt *RawCheckpoint) error // Must be called when a raw checkpoint's multi-sig is verified
 }

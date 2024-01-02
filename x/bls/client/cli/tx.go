@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"cosmossdk.io/core/address"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
@@ -28,7 +29,7 @@ const (
 )
 
 // GetTxCmd returns the transaction commands for this module
-func GetTxCmd() *cobra.Command {
+func GetTxCmd(ac address.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      fmt.Sprintf("%s transactions subcommands", types.ModuleName),
@@ -38,7 +39,7 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdTxAddBlsSig())
-	cmd.AddCommand(CmdWrappedCreateValidator())
+	cmd.AddCommand(CmdWrappedCreateValidator(ac))
 
 	return cmd
 }
@@ -85,8 +86,8 @@ func CmdTxAddBlsSig() *cobra.Command {
 	return cmd
 }
 
-func CmdWrappedCreateValidator() *cobra.Command {
-	cmd := cosmoscli.NewCreateValidatorCmd()
+func CmdWrappedCreateValidator(ac address.Codec) *cobra.Command {
+	cmd := cosmoscli.NewCreateValidatorCmd(ac)
 	cmd.Long = strings.TrimSpace(
 		string(`create-validator will create a new validator initialized
 with a self-delegation to it using the BLS key generated for the validator (e.g., via babylond create-bls-key).

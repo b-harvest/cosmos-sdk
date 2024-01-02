@@ -4,7 +4,8 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 
-	"github.com/cosmos/cosmos-sdk/store/prefix"
+	"cosmossdk.io/store/prefix"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/epoching/types"
 )
@@ -16,7 +17,7 @@ func (k Keeper) setSlashedVotingPower(ctx sdk.Context, epochNumber uint64, power
 	// key: epochNumber
 	epochNumberBytes := sdk.Uint64ToBigEndian(epochNumber)
 	// value: power
-	powerBytes, err := sdk.NewInt(power).Marshal()
+	powerBytes, err := math.NewInt(power).Marshal()
 	if err != nil {
 		panic(errorsmod.Wrap(types.ErrMarshal, err.Error()))
 	}
@@ -59,7 +60,7 @@ func (k Keeper) AddSlashedValidator(ctx sdk.Context, valAddr sdk.ValAddress) err
 	if err != nil {
 		panic(errorsmod.Wrap(types.ErrMarshal, err.Error()))
 	}
-	thisVotingPowerBytes, err := sdk.NewInt(thisVotingPower).Marshal()
+	thisVotingPowerBytes, err := math.NewInt(thisVotingPower).Marshal()
 	if err != nil {
 		panic(errorsmod.Wrap(types.ErrMarshal, err.Error()))
 	}

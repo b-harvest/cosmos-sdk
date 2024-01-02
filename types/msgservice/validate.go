@@ -44,6 +44,7 @@ func ValidateProtoAnnotations(protoFiles signing.ProtoFileResolver) error {
 	return errors.Join(serviceErrs...)
 }
 
+// TODO: bump 50, set for
 // validateMsgServiceAnnotations validates that the service has the
 // `(cosmos.msg.v1.service) = true` proto annotation.
 func validateMsgServiceAnnotations(sd protoreflect.ServiceDescriptor) error {

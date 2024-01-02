@@ -79,12 +79,13 @@ func (m *MsgWrappedCreateValidator) ValidateBasic() error {
 		return errors.New("MsgCreateValidator is nil")
 	}
 	// TODO: interface wiring
-	err := m.MsgCreateValidator.ValidateBasic()
-	if err != nil {
-		return err
-	}
+	// TODO: bump 50, deprecated legacy msg interface
+	//err := m.MsgCreateValidator.ValidateBasic()
+	//if err != nil {
+	//	return err
+	//}
 	var pubKey ed255192.PubKey
-	err = pubKey.Unmarshal(m.MsgCreateValidator.Pubkey.GetValue())
+	err := pubKey.Unmarshal(m.MsgCreateValidator.Pubkey.GetValue())
 	if err != nil {
 		return err
 	}
@@ -96,10 +97,11 @@ func (m *MsgWrappedCreateValidator) ValidateBasic() error {
 	return nil
 }
 
-func (m *MsgWrappedCreateValidator) GetSigners() []sdk.AccAddress {
-	// TODO: interface wiring
-	return m.MsgCreateValidator.GetSigners()
-}
+// TODO: bump 50, deprecated legacy msg interface
+//func (m *MsgWrappedCreateValidator) GetSigners() []sdk.AccAddress {
+//	// TODO: interface wiring
+//	return m.MsgCreateValidator.GetSigners()
+//}
 
 // UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
 // Needed since msg.MsgCreateValidator.Pubkey is in type Any

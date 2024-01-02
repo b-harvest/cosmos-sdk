@@ -4,12 +4,14 @@ import (
 	"time"
 
 	errorsmod "cosmossdk.io/errors"
+
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -138,14 +140,15 @@ func NewQueuedMessage(blockHeight uint64, blockTime time.Time, txid []byte, msg 
 	return queuedMsg, nil
 }
 
-func (qm QueuedMessage) GetSigners() []sdk.AccAddress {
-	return qm.UnwrapToSdkMsg().GetSigners()
-}
-
-func (qm QueuedMessage) ValidateBasic() error {
-	return qm.UnwrapToSdkMsg().ValidateBasic()
-
-}
+// TODO: bump 50 deprecated legacy msg interfaces
+//func (qm QueuedMessage) GetSigners() []sdk.AccAddress {
+//	return qm.UnwrapToSdkMsg().GetSigners()
+//}
+//
+//func (qm QueuedMessage) ValidateBasic() error {
+//	return qm.UnwrapToSdkMsg().ValidateBasic()
+//
+//}
 
 // UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
 func (qm QueuedMessage) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {

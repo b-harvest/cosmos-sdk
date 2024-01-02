@@ -4,8 +4,9 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 
+	"cosmossdk.io/store/prefix"
+
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/epoching/types"
 )
@@ -60,7 +61,7 @@ func (k Keeper) InitValidatorSet(ctx sdk.Context) {
 	// store the validator set
 	k.stk.IterateLastValidatorPowers(ctx, func(addr sdk.ValAddress, power int64) (stop bool) {
 		addrBytes := []byte(addr)
-		powerBytes, err := sdk.NewInt(power).Marshal()
+		powerBytes, err := math.NewInt(power).Marshal()
 		if err != nil {
 			panic(errorsmod.Wrap(types.ErrMarshal, err.Error()))
 		}
@@ -72,7 +73,7 @@ func (k Keeper) InitValidatorSet(ctx sdk.Context) {
 
 	// store total voting power of this validator set
 	epochNumberBytes := sdk.Uint64ToBigEndian(epochNumber)
-	totalPowerBytes, err := sdk.NewInt(totalPower).Marshal()
+	totalPowerBytes, err := math.NewInt(totalPower).Marshal()
 	if err != nil {
 		panic(errorsmod.Wrap(types.ErrMarshal, err.Error()))
 	}
