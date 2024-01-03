@@ -4,7 +4,7 @@ package testepoching
 //	"math/rand"
 //	"testing"
 //
-//	"github.com/cosmos/cosmos-sdk/crypto/bls12381"
+//	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
 //	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
 //
 //	"cosmossdk.io/math"
