@@ -40,6 +40,11 @@ import (
 	_ "cosmossdk.io/x/upgrade"    // import for side-effects
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 
+	blsmodulev1 "github.com/cosmos/cosmos-sdk/api/cosmos/bls/module/v1"
+	epochingmodulev1 "github.com/cosmos/cosmos-sdk/api/cosmos/epoching/module/v1"
+	_ "github.com/cosmos/cosmos-sdk/x/bls"
+	_ "github.com/cosmos/cosmos-sdk/x/epoching"
+
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	_ "github.com/cosmos/cosmos-sdk/x/auth/tx/config" // import for side-effects
@@ -271,6 +276,14 @@ var (
 			{
 				Name:   circuittypes.ModuleName,
 				Config: appconfig.WrapAny(&circuitmodulev1.Module{}),
+			},
+			{
+				Name:   epochingtypes.ModuleName,
+				Config: appconfig.WrapAny(&epochingmodulev1.Module{}),
+			},
+			{
+				Name:   blstypes.ModuleName,
+				Config: appconfig.WrapAny(&blsmodulev1.Module{}),
 			},
 		},
 	}),
