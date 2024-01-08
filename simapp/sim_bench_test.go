@@ -61,7 +61,7 @@ func BenchmarkFullAppSimulation(b *testing.B) {
 	appOptions.SetDefault(flags.FlagHome, DefaultNodeHome)
 	appOptions.SetDefault(server.FlagInvCheckPeriod, simcli.FlagPeriodValue)
 
-	app := NewSimApp(logger, db, nil, true, appOptions, interBlockCacheOpt(), baseapp.SetChainID(SimAppChainID))
+	app := NewSimApp(logger, db, nil, true, nil, appOptions, interBlockCacheOpt(), baseapp.SetChainID(SimAppChainID))
 
 	// run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(
@@ -116,7 +116,7 @@ func BenchmarkInvariants(b *testing.B) {
 	appOptions[flags.FlagHome] = DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = simcli.FlagPeriodValue
 
-	app := NewSimApp(logger, db, nil, true, appOptions, interBlockCacheOpt(), baseapp.SetChainID(SimAppChainID))
+	app := NewSimApp(logger, db, nil, true, nil, appOptions, interBlockCacheOpt(), baseapp.SetChainID(SimAppChainID))
 
 	// run randomized simulation
 	_, simParams, simErr := simulation.SimulateFromSeed(

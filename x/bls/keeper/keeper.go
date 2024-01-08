@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"cosmossdk.io/core/store"
-
 	"cosmossdk.io/log"
 
 	storetypes "cosmossdk.io/store/types"
@@ -25,8 +23,7 @@ import (
 
 type (
 	Keeper struct {
-		// TODO:
-		storeService   store.KVStoreService
+		//storeService   store.KVStoreService
 		cdc            codec.BinaryCodec
 		storeKey       storetypes.StoreKey
 		memKey         storetypes.StoreKey
@@ -39,7 +36,7 @@ type (
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
-	storeService store.KVStoreService,
+	//storeService store.KVStoreService,
 	storeKey,
 	memKey storetypes.StoreKey,
 	signer BlsSigner,
@@ -52,7 +49,7 @@ func NewKeeper(
 	//Params:           collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.Params](cdc)),
 	//	FeePool:          collections.NewItem(sb, types.FeePoolKey, "fee_pool", codec.CollValue[types.FeePool](cdc)),
 	return Keeper{
-		storeService:   storeService,
+		//storeService:   storeService,
 		cdc:            cdc,
 		storeKey:       storeKey,
 		memKey:         memKey,

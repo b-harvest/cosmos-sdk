@@ -4,17 +4,22 @@ import (
 	"errors"
 	"io"
 	"os"
+	"path/filepath"
 
 	cmtcfg "github.com/cometbft/cometbft/config"
+	tmtypes "github.com/cometbft/cometbft/types"
 	dbm "github.com/cosmos/cosmos-db"
+	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"cosmossdk.io/log"
-	"cosmossdk.io/simapp"
 	confixcmd "cosmossdk.io/tools/confix/cmd"
 
+	"cosmossdk.io/simapp"
+	"cosmossdk.io/simapp/params"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
@@ -26,9 +31,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
@@ -194,6 +201,19 @@ func txCommand() *cobra.Command {
 	return cmd
 }
 
+func ParseKeyNameFromConfig(opts servertypes.AppOptions) string {
+	valueInterface := opts.Get("signer-config.key-name")
+	if valueInterface == nil {
+		panic("Signer key name should be provided in options")
+	}
+	keyName, err := cast.ToStringE(valueInterface)
+	if err != nil {
+		panic("Signer key name should be valid string")
+	}
+
+	return keyName
+}
+
 // newApp creates the application
 func newApp(
 	logger log.Logger,
@@ -203,8 +223,50 @@ func newApp(
 ) servertypes.Application {
 	baseappOptions := server.DefaultBaseappOptions(appOpts)
 
+	homeDir := cast.ToString(appOpts.Get(flags.FlagHome))
+
+	chainID := cast.ToString(appOpts.Get(flags.FlagChainID))
+	if chainID == "" {
+		// fallback to genesis chain-id
+		appGenesis, err := tmtypes.GenesisDocFromFile(filepath.Join(homeDir, "config", "genesis.json"))
+		if err != nil {
+			panic(err)
+		}
+		chainID = appGenesis.ChainID
+	}
+
+	tempApp := simapp.NewSimApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true, nil, simtestutil.NewAppOptionsWithFlagHome(tempDir()))
+	encodingConfig := params.EncodingConfig{
+		InterfaceRegistry: tempApp.InterfaceRegistry(),
+		Codec:             tempApp.AppCodec(),
+		TxConfig:          tempApp.TxConfig(),
+		Amino:             tempApp.LegacyAmino(),
+	}
+
+	clientCtx, err := config.ReadFromClientConfig(
+		client.Context{}.
+			WithCodec(encodingConfig.Codec).
+			WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
+			WithTxConfig(encodingConfig.TxConfig).
+			WithLegacyAmino(encodingConfig.Amino).
+			WithInput(os.Stdin).
+			WithAccountRetriever(types.AccountRetriever{}).
+			WithHomeDir(homeDir).
+			WithViper(""),
+	)
+	if err != nil {
+		panic(err)
+	}
+	// parse the key name that will be used for signing BLS-sig txs from app.toml
+	keyName := ParseKeyNameFromConfig(appOpts)
+
+	privSigner, err := simapp.InitPrivSigner(clientCtx, homeDir, clientCtx.Keyring, keyName, encodingConfig)
+	if err != nil {
+		panic(err)
+	}
+
 	return simapp.NewSimApp(
-		logger, db, traceStore, true,
+		logger, db, traceStore, true, privSigner,
 		appOpts,
 		baseappOptions...,
 	)
@@ -239,13 +301,13 @@ func appExport(
 
 	var simApp *simapp.SimApp
 	if height != -1 {
-		simApp = simapp.NewSimApp(logger, db, traceStore, false, appOpts)
+		simApp = simapp.NewSimApp(logger, db, traceStore, false, nil, appOpts)
 
 		if err := simApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		simApp = simapp.NewSimApp(logger, db, traceStore, true, appOpts)
+		simApp = simapp.NewSimApp(logger, db, traceStore, true, nil, appOpts)
 	}
 
 	return simApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)

@@ -75,7 +75,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	consensus "github.com/cosmos/cosmos-sdk/x/consensus"
+	"github.com/cosmos/cosmos-sdk/x/bls"
+	blskeeper "github.com/cosmos/cosmos-sdk/x/bls/keeper"
+	blstypes "github.com/cosmos/cosmos-sdk/x/bls/types"
+	"github.com/cosmos/cosmos-sdk/x/consensus"
 	consensusparamkeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
@@ -84,6 +87,10 @@ import (
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	"github.com/cosmos/cosmos-sdk/x/epoching"
+	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
+
+	epochingkeeper "github.com/cosmos/cosmos-sdk/x/epoching/keeper"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/cosmos/cosmos-sdk/x/gov"
@@ -110,7 +117,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
-const appName = "SimApp"
+const appName = "SimAppLegacy"
 
 var (
 	// DefaultNodeHome default home directories for the application daemon
@@ -166,6 +173,10 @@ type SimApp struct {
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	CircuitKeeper         circuitkeeper.Keeper
 
+	// BLS modules
+	BLSKeeper      blskeeper.Keeper
+	EpochingKeeper epochingkeeper.Keeper
+
 	// the module manager
 	ModuleManager      *module.Manager
 	BasicModuleManager module.BasicManager
@@ -192,6 +203,7 @@ func NewSimApp(
 	db dbm.DB,
 	traceStore io.Writer,
 	loadLatest bool,
+	privSigner *PrivSigner,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *SimApp {
@@ -258,6 +270,7 @@ func NewSimApp(
 		govtypes.StoreKey, paramstypes.StoreKey, consensusparamtypes.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, circuittypes.StoreKey,
 		authzkeeper.StoreKey, nftkeeper.StoreKey, group.StoreKey,
+		blstypes.StoreKey, epochingtypes.StoreKey,
 	)
 
 	// register streaming services
@@ -381,6 +394,33 @@ func NewSimApp(
 
 	app.NFTKeeper = nftkeeper.NewKeeper(runtime.NewKVStoreService(keys[nftkeeper.StoreKey]), appCodec, app.AccountKeeper, app.BankKeeper)
 
+	// TODO: privSigner ref from babylon app
+
+	app.EpochingKeeper = epochingkeeper.NewKeeper(
+		appCodec, keys[epochingtypes.StoreKey], keys[epochingtypes.StoreKey], app.BankKeeper, app.StakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	// TODO: temporary branch for pre-init
+	if privSigner != nil {
+		app.BLSKeeper = blskeeper.NewKeeper(
+			appCodec,
+			keys[blstypes.StoreKey],
+			keys[blstypes.MemStoreKey],
+			privSigner.WrappedPV,
+			&app.EpochingKeeper,
+			privSigner.ClientCtx,
+		)
+	} else {
+		app.BLSKeeper = blskeeper.NewKeeper(
+			appCodec,
+			keys[blstypes.StoreKey],
+			keys[blstypes.MemStoreKey],
+			nil,
+			&app.EpochingKeeper,
+			client.Context{},
+		)
+	}
+
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec, runtime.NewKVStoreService(keys[evidencetypes.StoreKey]), app.StakingKeeper, app.SlashingKeeper, app.AccountKeeper.AddressCodec(), runtime.ProvideCometInfoService(),
@@ -419,6 +459,9 @@ func NewSimApp(
 		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		circuit.NewAppModule(appCodec, app.CircuitKeeper),
+		// Babylon modules
+		epoching.NewAppModule(appCodec, app.EpochingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
+		bls.NewAppModule(appCodec, app.BLSKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// BasicModuleManager defines the module BasicManager is in charge of setting up basic,
@@ -454,6 +497,8 @@ func NewSimApp(
 		stakingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		authz.ModuleName,
+		epochingtypes.ModuleName,
+		blstypes.ModuleName,
 	)
 	app.ModuleManager.SetOrderEndBlockers(
 		crisistypes.ModuleName,
@@ -462,6 +507,8 @@ func NewSimApp(
 		genutiltypes.ModuleName,
 		feegrant.ModuleName,
 		group.ModuleName,
+		epochingtypes.ModuleName,
+		blstypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -472,7 +519,7 @@ func NewSimApp(
 		distrtypes.ModuleName, stakingtypes.ModuleName, slashingtypes.ModuleName, govtypes.ModuleName,
 		minttypes.ModuleName, crisistypes.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
 		feegrant.ModuleName, nft.ModuleName, group.ModuleName, paramstypes.ModuleName, upgradetypes.ModuleName,
-		vestingtypes.ModuleName, consensusparamtypes.ModuleName, circuittypes.ModuleName,
+		vestingtypes.ModuleName, consensusparamtypes.ModuleName, circuittypes.ModuleName, blstypes.ModuleName, epochingtypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)

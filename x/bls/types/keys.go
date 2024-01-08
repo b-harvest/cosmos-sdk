@@ -7,7 +7,7 @@ import (
 
 const (
 	// ModuleName defines the module name
-	ModuleName = "checkpointing"
+	ModuleName = "bls"
 
 	// StoreKey defines the primary module store key
 	StoreKey = ModuleName
@@ -19,7 +19,7 @@ const (
 	QuerierRoute = ModuleName
 
 	// MemStoreKey defines the in-memory store key
-	MemStoreKey = "mem_checkpointing"
+	MemStoreKey = "mem_bls"
 )
 
 var (

@@ -34,13 +34,16 @@ func (k msgServer) WrappedDelegate(goCtx context.Context, msg *types.MsgWrappedD
 	if valErr != nil {
 		return nil, valErr
 	}
-	if _, found := k.stk.GetValidator(ctx, valAddr); !found {
+	if _, err := k.stk.GetValidator(ctx, valAddr); err != nil {
 		return nil, stakingtypes.ErrNoValidatorFound
 	}
 	if _, err := sdk.AccAddressFromBech32(msg.Msg.DelegatorAddress); err != nil {
 		return nil, err
 	}
-	bondDenom := k.stk.BondDenom(ctx)
+	bondDenom, err := k.stk.BondDenom(ctx)
+	if err != nil {
+		return nil, err
+	}
 	if msg.Msg.Amount.Denom != bondDenom {
 		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrInvalidRequest, "invalid coin denomination: got %s, expected %s", msg.Msg.Amount.Denom, bondDenom,
@@ -93,7 +96,10 @@ func (k msgServer) WrappedUndelegate(goCtx context.Context, msg *types.MsgWrappe
 	if _, err := k.stk.ValidateUnbondAmount(ctx, delegatorAddress, valAddr, msg.Msg.Amount.Amount); err != nil {
 		return nil, err
 	}
-	bondDenom := k.stk.BondDenom(ctx)
+	bondDenom, err := k.stk.BondDenom(ctx)
+	if err != nil {
+		return nil, err
+	}
 	if msg.Msg.Amount.Denom != bondDenom {
 		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrInvalidRequest, "invalid coin denomination: got %s, expected %s", msg.Msg.Amount.Denom, bondDenom,
@@ -146,7 +152,10 @@ func (k msgServer) WrappedBeginRedelegate(goCtx context.Context, msg *types.MsgW
 	if _, err := k.stk.ValidateUnbondAmount(ctx, delegatorAddress, valSrcAddr, msg.Msg.Amount.Amount); err != nil {
 		return nil, err
 	}
-	bondDenom := k.stk.BondDenom(ctx)
+	bondDenom, err := k.stk.BondDenom(ctx)
+	if err != nil {
+		return nil, err
+	}
 	if msg.Msg.Amount.Denom != bondDenom {
 		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrInvalidRequest, "invalid coin denomination: got %s, expected %s", msg.Msg.Amount.Denom, bondDenom,

@@ -16,21 +16,21 @@ import (
 var _ types.EpochingHooks = Keeper{}
 
 // AfterEpochBegins - call hook if registered
-func (k Keeper) AfterEpochBegins(ctx sdk.Context, epoch uint64) {
+func (k Keeper) AfterEpochBegins(ctx context.Context, epoch uint64) {
 	if k.hooks != nil {
 		k.hooks.AfterEpochBegins(ctx, epoch)
 	}
 }
 
 // AfterEpochEnds - call hook if registered
-func (k Keeper) AfterEpochEnds(ctx sdk.Context, epoch uint64) {
+func (k Keeper) AfterEpochEnds(ctx context.Context, epoch uint64) {
 	if k.hooks != nil {
 		k.hooks.AfterEpochEnds(ctx, epoch)
 	}
 }
 
 // BeforeSlashThreshold triggers the BeforeSlashThreshold hook for other modules that register this hook
-func (k Keeper) BeforeSlashThreshold(ctx sdk.Context, valSet types.ValidatorSet) {
+func (k Keeper) BeforeSlashThreshold(ctx context.Context, valSet types.ValidatorSet) {
 	if k.hooks != nil {
 		k.hooks.BeforeSlashThreshold(ctx, valSet)
 	}

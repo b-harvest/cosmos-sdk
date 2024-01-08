@@ -40,8 +40,8 @@ func (k Keeper) GetCurrentValidatorSet(ctx sdk.Context) types.ValidatorSet {
 }
 
 func (k Keeper) GetValidatorPubkey(ctx sdk.Context, valAddr sdk.ValAddress) (cryptotypes.PubKey, bool) {
-	validator, found := k.stk.GetValidator(ctx, valAddr)
-	if !found {
+	validator, err := k.stk.GetValidator(ctx, valAddr)
+	if err != nil {
 		return nil, false
 	}
 	pubkey, err := validator.ConsPubKey()

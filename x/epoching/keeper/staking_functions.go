@@ -23,7 +23,10 @@ func (k Keeper) CheckMsgCreateValidator(ctx sdk.Context, msg *stakingtypes.MsgCr
 	}
 
 	// get parameters of the staking module
-	sParams := k.stk.GetParams(ctx)
+	sParams, err := k.stk.GetParams(ctx)
+	if err != nil {
+		return err
+	}
 
 	// check commission rate
 	if msg.Commission.Rate.LT(sParams.MinCommissionRate) {
@@ -31,7 +34,8 @@ func (k Keeper) CheckMsgCreateValidator(ctx sdk.Context, msg *stakingtypes.MsgCr
 	}
 
 	// ensure the validator operator was not registered before
-	if _, found := k.stk.GetValidator(ctx, valAddr); found {
+	// TODO: need to check exist
+	if _, err := k.stk.GetValidator(ctx, valAddr); err == nil {
 		return stakingtypes.ErrValidatorOwnerExists
 	}
 
@@ -42,7 +46,8 @@ func (k Keeper) CheckMsgCreateValidator(ctx sdk.Context, msg *stakingtypes.MsgCr
 	}
 
 	// ensure the validator was not registered before
-	if _, found := k.stk.GetValidatorByConsAddr(ctx, sdk.GetConsAddress(pk)); found {
+	// TODO: ensure exist
+	if _, err := k.stk.GetValidatorByConsAddr(ctx, sdk.GetConsAddress(pk)); err == nil {
 		return stakingtypes.ErrValidatorPubKeyExists
 	}
 

@@ -28,20 +28,31 @@ func (k Keeper) ApplyMatureUnbonding(ctx sdk.Context, epochNumber uint64) {
 		panic(err)
 	}
 	epochBoundaryHeader := finalizedEpoch.LastBlockHeader
-	epochBoundaryHeader.Time = epochBoundaryHeader.Time.Add(k.stk.GetParams(ctx).UnbondingTime) // nullifies the effect of UnbondingTime in staking module
+	stakingParams, err := k.stk.GetParams(ctx)
+	if err != nil {
+		panic(err)
+	}
+	epochBoundaryHeader.Time = epochBoundaryHeader.Time.Add(stakingParams.UnbondingTime) // nullifies the effect of UnbondingTime in staking module
 	ctx = ctx.WithBlockHeader(*epochBoundaryHeader)
 
 	// unbond all mature validators till the last block of the given epoch
 	matureValidators := k.getAllMatureValidators(ctx)
 	currentCtx.Logger().Info(fmt.Sprintf("Epoching: start completing the following unbonding validators matured in epoch %d: %v", epochNumber, matureValidators))
-	k.stk.UnbondAllMatureValidators(ctx)
+	err = k.stk.UnbondAllMatureValidators(ctx)
+	if err != nil {
+		panic(err)
+	}
 	// record state update of being UNBONDED for mature validators
 	for _, valAddr := range matureValidators {
 		k.RecordNewValState(currentCtx, valAddr, types.BondState_UNBONDED) //nolint:errcheck // either we ignore the error here, or propoagate up the stack
 	}
 
 	// get all mature unbonding delegations the epoch boundary from the ubd queue.
-	matureUnbonds := k.stk.DequeueAllMatureUBDQueue(ctx, epochBoundaryHeader.Time)
+	matureUnbonds, err := k.stk.DequeueAllMatureUBDQueue(ctx, epochBoundaryHeader.Time)
+	if err != nil {
+		panic(err)
+	}
+
 	currentCtx.Logger().Info(fmt.Sprintf("Epoching: start completing the following unbonding delegations matured in epoch %d: %v", epochNumber, matureUnbonds))
 
 	// unbond all mature delegations
@@ -74,7 +85,10 @@ func (k Keeper) ApplyMatureUnbonding(ctx sdk.Context, epochNumber uint64) {
 	}
 
 	// get all mature redelegations till the epoch boundary from the red queue.
-	matureRedelegations := k.stk.DequeueAllMatureRedelegationQueue(ctx, epochBoundaryHeader.Time)
+	matureRedelegations, err := k.stk.DequeueAllMatureRedelegationQueue(ctx, epochBoundaryHeader.Time)
+	if err != nil {
+		panic(err)
+	}
 	currentCtx.Logger().Info(fmt.Sprintf("Epoching: start completing the following redelegations matured in epoch %d: %v", epochNumber, matureRedelegations))
 
 	// finish all mature redelegations
@@ -149,7 +163,10 @@ func (k Keeper) getAllMatureValidators(ctx sdk.Context) []sdk.ValAddress {
 	// ValidatorQueueKey | timeBzLen (8-byte big endian) | timeBz | heightBz (8-byte big endian),
 	// so it may be possible that certain validator addresses that are iterated
 	// over are not ready to unbond, so an explicit check is required.
-	unbondingValIterator := k.stk.ValidatorQueueIterator(ctx, blockTime, blockHeight)
+	unbondingValIterator, err := k.stk.ValidatorQueueIterator(ctx, blockTime, blockHeight)
+	if err != nil {
+		panic(err)
+	}
 	defer unbondingValIterator.Close()
 
 	for ; unbondingValIterator.Valid(); unbondingValIterator.Next() {
@@ -168,8 +185,8 @@ func (k Keeper) getAllMatureValidators(ctx sdk.Context) []sdk.ValAddress {
 				if err != nil {
 					panic(err)
 				}
-				val, found := k.stk.GetValidator(ctx, addr)
-				if !found {
+				val, err := k.stk.GetValidator(ctx, addr)
+				if err != nil {
 					panic("validator in the unbonding queue was not found")
 				}
 

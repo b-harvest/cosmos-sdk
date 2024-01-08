@@ -6,10 +6,11 @@ import (
 	"os"
 
 	"cosmossdk.io/log"
-	"cosmossdk.io/simapp"
-	"cosmossdk.io/simapp/params"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/spf13/cobra"
+
+	"cosmossdk.io/simapp"
+	"cosmossdk.io/simapp/params"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
@@ -27,7 +28,7 @@ import (
 func NewRootCmd() *cobra.Command {
 	// we "pre"-instantiate the application for getting the injected/configured encoding configuration
 	// note, this is not necessary when using app wiring, as depinject can be directly used (see root_v2.go)
-	tempApp := simapp.NewSimApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true, simtestutil.NewAppOptionsWithFlagHome(tempDir()))
+	tempApp := simapp.NewSimApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true, nil, simtestutil.NewAppOptionsWithFlagHome(tempDir()))
 	encodingConfig := params.EncodingConfig{
 		InterfaceRegistry: tempApp.InterfaceRegistry(),
 		Codec:             tempApp.AppCodec(),
@@ -92,6 +93,16 @@ func NewRootCmd() *cobra.Command {
 			customAppTemplate, customAppConfig := initAppConfig()
 			customCMTConfig := initCometBFTConfig()
 
+			//// TODO: WIP
+			//homeDir := cast.ToString(appOpts.Get(flags.FlagHome))
+			//
+			//// parse the key name that will be used for signing BLS-sig txs from app.toml
+			//keyName := ParseKeyNameFromConfig(appOpts)
+			//
+			//privSigner, err := simapp.InitPrivSigner(initClientCtx, homeDir, initClientCtx.Keyring, keyName, encodingConfig)
+			//if err != nil {
+			//	panic(err)
+			//}
 			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customCMTConfig)
 		},
 	}

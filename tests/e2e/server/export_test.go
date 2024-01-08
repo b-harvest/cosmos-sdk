@@ -19,6 +19,7 @@ import (
 	"gotest.tools/v3/assert"
 
 	"cosmossdk.io/log"
+
 	"cosmossdk.io/simapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -160,7 +161,7 @@ func setupApp(t *testing.T, tempDir string) (*simapp.SimApp, context.Context, ge
 	assert.NilError(t, err)
 
 	db := dbm.NewMemDB()
-	app := simapp.NewSimApp(logger, db, nil, true, simtestutil.NewAppOptionsWithFlagHome(tempDir))
+	app := simapp.NewSimApp(logger, db, nil, true, nil, simtestutil.NewAppOptionsWithFlagHome(tempDir))
 
 	genesisState := simapp.GenesisStateWithSingleValidator(t, app)
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
@@ -197,12 +198,12 @@ func setupApp(t *testing.T, tempDir string) (*simapp.SimApp, context.Context, ge
 		func(_ log.Logger, _ dbm.DB, _ io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string, appOptions types.AppOptions, modulesToExport []string) (types.ExportedApp, error) {
 			var simApp *simapp.SimApp
 			if height != -1 {
-				simApp = simapp.NewSimApp(logger, db, nil, false, appOptions)
+				simApp = simapp.NewSimApp(logger, db, nil, false, nil, appOptions)
 				if err := simApp.LoadHeight(height); err != nil {
 					return types.ExportedApp{}, err
 				}
 			} else {
-				simApp = simapp.NewSimApp(logger, db, nil, true, appOptions)
+				simApp = simapp.NewSimApp(logger, db, nil, true, nil, appOptions)
 			}
 
 			return simApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
