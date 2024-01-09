@@ -3,7 +3,7 @@ package cosmos.bls.v1;
 
 import "cosmos/bls/v1/checkpoint.proto";
 
-option go_package = "github.com/cosmos/cosmos-sdk/x/bls/types";
+option go_package = "cosmossdk.io/x/bls/types";
 
 // EventCheckpointAccumulating is emitted when a checkpoint reaches the
 // `Accumulating` state.

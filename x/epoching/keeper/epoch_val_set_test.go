@@ -4,12 +4,12 @@ package keeper_test
 //	"math/rand"
 //	"testing"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
+//	"cosmossdk.io/x/epoching/testepoching/datagen"
 //
 //	"github.com/stretchr/testify/require"
 //
 //	sdk "github.com/cosmos/cosmos-sdk/types"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching"
+//	"cosmossdk.io/x/epoching/testepoching"
 //)
 //
 //func FuzzEpochValSet(f *testing.F) {

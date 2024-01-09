@@ -3,7 +3,7 @@ package types
 import (
 	errorsmod "cosmossdk.io/errors"
 	//epochingv1 "github.com/cosmos/cosmos-sdk/api/cosmos/epoching/v1"
-	//epochingv1 "github.com/cosmos/cosmos-sdk/x/epoching/types/epoching/v1"
+	//epochingv1 "cosmossdk.io/x/epoching/types/epoching/v1"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"

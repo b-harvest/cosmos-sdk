@@ -19,7 +19,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	// "github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
+	"cosmossdk.io/x/bls/types"
 )
 
 //nolint:unused

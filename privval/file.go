@@ -19,8 +19,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	blstypes "cosmossdk.io/x/bls/types"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
-	blstypes "github.com/cosmos/cosmos-sdk/x/bls/types"
 )
 
 // copied from github.com/cometbft/cometbft/privval/file.go"

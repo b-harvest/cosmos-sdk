@@ -5,8 +5,8 @@ package bls
 //	simappparams "github.com/cosmos/cosmos-sdk/app/params"
 //	"github.com/cosmos/cosmos-sdk/testutil/sample"
 //
-//	checkpointingsimulation "github.com/cosmos/cosmos-sdk/x/bls/simulation"
-//	"github.com/cosmos/cosmos-sdk/x/bls/types"
+//	checkpointingsimulation "cosmossdk.io/x/bls/simulation"
+//	"cosmossdk.io/x/bls/types"
 //
 //	"github.com/cosmos/cosmos-sdk/baseapp"
 //	sdk "github.com/cosmos/cosmos-sdk/types"

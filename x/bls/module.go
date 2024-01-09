@@ -12,9 +12,9 @@ import (
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
-	"github.com/cosmos/cosmos-sdk/x/bls/client/cli"
-	"github.com/cosmos/cosmos-sdk/x/bls/keeper"
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
+	"cosmossdk.io/x/bls/client/cli"
+	"cosmossdk.io/x/bls/keeper"
+	"cosmossdk.io/x/bls/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"

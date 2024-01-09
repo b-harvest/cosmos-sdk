@@ -6,11 +6,11 @@ package keeper_test
 //
 //	"github.com/stretchr/testify/require"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
+//	"cosmossdk.io/x/epoching/testepoching/datagen"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/keeper"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	"cosmossdk.io/x/epoching/keeper"
+//	"cosmossdk.io/x/epoching/testepoching"
+//	"cosmossdk.io/x/epoching/types"
 //)
 //
 //func FuzzAppHashChain(f *testing.F) {

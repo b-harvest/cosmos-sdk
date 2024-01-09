@@ -42,8 +42,13 @@ import (
 
 	//blsmodulev1 "github.com/cosmos/cosmos-sdk/api/cosmos/bls/module/v1"
 	//epochingmodulev1 "github.com/cosmos/cosmos-sdk/api/cosmos/epoching/module/v1"
-	_ "github.com/cosmos/cosmos-sdk/x/bls"
-	_ "github.com/cosmos/cosmos-sdk/x/epoching"
+	_ "cosmossdk.io/x/epoching"
+
+	_ "cosmossdk.io/x/bls"
+
+	epochingtypes "cosmossdk.io/x/epoching/types"
+
+	blstypes "cosmossdk.io/x/bls/types"
 
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -55,14 +60,12 @@ import (
 	_ "github.com/cosmos/cosmos-sdk/x/authz/module" // import for side-effects
 	_ "github.com/cosmos/cosmos-sdk/x/bank"         // import for side-effects
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	blstypes "github.com/cosmos/cosmos-sdk/x/bls/types"
 	_ "github.com/cosmos/cosmos-sdk/x/consensus" // import for side-effects
 	consensustypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	_ "github.com/cosmos/cosmos-sdk/x/crisis" // import for side-effects
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	_ "github.com/cosmos/cosmos-sdk/x/distribution" // import for side-effects
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/cosmos/cosmos-sdk/x/gov"

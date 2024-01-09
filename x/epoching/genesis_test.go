@@ -6,11 +6,11 @@ package epoching_test
 //	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 //	"github.com/stretchr/testify/require"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching"
+//	"cosmossdk.io/x/epoching"
 //
 //	simapp "github.com/cosmos/cosmos-sdk/app"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	"cosmossdk.io/x/epoching/types"
 //)
 //
 //func TestExportGenesis(t *testing.T) {

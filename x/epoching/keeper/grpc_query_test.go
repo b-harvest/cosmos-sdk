@@ -8,12 +8,12 @@ package keeper_test
 //
 //	"github.com/stretchr/testify/require"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
+//	"cosmossdk.io/x/epoching/testepoching/datagen"
 //
 //	sdk "github.com/cosmos/cosmos-sdk/types"
 //	"github.com/cosmos/cosmos-sdk/types/query"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	"cosmossdk.io/x/epoching/testepoching"
+//	"cosmossdk.io/x/epoching/types"
 //)
 //
 //// FuzzParamsQuery fuzzes queryClient.Params

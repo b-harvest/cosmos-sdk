@@ -6,7 +6,7 @@ package keeper_test
 //	testkeeper "github.com/cosmos/cosmos-sdk/testutil/keeper"
 //	"github.com/stretchr/testify/require"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	"cosmossdk.io/x/epoching/types"
 //)
 //
 //func TestGetParams(t *testing.T) {

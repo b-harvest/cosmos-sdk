@@ -5,10 +5,11 @@ import (
 
 	"github.com/boljen/go-bitmap"
 
+	"cosmossdk.io/x/bls/types"
+
 	"github.com/cosmos/cosmos-sdk/btctxformatter"
 	txformat "github.com/cosmos/cosmos-sdk/btctxformatter"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
 )
 
 // GenRandomBitmap generates a random bitmap for the validator set

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+	"cosmossdk.io/x/epoching/types"
 )
 
 func TestParamsEqual(t *testing.T) {

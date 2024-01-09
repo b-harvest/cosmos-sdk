@@ -8,7 +8,7 @@ package simulation
 //	"math/rand"
 //
 //	"github.com/cosmos/cosmos-sdk/types/module"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	"cosmossdk.io/x/epoching/types"
 //)
 //
 //// Simulation parameter constants

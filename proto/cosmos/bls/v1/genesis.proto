@@ -4,7 +4,7 @@ package cosmos.bls.v1;
 import "cosmos/crypto/ed25519/keys.proto";
 import "cosmos/bls/v1/bls_key.proto";
 
-option go_package = "github.com/cosmos/cosmos-sdk/x/bls/types";
+option go_package = "cosmossdk.io/x/bls/types";
 
 // GenesisState defines the bls module's genesis state.
 message GenesisState {

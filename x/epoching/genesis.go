@@ -1,9 +1,9 @@
 package epoching
 
 import (
+	"cosmossdk.io/x/epoching/keeper"
+	"cosmossdk.io/x/epoching/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/epoching/keeper"
-	"github.com/cosmos/cosmos-sdk/x/epoching/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis

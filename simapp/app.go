@@ -36,6 +36,13 @@ import (
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/spf13/cast"
 
+	"cosmossdk.io/x/epoching"
+	epochingtypes "cosmossdk.io/x/epoching/types"
+
+	"cosmossdk.io/x/bls"
+	blskeeper "cosmossdk.io/x/bls/keeper"
+	blstypes "cosmossdk.io/x/bls/types"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -75,9 +82,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/cosmos/cosmos-sdk/x/bls"
-	blskeeper "github.com/cosmos/cosmos-sdk/x/bls/keeper"
-	blstypes "github.com/cosmos/cosmos-sdk/x/bls/types"
 	"github.com/cosmos/cosmos-sdk/x/consensus"
 	consensusparamkeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
@@ -87,10 +91,9 @@ import (
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	"github.com/cosmos/cosmos-sdk/x/epoching"
-	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
 
-	epochingkeeper "github.com/cosmos/cosmos-sdk/x/epoching/keeper"
+	epochingkeeper "cosmossdk.io/x/epoching/keeper"
+
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/cosmos/cosmos-sdk/x/gov"

@@ -8,12 +8,12 @@ import (
 	"cosmossdk.io/core/address"
 	"github.com/spf13/cobra"
 
+	"cosmossdk.io/x/epoching/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/cosmos/cosmos-sdk/x/epoching/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 

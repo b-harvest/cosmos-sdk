@@ -8,15 +8,15 @@ package keeper_test
 //	"github.com/cosmos/cosmos-sdk/app"
 //	"github.com/stretchr/testify/require"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
+//	"cosmossdk.io/x/epoching/testepoching/datagen"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching"
+//	"cosmossdk.io/x/epoching/testepoching"
 //
 //	"github.com/cosmos/cosmos-sdk/baseapp"
 //	sdk "github.com/cosmos/cosmos-sdk/types"
 //	"github.com/cosmos/cosmos-sdk/types/query"
-//	checkpointingkeeper "github.com/cosmos/cosmos-sdk/x/bls/keeper"
-//	"github.com/cosmos/cosmos-sdk/x/bls/types"
+//	checkpointingkeeper "cosmossdk.io/x/bls/keeper"
+//	"cosmossdk.io/x/bls/types"
 //)
 //
 //// FuzzQueryBLSKeySet does the following checks

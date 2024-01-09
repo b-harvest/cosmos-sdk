@@ -14,16 +14,16 @@ package keeper_test
 //
 //	"github.com/cosmos/cosmos-sdk/app"
 //	appparams "github.com/cosmos/cosmos-sdk/app/params"
-//	"github.com/cosmos/cosmos-sdk/privval"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
+//	"cosmossdk.io/privval"
+//	"cosmossdk.io/x/epoching/testepoching/datagen"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching"
-//	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	"cosmossdk.io/x/epoching/testepoching"
+//	epochingtypes "cosmossdk.io/x/epoching/types"
 //
 //	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
 //
-//	checkpointingkeeper "github.com/cosmos/cosmos-sdk/x/bls/keeper"
-//	"github.com/cosmos/cosmos-sdk/x/bls/types"
+//	checkpointingkeeper "cosmossdk.io/x/bls/keeper"
+//	"cosmossdk.io/x/bls/types"
 //)
 //
 //// FuzzWrappedCreateValidator_InsufficientTokens tests adding new validators with zero voting power

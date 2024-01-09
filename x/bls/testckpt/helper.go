@@ -6,14 +6,14 @@ package testckpt
 //
 //	"cosmossdk.io/math"
 //	appparams "github.com/cosmos/cosmos-sdk/app/params"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
+//	"cosmossdk.io/x/epoching/testepoching/datagen"
 //	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 //	"github.com/cosmos/gogoproto/proto"
 //	"github.com/stretchr/testify/require"
 //
 //	"github.com/cosmos/cosmos-sdk/simapp"
 //
-//	epochingkeeper "github.com/cosmos/cosmos-sdk/x/epoching/keeper"
+//	epochingkeeper "cosmossdk.io/x/epoching/keeper"
 //
 //	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
 //
@@ -21,8 +21,8 @@ package testckpt
 //	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 //	sdk "github.com/cosmos/cosmos-sdk/types"
 //	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-//	"github.com/cosmos/cosmos-sdk/x/bls/keeper"
-//	"github.com/cosmos/cosmos-sdk/x/bls/types"
+//	"cosmossdk.io/x/bls/keeper"
+//	"cosmossdk.io/x/bls/types"
 //	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 //	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 //)

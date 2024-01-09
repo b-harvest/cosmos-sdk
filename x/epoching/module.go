@@ -11,14 +11,14 @@ import (
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
+	"cosmossdk.io/x/epoching/client/cli"
+	"cosmossdk.io/x/epoching/keeper"
+	"cosmossdk.io/x/epoching/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/cosmos/cosmos-sdk/x/epoching/client/cli"
-	"github.com/cosmos/cosmos-sdk/x/epoching/keeper"
-	"github.com/cosmos/cosmos-sdk/x/epoching/types"
 )
 
 var (

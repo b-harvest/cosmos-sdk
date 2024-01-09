@@ -8,7 +8,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+	"cosmossdk.io/x/epoching/types"
 )
 
 // CheckMsgCreateValidator performs checks on a given `MsgCreateValidator` message

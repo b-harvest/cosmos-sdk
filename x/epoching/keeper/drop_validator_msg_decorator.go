@@ -1,8 +1,8 @@
 package keeper
 
 import (
+	epochingtypes "cosmossdk.io/x/epoching/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 

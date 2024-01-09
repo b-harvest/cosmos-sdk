@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/x/epoching/keeper"
-	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+	"cosmossdk.io/x/epoching/keeper"
+	"cosmossdk.io/x/epoching/types"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 

@@ -7,8 +7,8 @@ package epoching
 //	sdk "github.com/cosmos/cosmos-sdk/types"
 //	"github.com/cosmos/cosmos-sdk/types/module"
 //	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-//	epochingsimulation "github.com/cosmos/cosmos-sdk/x/epoching/simulation"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	epochingsimulation "cosmossdk.io/x/epoching/simulation"
+//	"cosmossdk.io/x/epoching/types"
 //	"github.com/cosmos/cosmos-sdk/x/simulation"
 //)
 //

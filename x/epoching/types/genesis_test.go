@@ -8,8 +8,8 @@ package types_test
 //	"github.com/cosmos/cosmos-sdk/testutil/nullify"
 //	"github.com/stretchr/testify/require"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	"cosmossdk.io/x/epoching"
+//	"cosmossdk.io/x/epoching/types"
 //)
 //
 //func TestGenesis(t *testing.T) {

@@ -5,9 +5,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	blstypes "cosmossdk.io/x/bls/types"
+
+	epochingtypes "cosmossdk.io/x/epoching/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
-	blstypes "github.com/cosmos/cosmos-sdk/x/bls/types"
-	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
 )
 
 func GenRandomValSet(n int) epochingtypes.ValidatorSet {

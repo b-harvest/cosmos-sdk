@@ -15,14 +15,14 @@ import (
 	tmconfig "github.com/cometbft/cometbft/config"
 	tmos "github.com/cometbft/cometbft/libs/os"
 
-	"github.com/cosmos/cosmos-sdk/privval"
+	"cosmossdk.io/privval"
 
+	"cosmossdk.io/x/bls/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
 	cosmoscli "github.com/cosmos/cosmos-sdk/x/staking/client/cli"
 	staketypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )

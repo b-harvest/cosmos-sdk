@@ -10,8 +10,9 @@ import (
 	"github.com/cometbft/cometbft/p2p"
 	"github.com/cosmos/go-bip39"
 
+	"cosmossdk.io/privval"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
-	"github.com/cosmos/cosmos-sdk/privval"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

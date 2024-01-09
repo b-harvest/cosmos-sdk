@@ -5,8 +5,8 @@ import (
 
 	"cosmossdk.io/store/prefix"
 
+	"cosmossdk.io/x/bls/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
 )
 
 // GetValidatorBlsKeySet returns the set of validators of a given epoch with BLS public key

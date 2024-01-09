@@ -12,7 +12,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
+	"cosmossdk.io/x/bls/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module

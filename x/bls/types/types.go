@@ -7,7 +7,7 @@ import (
 
 	"github.com/boljen/go-bitmap"
 
-	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
+	epochingtypes "cosmossdk.io/x/epoching/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"

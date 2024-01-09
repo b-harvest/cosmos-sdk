@@ -1,8 +1,8 @@
 package bls
 
 import (
-	"github.com/cosmos/cosmos-sdk/x/bls/keeper"
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
+	"cosmossdk.io/x/bls/keeper"
+	"cosmossdk.io/x/bls/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

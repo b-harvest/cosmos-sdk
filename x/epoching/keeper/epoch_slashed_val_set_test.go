@@ -5,13 +5,13 @@ package keeper_test
 //	"sort"
 //	"testing"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
+//	"cosmossdk.io/x/epoching/testepoching/datagen"
 //
 //	"github.com/stretchr/testify/require"
 //
 //	sdk "github.com/cosmos/cosmos-sdk/types"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	"cosmossdk.io/x/epoching/testepoching"
+//	"cosmossdk.io/x/epoching/types"
 //)
 //
 //func FuzzSlashedValSet(f *testing.F) {

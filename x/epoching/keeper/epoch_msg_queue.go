@@ -8,8 +8,8 @@ import (
 
 	"cosmossdk.io/store/prefix"
 
+	"cosmossdk.io/x/epoching/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/epoching/types"
 )
 
 // InitMsgQueue initialises the msg queue length of the current epoch to 0

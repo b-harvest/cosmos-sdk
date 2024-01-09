@@ -5,8 +5,8 @@ import (
 	tmcrypto "github.com/cometbft/cometbft/crypto"
 	tmtypes "github.com/cometbft/cometbft/types"
 
+	"cosmossdk.io/x/epoching/testepoching/datagen"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
-	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 

@@ -7,9 +7,9 @@ import (
 
 	"cosmossdk.io/store/prefix"
 
+	"cosmossdk.io/x/bls/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
 )
 
 type RegistrationState struct {

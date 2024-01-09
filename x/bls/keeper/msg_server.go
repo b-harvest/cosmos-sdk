@@ -6,9 +6,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
+	epochingtypes "cosmossdk.io/x/epoching/types"
 
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
+	"cosmossdk.io/x/bls/types"
 )
 
 type msgServer struct {

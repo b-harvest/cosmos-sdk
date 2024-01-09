@@ -17,7 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/cosmos/cosmos-sdk/privval"
+	"cosmossdk.io/privval"
 )
 
 const defaultConfigTemplate = `# This is a TOML config file.

@@ -17,7 +17,6 @@ require (
 	github.com/99designs/keyring v1.2.1
 	github.com/bgentry/speakeasy v0.1.1-0.20220910012023-760eaf8b6816
 	github.com/bits-and-blooms/bitset v1.8.0
-	github.com/boljen/go-bitmap v0.0.0-20151001105940-23cd2fb0ce7d
 	github.com/chzyer/readline v1.5.1
 	github.com/cockroachdb/apd/v2 v2.0.2
 	github.com/cockroachdb/errors v1.11.1
@@ -69,8 +68,6 @@ require (
 	pgregory.net/rapid v1.1.0
 	sigs.k8s.io/yaml v1.3.0
 )
-
-require github.com/jinzhu/copier v0.3.5
 
 require (
 	filippo.io/edwards25519 v1.0.0 // indirect

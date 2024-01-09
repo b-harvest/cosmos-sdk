@@ -6,8 +6,8 @@ package bls_test
 //
 //	"github.com/cometbft/cometbft/crypto/ed25519"
 //
-//	"github.com/cosmos/cosmos-sdk/privval"
-//	"github.com/cosmos/cosmos-sdk/x/bls"
+//	"cosmossdk.io/privval"
+//	"cosmossdk.io/x/bls"
 //
 //	"github.com/stretchr/testify/require"
 //
@@ -21,7 +21,7 @@ package bls_test
 //
 //	"github.com/cosmos/cosmos-sdk/simapp"
 //
-//	"github.com/cosmos/cosmos-sdk/x/bls/types"
+//	"cosmossdk.io/x/bls/types"
 //)
 //
 //func TestInitGenesis(t *testing.T) {

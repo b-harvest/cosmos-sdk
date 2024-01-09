@@ -6,8 +6,8 @@ import (
 
 	"cosmossdk.io/store/prefix"
 
+	"cosmossdk.io/x/epoching/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/epoching/types"
 )
 
 const (

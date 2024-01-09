@@ -7,15 +7,15 @@ import (
 	"github.com/cometbft/cometbft/crypto/ed25519"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cosmos/cosmos-sdk/privval"
+	"cosmossdk.io/privval"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
 
+	"cosmossdk.io/x/bls/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 

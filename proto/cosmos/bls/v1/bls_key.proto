@@ -3,7 +3,7 @@ package cosmos.bls.v1;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/cosmos/cosmos-sdk/x/bls/types";
+option go_package = "cosmossdk.io/x/bls/types";
 
 // BlsKey wraps BLS public key with PoP
 message BlsKey {

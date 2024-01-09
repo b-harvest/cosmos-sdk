@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
+	"cosmossdk.io/x/epoching/testepoching/datagen"
 )
 
 func TestValidatorSet_FindValidatorWithIndex(t *testing.T) {

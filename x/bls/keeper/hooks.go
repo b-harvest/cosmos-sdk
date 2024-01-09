@@ -3,8 +3,8 @@ package keeper
 import (
 	"context"
 
+	"cosmossdk.io/x/bls/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
 )
 
 // Implements CheckpointingHooks interface

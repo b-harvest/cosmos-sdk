@@ -14,11 +14,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
+	epochingtypes "cosmossdk.io/x/epoching/types"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
 
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
+	"cosmossdk.io/x/bls/types"
 )
 
 type (

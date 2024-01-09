@@ -14,8 +14,8 @@ package simulation_test
 //	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 //	"github.com/cosmos/cosmos-sdk/types/module"
 //	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/simulation"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	"cosmossdk.io/x/epoching/simulation"
+//	"cosmossdk.io/x/epoching/types"
 //)
 //
 //// TestRandomizedGenState tests the normal scenario of applying RandomizedGenState given a fixed seed.

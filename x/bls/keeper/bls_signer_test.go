@@ -1,9 +1,10 @@
 package keeper_test
 
 import (
+	epochingtypes "cosmossdk.io/x/epoching/types"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
 )

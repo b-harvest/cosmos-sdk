@@ -14,8 +14,8 @@ package simulation_test
 //
 //	"github.com/cosmos/cosmos-sdk/app"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/simulation"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	"cosmossdk.io/x/epoching/simulation"
+//	"cosmossdk.io/x/epoching/types"
 //)
 //
 //// nolint:deadcode,unused,varcheck

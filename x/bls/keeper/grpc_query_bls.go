@@ -7,8 +7,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"cosmossdk.io/x/bls/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bls/types"
 )
 
 func (k Keeper) BlsPublicKeyList(c context.Context, req *types.QueryBlsPublicKeyListRequest) (*types.QueryBlsPublicKeyListResponse, error) {

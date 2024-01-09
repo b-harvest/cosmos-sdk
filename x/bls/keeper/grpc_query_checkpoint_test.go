@@ -7,7 +7,7 @@ package keeper_test
 //
 //	"github.com/cosmos/cosmos-sdk/types/query"
 //
-//	"github.com/cosmos/cosmos-sdk/x/bls/keeper"
+//	"cosmossdk.io/x/bls/keeper"
 //
 //	"github.com/golang/mock/gomock"
 //
@@ -15,9 +15,9 @@ package keeper_test
 //
 //	"github.com/cosmos/cosmos-sdk/testutil/mocks"
 //
-//	epochingtypes "github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	epochingtypes "cosmossdk.io/x/epoching/types"
 //
-//	"github.com/cosmos/cosmos-sdk/x/bls/types"
+//	"cosmossdk.io/x/bls/types"
 //
 //	"github.com/stretchr/testify/require"
 //
@@ -25,7 +25,7 @@ package keeper_test
 //
 //	testkeeper "github.com/cosmos/cosmos-sdk/testutil/keeper"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
+//	"cosmossdk.io/x/epoching/testepoching/datagen"
 //)
 //
 //func FuzzQueryEpoch(f *testing.F) {

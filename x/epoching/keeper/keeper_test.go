@@ -5,8 +5,8 @@ package keeper_test
 //
 //	"github.com/stretchr/testify/require"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching"
-//	"github.com/cosmos/cosmos-sdk/x/epoching/types"
+//	"cosmossdk.io/x/epoching/testepoching"
+//	"cosmossdk.io/x/epoching/types"
 //)
 //
 //func TestParams(t *testing.T) {

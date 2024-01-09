@@ -6,9 +6,9 @@ import (
 
 	"cosmossdk.io/store/prefix"
 
+	"cosmossdk.io/x/epoching/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/epoching/types"
 )
 
 // GetValidatorSet returns the set of validators of a given epoch, where the validators are ordered by their address in ascending order

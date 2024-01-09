@@ -18,6 +18,10 @@ import (
 	nftkeeper "cosmossdk.io/x/nft/keeper"
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 
+	epochingkeeper "cosmossdk.io/x/epoching/keeper"
+
+	blskeeper "cosmossdk.io/x/bls/keeper"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -35,11 +39,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	blskeeper "github.com/cosmos/cosmos-sdk/x/bls/keeper"
 	consensuskeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
-	epochingkeeper "github.com/cosmos/cosmos-sdk/x/epoching/keeper"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
@@ -88,7 +90,7 @@ type SimApp struct {
 
 	// Babylon modules
 	EpochingKeeper epochingkeeper.Keeper
-	BlsKeeper      blskeeper.Keeper
+	BLSKeeper      blskeeper.Keeper
 
 	// simulation manager
 	sm *module.SimulationManager
@@ -193,7 +195,7 @@ func NewSimApp(
 		&app.ConsensusParamsKeeper,
 		&app.CircuitBreakerKeeper,
 		&app.EpochingKeeper,
-		&app.BlsKeeper,
+		&app.BLSKeeper,
 	); err != nil {
 		panic(err)
 	}

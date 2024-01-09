@@ -11,9 +11,9 @@ package types_test
 //
 //	testkeeper "github.com/cosmos/cosmos-sdk/testutil/keeper"
 //
-//	"github.com/cosmos/cosmos-sdk/x/epoching/testepoching/datagen"
+//	"cosmossdk.io/x/epoching/testepoching/datagen"
 //
-//	"github.com/cosmos/cosmos-sdk/x/bls/types"
+//	"cosmossdk.io/x/bls/types"
 //)
 //
 //// a single validator

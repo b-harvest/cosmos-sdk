@@ -36,11 +36,11 @@ package cli_test
 //	"github.com/cosmos/cosmos-sdk/app"
 //	"github.com/cosmos/cosmos-sdk/app/params"
 //
-//	"github.com/cosmos/cosmos-sdk/privval"
+//	"cosmossdk.io/privval"
 //
 //	testutilcli "github.com/cosmos/cosmos-sdk/testutil/cli"
 //
-//	checkpointcli "github.com/cosmos/cosmos-sdk/x/bls/client/cli"
+//	checkpointcli "cosmossdk.io/x/bls/client/cli"
 //)
 //
 //// TODO: bump 50

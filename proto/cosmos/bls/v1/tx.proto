@@ -9,7 +9,7 @@ import "cosmos_proto/cosmos.proto";
 import "cosmos/msg/v1/msg.proto";
 import "amino/amino.proto";
 
-option go_package = "github.com/cosmos/cosmos-sdk/x/bls/types";
+option go_package = "cosmossdk.io/x/bls/types";
 
 // Msg defines the bls Msg service.
 service Msg {
