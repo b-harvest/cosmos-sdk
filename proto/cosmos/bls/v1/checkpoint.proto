@@ -3,6 +3,8 @@ package cosmos.bls.v1;
 
 import "google/protobuf/timestamp.proto";
 import "gogoproto/gogo.proto";
+import "cosmos/msg/v1/msg.proto";
+import "amino/amino.proto";
 
 option go_package = "github.com/cosmos/cosmos-sdk/x/bls/types";
 
@@ -71,7 +73,8 @@ message CheckpointStateUpdate {
 
 // BlsSig wraps the BLS sig with meta data.
 message BlsSig {
-  option (gogoproto.equal) = false;
+  option (cosmos.msg.v1.signer) = "signer_address";
+  option (gogoproto.equal)      = false;
 
   // epoch_num defines the epoch number that the BLS sig is signed on
   uint64 epoch_num = 1;

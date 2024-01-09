@@ -4,10 +4,8 @@ import (
 	"errors"
 	"io"
 	"os"
-	"path/filepath"
 
 	cmtcfg "github.com/cometbft/cometbft/config"
-	tmtypes "github.com/cometbft/cometbft/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
@@ -225,15 +223,16 @@ func newApp(
 
 	homeDir := cast.ToString(appOpts.Get(flags.FlagHome))
 
-	chainID := cast.ToString(appOpts.Get(flags.FlagChainID))
-	if chainID == "" {
-		// fallback to genesis chain-id
-		appGenesis, err := tmtypes.GenesisDocFromFile(filepath.Join(homeDir, "config", "genesis.json"))
-		if err != nil {
-			panic(err)
-		}
-		chainID = appGenesis.ChainID
-	}
+	//chainID := cast.ToString(appOpts.Get(flags.FlagChainID))
+	//if chainID == "" {
+	//	// fallback to genesis chain-id
+	//	genutiltypes.AppGenesisFromFile
+	//	appGenesis, err := tmtypes.GenesisDocFromFile(filepath.Join(homeDir, "config", "genesis.json"))
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//	chainID = appGenesis.ChainID
+	//}
 
 	tempApp := simapp.NewSimApp(log.NewNopLogger(), dbm.NewMemDB(), nil, true, nil, simtestutil.NewAppOptionsWithFlagHome(tempDir()))
 	encodingConfig := params.EncodingConfig{

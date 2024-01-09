@@ -7,6 +7,7 @@ import "cosmos/bls/v1/bls_key.proto";
 import "cosmos/staking/v1beta1/tx.proto";
 import "cosmos_proto/cosmos.proto";
 import "cosmos/msg/v1/msg.proto";
+import "amino/amino.proto";
 
 option go_package = "github.com/cosmos/cosmos-sdk/x/bls/types";
 
@@ -24,6 +25,9 @@ service Msg {
 // MsgAddBlsSig defines a message to add a bls signature from a
 // validator
 message MsgAddBlsSig {
+  option (cosmos.msg.v1.signer) = "signer";
+  option (amino.name)           = "cosmos-sdk/MsgAddBlsSig";
+
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
 
@@ -40,6 +44,9 @@ message MsgAddBlsSigResponse {}
 
 // MsgWrappedCreateValidator defines a wrapped message to create a validator
 message MsgWrappedCreateValidator {
+  option (cosmos.msg.v1.signer) = "msg_create_validator";
+  option (amino.name)           = "cosmos-sdk/MsgWrappedCreateValidator";
+
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
 

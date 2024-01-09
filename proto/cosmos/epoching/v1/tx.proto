@@ -7,6 +7,7 @@ import "cosmos/epoching/v1/params.proto";
 
 import "cosmos_proto/cosmos.proto";
 import "cosmos/msg/v1/msg.proto";
+import "amino/amino.proto";
 
 option go_package = "github.com/cosmos/cosmos-sdk/x/epoching/types";
 
@@ -32,6 +33,9 @@ service Msg {
 
 // MsgWrappedDelegate is the message for delegating stakes
 message MsgWrappedDelegate {
+  option (cosmos.msg.v1.signer) = "msg";
+  option (amino.name)           = "cosmos-sdk/MsgWrappedDelegate";
+
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
 
@@ -43,6 +47,9 @@ message MsgWrappedDelegateResponse {}
 
 // MsgWrappedUndelegate is the message for undelegating stakes
 message MsgWrappedUndelegate {
+  option (cosmos.msg.v1.signer) = "msg";
+  option (amino.name)           = "cosmos-sdk/MsgWrappedUndelegate";
+
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
 
@@ -56,6 +63,9 @@ message MsgWrappedUndelegateResponse {}
 // MsgWrappedDelegate is the message for moving bonded stakes from a
 // validator to another validator
 message MsgWrappedBeginRedelegate {
+  option (cosmos.msg.v1.signer) = "msg";
+  option (amino.name)           = "cosmos-sdk/MsgWrappedBeginRedelegate";
+
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
 

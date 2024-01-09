@@ -2,6 +2,8 @@ package types
 
 import (
 	errorsmod "cosmossdk.io/errors"
+	//epochingv1 "github.com/cosmos/cosmos-sdk/api/cosmos/epoching/v1"
+	//epochingv1 "github.com/cosmos/cosmos-sdk/x/epoching/types/epoching/v1"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -51,6 +53,35 @@ func (msg MsgWrappedDelegate) Type() string { return TypeMsgWrappedDelegate }
 //		return msg.Msg.GetSignBytes()
 //	}
 //
+
+//func GetSignersFromMsgWrappedDelegate(msg protov2.Message) ([][]byte, error) {
+//	msgv2, ok := msg.(*epochingv1.MsgWrappedDelegate)
+//	if !ok {
+//		return nil, nil
+//	}
+//
+//	//msgv2.Msg.
+//	//
+//	//msgv1 := MsgWrappedDelegate{
+//	//	Msg: msgv2.Msg,
+//	//	//Authority: msgv2.Authority,
+//	//}
+//	//
+//	signers := [][]byte{}
+//	//for _, signer := range msgv2.Msg.DelegatorAddress {
+//	//	signers = append(signers, signer.Bytes())
+//	//}
+//
+//	addr := sdk.MustAccAddressFromBech32(msgv2.Msg.DelegatorAddress)
+//	signers = append(signers, addr.Bytes())
+//	return signers, nil
+//}
+//
+//func (msg MsgWrappedDelegate) GetSigners() []sdk.AccAddress {
+//	addr := sdk.MustAccAddressFromBech32(msg.Msg.DelegatorAddress)
+//	return []sdk.AccAddress{addr}
+//}
+
 // // ValidateBasic implements the sdk.Msg interface.
 func (msg MsgWrappedDelegate) ValidateBasic() error {
 	// TODO: bump 50

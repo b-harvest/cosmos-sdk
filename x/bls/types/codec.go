@@ -12,7 +12,6 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 
 // TODO: interface wiring
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
-
 	// Register messages
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgAddBlsSig{},
