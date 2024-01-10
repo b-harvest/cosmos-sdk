@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"cosmossdk.io/core/address"
+	"cosmossdk.io/core/appmodule"
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
@@ -26,6 +27,13 @@ import (
 var (
 	_ module.AppModule      = AppModule{}
 	_ module.AppModuleBasic = AppModuleBasic{}
+	//_ module.AppModuleSimulation = AppModule{}
+	_ module.HasServices    = AppModule{}
+	_ module.HasInvariants  = AppModule{}
+	_ module.HasABCIGenesis = AppModule{}
+	//_ module.HasABCIEndBlock     = AppModule{}
+	_ appmodule.AppModule = AppModule{}
+	//_ appmodule.HasBeginBlocker = AppModule{}
 )
 
 // ----------------------------------------------------------------------------
@@ -47,12 +55,13 @@ func (AppModuleBasic) Name() string {
 	return types.ModuleName
 }
 
-func (AppModuleBasic) RegisterCodec(cdc *codec.LegacyAmino) {
-	types.RegisterCodec(cdc)
-}
+//// Deprecated
+//func (AppModuleBasic) RegisterCodec(cdc *codec.LegacyAmino) {
+//	types.RegisterCodec(cdc)
+//}
 
 func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	types.RegisterCodec(cdc)
+	types.RegisterLegacyAminoCodec(cdc)
 }
 
 // RegisterInterfaces registers the module's interface types

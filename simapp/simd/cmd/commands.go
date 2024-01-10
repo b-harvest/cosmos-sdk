@@ -16,6 +16,7 @@ import (
 
 	"cosmossdk.io/simapp"
 	"cosmossdk.io/simapp/params"
+	cmd "cosmossdk.io/simapp/simd/cmd/blscmd"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
@@ -129,6 +130,8 @@ func initRootCmd(
 
 	server.AddCommands(rootCmd, simapp.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
 
+	//gentxModule := simapp.ModuleBasics[genutiltypes.ModuleName].(genutil.AppModuleBasic)
+
 	// add keybase, auxiliary RPC, query, genesis, and tx child commands
 	rootCmd.AddCommand(
 		server.StatusCommand(),
@@ -136,6 +139,11 @@ func initRootCmd(
 		queryCommand(),
 		txCommand(),
 		keys.Commands(),
+
+		// bls
+		cmd.CreateBlsKeyCmd(),
+		cmd.GenBlsCmd(),
+		//cmd.AddGenBlsCmd(gentxModule.GenTxValidator),
 	)
 }
 

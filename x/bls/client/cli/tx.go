@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	flag "github.com/spf13/pflag"
+
 	"cosmossdk.io/core/address"
 	"github.com/spf13/cobra"
 
@@ -86,8 +88,66 @@ func CmdTxAddBlsSig() *cobra.Command {
 	return cmd
 }
 
+// LEGACY
+
+func flagSetDescriptionCreate() *flag.FlagSet {
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+
+	fs.String(cosmoscli.FlagMoniker, "", "The validator's name")
+	fs.String(cosmoscli.FlagIdentity, "", "The optional identity signature (ex. UPort or Keybase)")
+	fs.String(cosmoscli.FlagWebsite, "", "The validator's (optional) website")
+	fs.String(cosmoscli.FlagSecurityContact, "", "The validator's (optional) security contact email")
+	fs.String(cosmoscli.FlagDetails, "", "The validator's (optional) details")
+
+	return fs
+}
+
+// NewCreateValidatorCmd returns a CLI command handler for creating a MsgCreateValidator transaction.
+func NewCreateValidatorCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create-validator",
+		Short: "create new validator initialized with a self-delegation to it",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			txf, err := tx.NewFactoryCLI(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			txf, msg, err := newBuildCreateValidatorMsg(clientCtx, txf, cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxWithFactory(clientCtx, txf, msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(cosmoscli.FlagSetPublicKey())
+	cmd.Flags().AddFlagSet(cosmoscli.FlagSetAmount())
+	cmd.Flags().AddFlagSet(flagSetDescriptionCreate())
+	cmd.Flags().AddFlagSet(cosmoscli.FlagSetCommissionCreate())
+	cmd.Flags().AddFlagSet(cosmoscli.FlagSetMinSelfDelegation())
+
+	cmd.Flags().String(cosmoscli.FlagIP, "", fmt.Sprintf("The node's public IP. It takes effect only when used in combination with --%s", flags.FlagGenerateOnly))
+	cmd.Flags().String(cosmoscli.FlagNodeID, "", "The node's ID")
+	flags.AddTxFlagsToCmd(cmd)
+
+	_ = cmd.MarkFlagRequired(flags.FlagFrom)
+	_ = cmd.MarkFlagRequired(cosmoscli.FlagAmount)
+	_ = cmd.MarkFlagRequired(cosmoscli.FlagPubKey)
+	_ = cmd.MarkFlagRequired(cosmoscli.FlagMoniker)
+
+	return cmd
+}
+
 func CmdWrappedCreateValidator(ac address.Codec) *cobra.Command {
-	cmd := cosmoscli.NewCreateValidatorCmd(ac)
+	//cmd := cosmoscli.NewCreateValidatorCmd(ac)
+	cmd := NewCreateValidatorCmd()
 	cmd.Long = strings.TrimSpace(
 		string(`create-validator will create a new validator initialized
 with a self-delegation to it using the BLS key generated for the validator (e.g., via babylond create-bls-key).
@@ -125,6 +185,7 @@ before running the command (e.g., via babylond create-bls-key).`))
 		panic(err)
 	}
 
+	// TODO: fix
 	defaultNodeHome := filepath.Join(userHomeDir, ".babylond")
 	cmd.Flags().String(flags.FlagHome, defaultNodeHome, "The node home directory")
 

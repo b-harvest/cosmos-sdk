@@ -6,7 +6,6 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/bls12381"
 	ed255192 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
@@ -69,8 +68,14 @@ func (m *MsgAddBlsSig) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{signer}
 }
 
-func (m *MsgWrappedCreateValidator) VerifyPoP(valPubkey cryptotypes.PubKey) bool {
-	return m.Key.Pop.IsValid(*m.Key.Pubkey, valPubkey)
+// TODO: fixed
+func (m *MsgWrappedCreateValidator) VerifyPoP() bool {
+	var pubKey ed255192.PubKey
+	err := pubKey.Unmarshal(m.MsgCreateValidator.Pubkey.GetValue())
+	if err != nil {
+		return false
+	}
+	return m.Key.Pop.IsValid(*m.Key.Pubkey, &pubKey)
 }
 
 // ValidateBasic validates statelesss message elements
@@ -89,7 +94,7 @@ func (m *MsgWrappedCreateValidator) ValidateBasic() error {
 	if err != nil {
 		return err
 	}
-	ok := m.VerifyPoP(&pubKey)
+	ok := m.VerifyPoP()
 	if !ok {
 		return errors.New("the proof-of-possession is not valid")
 	}

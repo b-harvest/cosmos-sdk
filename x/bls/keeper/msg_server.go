@@ -37,10 +37,40 @@ func (m msgServer) AddBlsSig(goCtx context.Context, msg *types.MsgAddBlsSig) (*t
 	return &types.MsgAddBlsSigResponse{}, nil
 }
 
+// TODO: add become bls validator, pop msg
+
 // WrappedCreateValidator registers validator's BLS public key
 // and forwards corresponding MsgCreateValidator message to
 // the epoching module
 func (m msgServer) WrappedCreateValidator(goCtx context.Context, msg *types.MsgWrappedCreateValidator) (*types.MsgWrappedCreateValidatorResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// stateless checks on the inside `MsgCreateValidator` msg
+	//if err := m.k.epochingKeeper.CheckMsgCreateValidator(ctx, msg.MsgCreateValidator); err != nil {
+	//	return nil, err
+	//}
+
+	if msg.VerifyPoP() != true {
+		return nil, fmt.Errorf("the proof-of-possession is not valid")
+	}
+	valAddr, err := sdk.ValAddressFromBech32(msg.MsgCreateValidator.ValidatorAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	// store BLS public key
+	err = m.k.CreateRegistration(ctx, *msg.Key.Pubkey, valAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgWrappedCreateValidatorResponse{}, err
+}
+
+// WrappedCreateValidatorOrigin registers validator's BLS public key
+// and forwards corresponding MsgCreateValidator message to
+// the epoching module
+func (m msgServer) WrappedCreateValidatorOrigin(goCtx context.Context, msg *types.MsgWrappedCreateValidator) (*types.MsgWrappedCreateValidatorResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// stateless checks on the inside `MsgCreateValidator` msg
