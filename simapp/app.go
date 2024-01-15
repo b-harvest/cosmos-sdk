@@ -419,6 +419,7 @@ func NewSimApp(
 			privSigner.WrappedPV,
 			&app.EpochingKeeper,
 			privSigner.ClientCtx,
+			app,
 		)
 	} else {
 		app.BLSKeeper = blskeeper.NewKeeper(
@@ -428,6 +429,7 @@ func NewSimApp(
 			nil,
 			&app.EpochingKeeper,
 			client.Context{},
+			app,
 		)
 	}
 
@@ -493,6 +495,8 @@ func NewSimApp(
 
 	// NOTE: upgrade module is required to be prioritized
 	app.ModuleManager.SetOrderPreBlockers(
+		// Set VoteExtension enable height
+		blstypes.ModuleName,
 		upgradetypes.ModuleName,
 	)
 	// During begin block slashing happens after distr.BeginBlocker so that

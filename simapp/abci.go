@@ -28,6 +28,7 @@ type (
 )
 
 func NewVoteExtensionHandler() *VoteExtensionHandler {
+	// TODO: CDK vote Extension handler
 	return &VoteExtensionHandler{}
 }
 

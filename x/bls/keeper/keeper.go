@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"cosmossdk.io/log"
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	storetypes "cosmossdk.io/store/types"
 
@@ -21,6 +22,13 @@ import (
 	"cosmossdk.io/x/bls/types"
 )
 
+// BaseAppParamManager defines an interrace that BaseApp is expected to fullfil
+// that allows upgrade handlers to modify BaseApp parameters.
+type BaseAppParamManager interface {
+	GetConsensusParams(ctx sdk.Context) cmtproto.ConsensusParams
+	StoreConsensusParams(ctx sdk.Context, cp cmtproto.ConsensusParams) error
+}
+
 type (
 	Keeper struct {
 		//storeService   store.KVStoreService
@@ -31,8 +39,19 @@ type (
 		epochingKeeper types.EpochingKeeper
 		hooks          types.CheckpointingHooks
 		clientCtx      client.Context
+		ParamManager   BaseAppParamManager
 	}
+
+	//CdkHandler struct {
+	//	pm BaseAppParamManager
+	//}
 )
+
+//func SetCdkHandler(pm BaseAppParamManager) *CdkHandler {
+//	return &CdkHandler{
+//		pm: pm,
+//	}
+//}
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
@@ -42,6 +61,7 @@ func NewKeeper(
 	signer BlsSigner,
 	ek types.EpochingKeeper,
 	clientCtx client.Context,
+	pm BaseAppParamManager,
 ) Keeper {
 
 	// TODO:
@@ -57,6 +77,7 @@ func NewKeeper(
 		epochingKeeper: ek,
 		hooks:          nil,
 		clientCtx:      clientCtx,
+		ParamManager:   pm,
 	}
 }
 
