@@ -163,6 +163,19 @@ func (st *Store) VersionExists(version int64) bool {
 	return st.tree.VersionExists(version)
 }
 
+func (st *Store) DeleteAll(start, end []byte) error {
+	iter := st.Iterator(start, end)
+	keys := [][]byte{}
+	for ; iter.Valid(); iter.Next() {
+		keys = append(keys, iter.Key())
+	}
+	iter.Close()
+	for _, key := range keys {
+		st.Delete(key)
+	}
+	return nil
+}
+
 // GetAllVersions returns all versions in the iavl tree
 func (st *Store) GetAllVersions() []int {
 	return st.tree.AvailableVersions()

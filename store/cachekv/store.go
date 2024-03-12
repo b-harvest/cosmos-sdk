@@ -406,3 +406,22 @@ func (store *Store) setCacheValue(key, value []byte, dirty bool) {
 		store.unsortedCache[keyStr] = struct{}{}
 	}
 }
+
+func (store *Store) VersionExists(version int64) bool {
+	return store.parent.VersionExists(version)
+}
+
+func (store *Store) DeleteAll(start, end []byte) error {
+	store.dirtyItems(start, end)
+	// memdb iterator
+	cachedIter, err := store.sortedCache.Iterator(start, end)
+	if err != nil {
+		return err
+	}
+	defer cachedIter.Close()
+	for ; cachedIter.Valid(); cachedIter.Next() {
+		// `Delete` would not touch sortedCache so it's okay to perform inside iterator
+		store.Delete(cachedIter.Key())
+	}
+	return nil
+}

@@ -64,6 +64,9 @@ type Context struct {
 	streamingManager     storetypes.StreamingManager
 	cometInfo            comet.BlockInfo
 	headerInfo           header.Info
+
+	txIndex          int
+	traceSpanContext context.Context
 }
 
 // Proposed rename, not done to avoid API breakage
@@ -91,6 +94,12 @@ func (c Context) TransientKVGasConfig() storetypes.GasConfig    { return c.trans
 func (c Context) StreamingManager() storetypes.StreamingManager { return c.streamingManager }
 func (c Context) CometInfo() comet.BlockInfo                    { return c.cometInfo }
 func (c Context) HeaderInfo() header.Info                       { return c.headerInfo }
+func (c Context) TraceSpanContext() context.Context {
+	return c.traceSpanContext
+}
+func (c Context) TxIndex() int {
+	return c.txIndex
+}
 
 // clone the header before returning
 func (c Context) BlockHeader() cmtproto.Header {
@@ -326,6 +335,17 @@ func (c Context) Value(key interface{}) interface{} {
 	}
 
 	return c.baseCtx.Value(key)
+}
+
+// WithTxIndex returns a Context with the current transaction index that's being processed
+func (c Context) WithTxIndex(txIndex int) Context {
+	c.txIndex = txIndex
+	return c
+}
+
+func (c Context) WithTraceSpanContext(ctx context.Context) Context {
+	c.traceSpanContext = ctx
+	return c
 }
 
 // ----------------------------------------------------------------------------

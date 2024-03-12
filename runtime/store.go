@@ -112,6 +112,14 @@ func (kvStoreAdapter) GetStoreType() storetypes.StoreType {
 	panic("unimplemented")
 }
 
+func (kvStoreAdapter) VersionExists(version int64) bool {
+	panic("unimplemented")
+}
+
+func (kvStoreAdapter) DeleteAll(start, end []byte) error {
+	panic("unimplemented")
+}
+
 func (s kvStoreAdapter) Delete(key []byte) {
 	err := s.store.Delete(key)
 	if err != nil {

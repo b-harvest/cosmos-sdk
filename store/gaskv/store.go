@@ -174,3 +174,11 @@ func (gi *gasIterator) consumeSeekGas() {
 	}
 	gi.gasMeter.ConsumeGas(gi.gasConfig.IterNextCostFlat, types.GasIterNextCostFlatDesc)
 }
+
+func (gs *Store) VersionExists(version int64) bool {
+	return gs.parent.VersionExists(version)
+}
+
+func (gs *Store) DeleteAll(start, end []byte) error {
+	return gs.parent.DeleteAll(start, end)
+}

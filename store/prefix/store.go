@@ -114,6 +114,22 @@ func (s Store) ReverseIterator(start, end []byte) types.Iterator {
 	return newPrefixIterator(s.prefix, start, end, iter)
 }
 
+func (s Store) VersionExists(version int64) bool {
+	return s.parent.VersionExists(version)
+}
+
+func (s Store) DeleteAll(start, end []byte) error {
+	newstart := cloneAppend(s.prefix, start)
+
+	var newend []byte
+	if end == nil {
+		newend = cpIncr(s.prefix)
+	} else {
+		newend = cloneAppend(s.prefix, end)
+	}
+	return s.parent.DeleteAll(newstart, newend)
+}
+
 var _ types.Iterator = (*prefixIterator)(nil)
 
 type prefixIterator struct {

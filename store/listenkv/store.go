@@ -140,3 +140,11 @@ func (s *Store) CacheWrap() types.CacheWrap {
 func (s *Store) CacheWrapWithTrace(_ io.Writer, _ types.TraceContext) types.CacheWrap {
 	panic("cannot CacheWrapWithTrace a ListenKVStore")
 }
+
+func (s *Store) VersionExists(version int64) bool {
+	return s.parent.VersionExists(version)
+}
+
+func (s *Store) DeleteAll(start, end []byte) error {
+	return s.parent.DeleteAll(start, end)
+}
