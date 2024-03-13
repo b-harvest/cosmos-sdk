@@ -244,7 +244,7 @@ func NewSimApp(
 		voteExtHandler := NewVoteExtensionHandler()
 		voteExtHandler.SetHandlers(bApp)
 	}
-	baseAppOptions = append(baseAppOptions, voteExtOp, baseapp.SetOptimisticExecution())
+	baseAppOptions = append(baseAppOptions, voteExtOp)
 
 	bApp := baseapp.NewBaseApp(appName, logger, db, txConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
@@ -523,6 +523,16 @@ func NewSimApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.setAnteHandler(txConfig)
+
+	// app.InternalFinalizeBlock is the Cosmos SDK native FinalizeBlock logic.
+	// To run custom FinalizeBlock logic, make the following modifications Replace
+	// app.InternalFinalizeBlock with your custom function
+	//
+	// NOTE: If you want to perform custom FinalizeBlock logic,
+	// SetOptimisticExecution should be called after SetFinalizeBlockHandler.
+	//
+	// app.SetFinalizeBlockHandler(FinalizeBlockFunc)
+	baseapp.SetOptimisticExecution()(app.BaseApp)
 
 	// In v0.46, the SDK introduces _postHandlers_. PostHandlers are like
 	// antehandlers, but are run _after_ the `runMsgs` execution. They are also

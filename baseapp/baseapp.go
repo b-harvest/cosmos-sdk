@@ -84,6 +84,7 @@ type BaseApp struct {
 	prepareProposal    sdk.PrepareProposalHandler     // ABCI PrepareProposal
 	extendVote         sdk.ExtendVoteHandler          // ABCI ExtendVote handler
 	verifyVoteExt      sdk.VerifyVoteExtensionHandler // ABCI VerifyVoteExtension handler
+	finalizeBlock      oe.FinalizeBlockFunc           // ABCI FinalizeBlock handler
 	prepareCheckStater sdk.PrepareCheckStater         // logic to run during commit using the checkState
 	precommiter        sdk.Precommiter                // logic to run during commit using the deliverState
 

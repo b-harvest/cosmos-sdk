@@ -871,7 +871,15 @@ func (app *BaseApp) FinalizeBlock(req *abci.RequestFinalizeBlock) (*abci.Respons
 	}
 
 	// if no OE is running, just run the block (this is either a block replay or a OE that got aborted)
-	res, err := app.internalFinalizeBlock(context.Background(), req)
+	var (
+		res *abci.ResponseFinalizeBlock
+		err error
+	)
+	if app.finalizeBlock == nil {
+		res, err = app.internalFinalizeBlock(context.Background(), req)
+	} else {
+		res, err = app.finalizeBlock(context.Background(), req)
+	}
 	if res != nil {
 		res.AppHash = app.workingHash()
 	}

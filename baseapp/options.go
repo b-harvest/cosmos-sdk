@@ -108,7 +108,11 @@ func SetChainID(chainID string) func(*BaseApp) {
 // SetOptimisticExecution enables optimistic execution.
 func SetOptimisticExecution(opts ...func(*oe.OptimisticExecution)) func(*BaseApp) {
 	return func(app *BaseApp) {
-		app.optimisticExec = oe.NewOptimisticExecution(app.logger, app.internalFinalizeBlock, opts...)
+		finalizeBlockFunc := app.finalizeBlock
+		if finalizeBlockFunc == nil {
+			finalizeBlockFunc = app.internalFinalizeBlock
+		}
+		app.optimisticExec = oe.NewOptimisticExecution(app.logger, finalizeBlockFunc, opts...)
 	}
 }
 
@@ -356,4 +360,12 @@ func (app *BaseApp) SetStoreMetrics(gatherer metrics.StoreMetrics) {
 // SetStreamingManager sets the streaming manager for the BaseApp.
 func (app *BaseApp) SetStreamingManager(manager storetypes.StreamingManager) {
 	app.streamingManager = manager
+}
+
+func (app *BaseApp) SetFinalizeBlockHandler(handler oe.FinalizeBlockFunc) {
+	if app.sealed {
+		panic("SetFinalizeblockHandler() on sealed BaseApp")
+	}
+
+	app.finalizeBlock = handler
 }
