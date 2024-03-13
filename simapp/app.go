@@ -524,14 +524,14 @@ func NewSimApp(
 	app.SetEndBlocker(app.EndBlocker)
 	app.setAnteHandler(txConfig)
 
-	// app.InternalFinalizeBlock is the Cosmos SDK native FinalizeBlock logic.
-	// To run custom FinalizeBlock logic, make the following modifications Replace
-	// app.InternalFinalizeBlock with your custom function
+	// To register your custom FinalizeBlock logic, you need to uncomment
+	// `app.SetFinalizeBlockHandler` and replace app.internalFinalizeBlock to
+	// custom FinalizeBlockFunc
 	//
 	// NOTE: If you want to perform custom FinalizeBlock logic,
 	// SetOptimisticExecution should be called after SetFinalizeBlockHandler.
 	//
-	// app.SetFinalizeBlockHandler(FinalizeBlockFunc)
+	// app.SetFinalizeBlockHandler(app.internalFinalizeBlock)
 	baseapp.SetOptimisticExecution()(app.BaseApp)
 
 	// In v0.46, the SDK introduces _postHandlers_. PostHandlers are like
