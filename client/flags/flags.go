@@ -89,6 +89,9 @@ const (
 	FlagLogLevel   = "log_level"
 	FlagLogFormat  = "log_format"
 	FlagLogNoColor = "log_no_color"
+
+	// OPE
+	FlagOPEEnabled = "ope-enabled"
 )
 
 // List of supported output formats

@@ -840,6 +840,157 @@ func (app *BaseApp) internalFinalizeBlock(ctx context.Context, req *abci.Request
 	}, nil
 }
 
+func (app *BaseApp) internalFinalizeBlockForOPE(ctx context.Context, req *abci.RequestFinalizeBlock) (*abci.ResponseFinalizeBlock, error) {
+	var events []abci.Event
+
+	if err := app.checkHalt(req.Height, req.Time); err != nil {
+		return nil, err
+	}
+
+	if err := app.validateFinalizeBlockHeight(req); err != nil {
+		return nil, err
+	}
+
+	if app.cms.TracingEnabled() {
+		app.cms.SetTracingContext(storetypes.TraceContext(
+			map[string]any{"blockHeight": req.Height},
+		))
+	}
+
+	header := cmtproto.Header{
+		ChainID:            app.chainID,
+		Height:             req.Height,
+		Time:               req.Time,
+		ProposerAddress:    req.ProposerAddress,
+		NextValidatorsHash: req.NextValidatorsHash,
+		AppHash:            app.LastCommitID().Hash,
+	}
+
+	// finalizeBlockState should be set on InitChain or ProcessProposal. If it is
+	// nil, it means we are replaying this block and we need to set the state here
+	// given that during block replay ProcessProposal is not executed by CometBFT.
+	if app.finalizeBlockState == nil {
+		app.setState(execModeFinalize, header)
+	}
+
+	// Context is now updated with Header information.
+	app.finalizeBlockState.SetContext(app.finalizeBlockState.Context().
+		WithBlockHeader(header).
+		WithHeaderHash(req.Hash).
+		WithHeaderInfo(coreheader.Info{
+			ChainID: app.chainID,
+			Height:  req.Height,
+			Time:    req.Time,
+			Hash:    req.Hash,
+			AppHash: app.LastCommitID().Hash,
+		}).
+		WithConsensusParams(app.GetConsensusParams(app.finalizeBlockState.Context())).
+		WithVoteInfos(req.DecidedLastCommit.Votes).
+		WithExecMode(sdk.ExecModeFinalize).
+		WithCometInfo(cometInfo{
+			Misbehavior:     req.Misbehavior,
+			ValidatorsHash:  req.NextValidatorsHash,
+			ProposerAddress: req.ProposerAddress,
+			LastCommit:      req.DecidedLastCommit,
+		}))
+
+	// GasMeter must be set after we get a context with updated consensus params.
+	gasMeter := app.getBlockGasMeter(app.finalizeBlockState.Context())
+	app.finalizeBlockState.SetContext(app.finalizeBlockState.Context().WithBlockGasMeter(gasMeter))
+
+	if app.checkState != nil {
+		app.checkState.SetContext(app.checkState.Context().
+			WithBlockGasMeter(gasMeter).
+			WithHeaderHash(req.Hash))
+	}
+
+	if err := app.preBlock(req); err != nil {
+		return nil, err
+	}
+
+	beginBlock, err := app.beginBlock(req)
+	if err != nil {
+		return nil, err
+	}
+
+	// First check for an abort signal after beginBlock, as it's the first place
+	// we spend any significant amount of time.
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+		// continue
+	}
+
+	events = append(events, beginBlock.Events...)
+
+	// Reset the gas meter so that the AnteHandlers aren't required to
+	gasMeter = app.getBlockGasMeter(app.finalizeBlockState.Context())
+	app.finalizeBlockState.SetContext(app.finalizeBlockState.Context().WithBlockGasMeter(gasMeter))
+
+	// Iterate over all raw transactions in the proposal and attempt to execute
+	// them, gathering the execution results.
+	//
+	// NOTE: Not all raw transactions may adhere to the sdk.Tx interface, e.g.
+	// vote extensions, so skip those.
+	txResults := make([]*abci.ExecTxResult, 0, len(req.Txs))
+	for _, rawTx := range req.Txs {
+		var response *abci.ExecTxResult
+
+		if _, err := app.txDecoder(rawTx); err == nil {
+			response = app.deliverTx(rawTx)
+		} else {
+			// In the case where a transaction included in a block proposal is malformed,
+			// we still want to return a default response to comet. This is because comet
+			// expects a response for each transaction included in a block proposal.
+			response = sdkerrors.ResponseExecTxResultWithEvents(
+				sdkerrors.ErrTxDecode,
+				0,
+				0,
+				nil,
+				false,
+			)
+		}
+
+		// check after every tx if we should abort
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		default:
+			// continue
+		}
+
+		txResults = append(txResults, response)
+	}
+
+	if app.finalizeBlockState.ms.TracingEnabled() {
+		app.finalizeBlockState.ms = app.finalizeBlockState.ms.SetTracingContext(nil).(storetypes.CacheMultiStore)
+	}
+
+	endBlock, err := app.endBlock(app.finalizeBlockState.Context())
+	if err != nil {
+		return nil, err
+	}
+
+	// check after endBlock if we should abort, to avoid propagating the result
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+		// continue
+	}
+
+	events = append(events, endBlock.Events...)
+	cp := app.GetConsensusParams(app.finalizeBlockState.Context())
+
+	return &abci.ResponseFinalizeBlock{
+		Events:                events,
+		TxResults:             txResults,
+		ValidatorUpdates:      endBlock.ValidatorUpdates,
+		ConsensusParamUpdates: &cp,
+	}, nil
+}
+
 // FinalizeBlock will execute the block proposal provided by RequestFinalizeBlock.
 // Specifically, it will execute an application's BeginBlock (if defined), followed
 // by the transactions in the proposal, finally followed by the application's
@@ -871,15 +1022,11 @@ func (app *BaseApp) FinalizeBlock(req *abci.RequestFinalizeBlock) (*abci.Respons
 	}
 
 	// if no OE is running, just run the block (this is either a block replay or a OE that got aborted)
-	var (
-		res *abci.ResponseFinalizeBlock
-		err error
-	)
-	if app.finalizeBlock == nil {
-		res, err = app.internalFinalizeBlock(context.Background(), req)
-	} else {
-		res, err = app.finalizeBlock(context.Background(), req)
+	internalFinalizeBlockFunc := app.internalFinalizeBlock
+	if app.opeEnabled {
+		internalFinalizeBlockFunc = app.internalFinalizeBlockForOPE
 	}
+	res, err := internalFinalizeBlockFunc(context.Background(), req)
 	if res != nil {
 		res.AppHash = app.workingHash()
 	}

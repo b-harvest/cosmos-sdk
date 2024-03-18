@@ -11,7 +11,6 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
-	"github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/utils/tracing"
 	"go.opentelemetry.io/otel/attribute"
@@ -71,7 +70,7 @@ func (dt *deliverTxTask) Increment() {
 
 // Scheduler processes tasks concurrently
 type Scheduler interface {
-	ProcessAll(ctx sdk.Context, reqs []*types.DeliverTxEntry) ([]abci.ResponseFinalizeBlock, error)
+	ProcessAll(ctx sdk.Context, reqs []*DeliverTxEntry) ([]abci.ResponseFinalizeBlock, error)
 }
 
 type scheduler struct {
@@ -145,7 +144,7 @@ func (s *scheduler) findConflicts(task *deliverTxTask) (bool, []int) {
 	return valid, conflicts
 }
 
-func toTasks(reqs []*types.DeliverTxEntry) []*deliverTxTask {
+func toTasks(reqs []*DeliverTxEntry) []*deliverTxTask {
 	res := make([]*deliverTxTask, 0, len(reqs))
 	for idx, r := range reqs {
 		res = append(res, &deliverTxTask{
@@ -204,7 +203,7 @@ func allValidated(tasks []*deliverTxTask) bool {
 	return true
 }
 
-func (s *scheduler) PrefillEstimates(reqs []*types.DeliverTxEntry) {
+func (s *scheduler) PrefillEstimates(reqs []*DeliverTxEntry) {
 	// iterate over TXs, update estimated writesets where applicable
 	for i, req := range reqs {
 		mappedWritesets := req.EstimatedWritesets
@@ -229,7 +228,7 @@ func (s *scheduler) emitMetrics() {
 	telemetry.SetGauge(float32(s.metrics.maxIncarnation), "scheduler", "max_incarnation")
 }
 
-func (s *scheduler) ProcessAll(ctx sdk.Context, reqs []*types.DeliverTxEntry) ([]abci.ResponseFinalizeBlock, error) {
+func (s *scheduler) ProcessAll(ctx sdk.Context, reqs []*DeliverTxEntry) ([]abci.ResponseFinalizeBlock, error) {
 	// initialize mutli-version stores if they haven't been initialized yet
 	s.tryInitMultiVersionStore(ctx)
 	// prefill estimates

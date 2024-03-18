@@ -1,16 +1,17 @@
-package types
+package tasks
 
 import (
 	"cosmossdk.io/store/multiversion"
 	storetypes "cosmossdk.io/store/types"
 	abci "github.com/cometbft/cometbft/abci/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // DeliverTxEntry represents an individual transaction's request within a batch.
 // This can be extended to include tx-level tracing or metadata
 type DeliverTxEntry struct {
 	Request            abci.RequestFinalizeBlock
-	SdkTx              Tx
+	SdkTx              sdk.Tx
 	Checksum           [32]byte
 	AbsoluteIndex      int
 	EstimatedWritesets MappedWritesets

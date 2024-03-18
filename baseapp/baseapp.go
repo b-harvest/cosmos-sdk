@@ -84,9 +84,10 @@ type BaseApp struct {
 	prepareProposal    sdk.PrepareProposalHandler     // ABCI PrepareProposal
 	extendVote         sdk.ExtendVoteHandler          // ABCI ExtendVote handler
 	verifyVoteExt      sdk.VerifyVoteExtensionHandler // ABCI VerifyVoteExtension handler
-	finalizeBlock      oe.FinalizeBlockFunc           // ABCI FinalizeBlock handler
 	prepareCheckStater sdk.PrepareCheckStater         // logic to run during commit using the checkState
 	precommiter        sdk.Precommiter                // logic to run during commit using the deliverState
+
+	opeEnabled bool // is OPE enabled
 
 	addrPeerFilter sdk.PeerFilter // filter peers by address and port
 	idPeerFilter   sdk.PeerFilter // filter peers by node ID
@@ -205,6 +206,7 @@ func NewBaseApp(
 		txDecoder:        txDecoder,
 		fauxMerkleMode:   false,
 		queryGasLimit:    math.MaxUint64,
+		opeEnabled:       false,
 	}
 
 	for _, option := range options {

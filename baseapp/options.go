@@ -105,12 +105,16 @@ func SetChainID(chainID string) func(*BaseApp) {
 	return func(app *BaseApp) { app.chainID = chainID }
 }
 
+func SetOPEEnabled(enabled bool) func(*BaseApp) {
+	return func(app *BaseApp) { app.opeEnabled = enabled }
+}
+
 // SetOptimisticExecution enables optimistic execution.
 func SetOptimisticExecution(opts ...func(*oe.OptimisticExecution)) func(*BaseApp) {
 	return func(app *BaseApp) {
-		finalizeBlockFunc := app.finalizeBlock
-		if finalizeBlockFunc == nil {
-			finalizeBlockFunc = app.internalFinalizeBlock
+		finalizeBlockFunc := app.internalFinalizeBlock
+		if app.opeEnabled {
+			finalizeBlockFunc = app.internalFinalizeBlockForOPE
 		}
 		app.optimisticExec = oe.NewOptimisticExecution(app.logger, finalizeBlockFunc, opts...)
 	}
@@ -362,10 +366,10 @@ func (app *BaseApp) SetStreamingManager(manager storetypes.StreamingManager) {
 	app.streamingManager = manager
 }
 
-func (app *BaseApp) SetFinalizeBlockHandler(handler oe.FinalizeBlockFunc) {
+func (app *BaseApp) SetOPEEnabled(enabled bool) {
 	if app.sealed {
-		panic("SetFinalizeblockHandler() on sealed BaseApp")
+		panic("SetOPEEnabled() on sealed BaseApp")
 	}
 
-	app.finalizeBlock = handler
+	app.opeEnabled = enabled
 }

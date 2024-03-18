@@ -220,19 +220,9 @@ func NewSimApp(
 		voteExtHandler := NewVoteExtensionHandler()
 		voteExtHandler.SetHandlers(bApp)
 	}
-	baseAppOptions = append(baseAppOptions, voteExtOp)
+	baseAppOptions = append(baseAppOptions, voteExtOp, baseapp.SetOptimisticExecution())
 
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
-
-	// app.internalFinalizeBlock is the Cosmos SDK native FinalizeBlock logic.
-	// To run custom FinalizeBlock logic, make the following modifications Replace
-	// app.internalFinalizeBlock with your custom function
-	//
-	// NOTE: If you want to perform custom FinalizeBlock logic,
-	// SetOptimisticExecution should be called after SetFinalizeBlockHandler.
-	//
-	// app.SetFinalizeBlockHandler(app.internalFinalizeBlock)
-	baseapp.SetOptimisticExecution()(app.BaseApp)
 
 	// register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {

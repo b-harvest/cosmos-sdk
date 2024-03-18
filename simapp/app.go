@@ -244,7 +244,7 @@ func NewSimApp(
 		voteExtHandler := NewVoteExtensionHandler()
 		voteExtHandler.SetHandlers(bApp)
 	}
-	baseAppOptions = append(baseAppOptions, voteExtOp)
+	baseAppOptions = append(baseAppOptions, voteExtOp, baseapp.SetOptimisticExecution())
 
 	bApp := baseapp.NewBaseApp(appName, logger, db, txConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
@@ -523,16 +523,6 @@ func NewSimApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.setAnteHandler(txConfig)
-
-	// To register your custom FinalizeBlock logic, you need to uncomment
-	// `app.SetFinalizeBlockHandler` and replace app.internalFinalizeBlock to
-	// custom FinalizeBlockFunc
-	//
-	// NOTE: If you want to perform custom FinalizeBlock logic,
-	// SetOptimisticExecution should be called after SetFinalizeBlockHandler.
-	//
-	// app.SetFinalizeBlockHandler(app.internalFinalizeBlock)
-	baseapp.SetOptimisticExecution()(app.BaseApp)
 
 	// In v0.46, the SDK introduces _postHandlers_. PostHandlers are like
 	// antehandlers, but are run _after_ the `runMsgs` execution. They are also

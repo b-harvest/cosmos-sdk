@@ -19,7 +19,6 @@ import (
 	"cosmossdk.io/store/cachekv"
 	"cosmossdk.io/store/cachemulti"
 	"cosmossdk.io/store/dbadapter"
-	"github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/utils/tracing"
 )
@@ -29,10 +28,10 @@ type mockDeliverTxFunc func(ctx sdk.Context, req abci.RequestFinalizeBlock, tx s
 var testStoreKey = storetypes.NewKVStoreKey("mock")
 var itemKey = []byte("key")
 
-func requestList(n int) []*types.DeliverTxEntry {
-	tasks := make([]*types.DeliverTxEntry, n)
+func requestList(n int) []*DeliverTxEntry {
+	tasks := make([]*DeliverTxEntry, n)
 	for i := 0; i < n; i++ {
-		tasks[i] = &types.DeliverTxEntry{
+		tasks[i] = &DeliverTxEntry{
 			Request: abci.RequestFinalizeBlock{
 				Tx: []byte(fmt.Sprintf("%d", i)),
 			},
@@ -79,7 +78,7 @@ func TestProcessAll(t *testing.T) {
 		workers       int
 		runs          int
 		before        func(ctx sdk.Context)
-		requests      []*types.DeliverTxEntry
+		requests      []*DeliverTxEntry
 		deliverTxFunc mockDeliverTxFunc
 		addStores     bool
 		expectedErr   error
