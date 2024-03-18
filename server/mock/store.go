@@ -168,6 +168,14 @@ func (ms multiStore) WorkingHash() []byte {
 	panic("not implemented")
 }
 
+func (ms multiStore) SetKVStores(func(storetypes.StoreKey, storetypes.KVStore) storetypes.CacheWrap) storetypes.MultiStore {
+	panic("not implemented")
+}
+
+func (ms multiStore) StoreKeys() []storetypes.StoreKey {
+	panic("not implemented")
+}
+
 var _ storetypes.KVStore = kvStore{}
 
 type kvStore struct {
@@ -238,4 +246,12 @@ func (kv kvStore) ReverseSubspaceIterator(prefix []byte) storetypes.Iterator {
 
 func NewCommitMultiStore() storetypes.CommitMultiStore {
 	return multiStore{kv: make(map[storetypes.StoreKey]kvStore)}
+}
+
+func (kv kvStore) DeleteAll(start, end []byte) error {
+	panic("not implemented")
+}
+
+func (kv kvStore) VersionExists(version int64) bool {
+	panic("not implemented")
 }
