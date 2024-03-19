@@ -2,10 +2,12 @@ package baseapp
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
 	"math"
 	"sort"
 	"strconv"
+	"sync"
 
 	"github.com/cockroachdb/errors"
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -27,6 +29,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	"github.com/cosmos/cosmos-sdk/tasks"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -1141,4 +1144,120 @@ func (app *BaseApp) Close() error {
 	}
 
 	return errors.Join(errs...)
+}
+
+// ProcessTXsWithOCC runs the transactions concurrently via OCC
+// func (app *BaseApp) ProcessTxsWithOCC(ctx sdk.Context, txs [][]byte, typedTxs []sdk.Tx, absoluteTxIndices []int) ([]*abci.ExecTxResult, sdk.Context) {
+func (app *BaseApp) ProcessTxsWithOPE(ctx sdk.Context, txs [][]byte, typedTxs []sdk.Tx, txIndices []int) ([]*abci.ExecTxResult, sdk.Context) {
+	entries := make([]*tasks.DeliverTxEntry, len(txs))
+	// var span trace.Span
+	// if app.TracingEnabled {
+	// 	_, span = app.TracingInfo.Start("GenerateEstimatedWritesets")
+	// }
+	wg := sync.WaitGroup{}
+	for txIndex, tx := range txs {
+		wg.Add(1)
+		go func(txIndex int, tx []byte) {
+			defer wg.Done()
+			deliverTxEntry := &tasks.DeliverTxEntry{
+				Request:       abci.RequestFinalizeBlock{Txs: [][]byte{tx}},
+				SdkTx:         typedTxs[txIndex],
+				Checksum:      sha256.Sum256(tx),
+				AbsoluteIndex: txIndices[txIndex],
+			}
+			// get prefill estimate
+			// estimatedWritesets, err := app.AccessControlKeeper.GenerateEstimatedWritesets(ctx, app.GetAnteDepGenerator(), txIndex, typedTxs[txIndex])
+			// if no error, then we assign the mapped writesets for prefill estimate
+			// if err == nil {
+			// 	deliverTxEntry.EstimatedWritesets = estimatedWritesets
+			// }
+			entries[txIndex] = deliverTxEntry
+		}(txIndex, tx)
+	}
+
+	wg.Wait()
+
+	// if app.TracingEnabled {
+	// 	span.End()
+	// }
+
+	batchResult := app.DeliverTxBatch(ctx, tasks.DeliverTxBatchRequest{TxEntries: entries})
+
+	execResults := make([]*abci.ExecTxResult, 0, len(batchResult.Results))
+	for _, r := range batchResult.Results {
+		execResults = append(execResults, r.Response.TxResults...)
+	}
+
+	return execResults, ctx
+}
+
+// DeliverTxBatch executes multiple txs
+func (app *BaseApp) DeliverTxBatch(ctx sdk.Context, req tasks.DeliverTxBatchRequest) (res tasks.DeliverTxBatchResponse) {
+	concurrencyWorkers := 20 // TODO(dudong2): move to config?
+	scheduler := tasks.NewScheduler(concurrencyWorkers, app.DeliverTx)
+	// This will basically no-op the actual prefill if the metadata for the txs is empty
+
+	// process all txs, this will also initializes the MVS if prefill estimates was disabled
+	txRes, err := scheduler.ProcessAll(ctx, req.TxEntries)
+	if err != nil {
+		// TODO: handle error
+	}
+
+	responses := make([]*tasks.DeliverTxResult, 0, len(req.TxEntries))
+	for _, tx := range txRes {
+		responses = append(responses, &tasks.DeliverTxResult{Response: tx})
+	}
+	return tasks.DeliverTxBatchResponse{Results: responses}
+}
+
+// DeliverTx implements the ABCI interface and executes a tx in DeliverTx mode.
+// State only gets persisted if all messages are valid and get executed successfully.
+// Otherwise, the ResponseDeliverTx will contain relevant error information.
+// Regardless of tx execution outcome, the ResponseDeliverTx will contain relevant
+// gas execution context.
+func (app *BaseApp) DeliverTx(ctx sdk.Context, req abci.RequestFinalizeBlock, tx sdk.Tx, checksum [32]byte) (res abci.ResponseFinalizeBlock) {
+	// defer telemetry.MeasureSince(time.Now(), "abci", "deliver_tx")
+	// defer func() {
+	// 	for _, streamingListener := range app.abciListeners {
+	// 		if err := streamingListener.ListenDeliverTx(app.deliverState.ctx, req, res); err != nil {
+	// 			app.logger.Error("DeliverTx listening hook failed", "err", err)
+	// 		}
+	// 	}
+	// }()
+
+	gInfo := sdk.GasInfo{}
+	// resultStr := "successful"
+
+	// defer func() {
+	// 	telemetry.IncrCounter(1, "tx", "count")
+	// 	telemetry.IncrCounter(1, "tx", resultStr)
+	// 	telemetry.SetGauge(float32(gInfo.GasUsed), "tx", "gas", "used")
+	// 	telemetry.SetGauge(float32(gInfo.GasWanted), "tx", "gas", "wanted")
+	// }()
+
+	txbz, err := app.txEncoder(tx)
+	if err != nil {
+		return errorsmod.ResponseDeliverTxWithEvents(err, gInfo.GasWanted, gInfo.GasUsed, nil, app.trace)
+	}
+	gInfo, result, anteEvents, err := app.runTx(execModeFinalize, txbz)
+	if err != nil {
+		// resultStr = "failed"
+		// if we have a result, use those events instead of just the anteEvents
+		if result != nil {
+			return errorsmod.ResponseDeliverTxWithEvents(err, gInfo.GasWanted, gInfo.GasUsed, sdk.MarkEventsToIndex(result.Events, app.indexEvents), app.trace)
+		}
+		return errorsmod.ResponseDeliverTxWithEvents(err, gInfo.GasWanted, gInfo.GasUsed, sdk.MarkEventsToIndex(anteEvents, app.indexEvents), app.trace)
+	}
+
+	return abci.ResponseFinalizeBlock{
+		TxResults: []*abci.ExecTxResult{
+			{
+				GasWanted: int64(gInfo.GasWanted), // TODO: Should type accept unsigned ints?
+				GasUsed:   int64(gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
+				Log:       result.Log,
+				Data:      result.Data,
+				Events:    sdk.MarkEventsToIndex(result.Events, app.indexEvents),
+			},
+		},
+	}
 }

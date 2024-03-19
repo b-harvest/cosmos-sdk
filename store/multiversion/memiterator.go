@@ -4,6 +4,7 @@ import (
 	dbm "github.com/cosmos/cosmos-db"
 
 	"cosmossdk.io/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Iterates over iterKVCache items.
@@ -54,7 +55,7 @@ type validationIterator struct {
 	mvStore      MultiVersionStore
 	writeset     WriteSet
 	index        int
-	abortChannel chan types.Abort
+	abortChannel chan sdk.Abort
 }
 
 func (store *Store) newMVSValidationIterator(
@@ -63,7 +64,7 @@ func (store *Store) newMVSValidationIterator(
 	items *dbm.MemDB,
 	ascending bool,
 	writeset WriteSet,
-	abortChannel chan types.Abort,
+	abortChannel chan sdk.Abort,
 ) *validationIterator {
 	var iter types.Iterator
 	var err error
@@ -104,7 +105,7 @@ func (vi *validationIterator) Value() []byte {
 
 	// if we have an estimate, write to abort channel
 	if val.IsEstimate() {
-		vi.abortChannel <- types.NewEstimateAbort(val.Index())
+		vi.abortChannel <- sdk.NewEstimateAbort(val.Index())
 	}
 
 	// if we have a deleted value, return nil

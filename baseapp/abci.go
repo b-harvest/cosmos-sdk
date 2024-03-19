@@ -933,35 +933,68 @@ func (app *BaseApp) internalFinalizeBlockForOPE(ctx context.Context, req *abci.R
 	//
 	// NOTE: Not all raw transactions may adhere to the sdk.Tx interface, e.g.
 	// vote extensions, so skip those.
-	txResults := make([]*abci.ExecTxResult, 0, len(req.Txs))
-	for _, rawTx := range req.Txs {
-		var response *abci.ExecTxResult
+	// txResults := make([]*abci.ExecTxResult, 0, len(req.Txs))
+	// for _, rawTx := range req.Txs {
+	// 	var response *abci.ExecTxResult
 
-		if _, err := app.txDecoder(rawTx); err == nil {
-			response = app.deliverTx(rawTx)
+	// 	if _, err := app.txDecoder(rawTx); err == nil {
+	// 		response = app.deliverTx(rawTx)
+	// 	} else {
+	// 		// In the case where a transaction included in a block proposal is malformed,
+	// 		// we still want to return a default response to comet. This is because comet
+	// 		// expects a response for each transaction included in a block proposal.
+	// 		response = sdkerrors.ResponseExecTxResultWithEvents(
+	// 			sdkerrors.ErrTxDecode,
+	// 			0,
+	// 			0,
+	// 			nil,
+	// 			false,
+	// 		)
+	// 	}
+
+	// 	// check after every tx if we should abort
+	// 	select {
+	// 	case <-ctx.Done():
+	// 		return nil, ctx.Err()
+	// 	default:
+	// 		// continue
+	// 	}
+
+	// 	txResults = append(txResults, response)
+	// }
+
+	// run the prioritized txs
+
+	txResults := make([]*abci.ExecTxResult, len(req.Txs))
+	typedTxs := []sdk.Tx{}
+	txIndices := []int{}
+
+	for i, tx := range req.Txs {
+		typedTx, err := app.txDecoder(tx)
+		// get txkey from tx
+		if err != nil {
+			app.Logger().Error(fmt.Sprintf("error decoding transaction at index %d due to %s", i, err))
+			typedTxs = append(typedTxs, nil)
 		} else {
-			// In the case where a transaction included in a block proposal is malformed,
-			// we still want to return a default response to comet. This is because comet
-			// expects a response for each transaction included in a block proposal.
-			response = sdkerrors.ResponseExecTxResultWithEvents(
-				sdkerrors.ErrTxDecode,
-				0,
-				0,
-				nil,
-				false,
-			)
+			// if isEVM, _ := evmante.IsEVMMessage(typedTx); isEVM {
+			// 	msg := evmtypes.MustGetEVMTransactionMessage(typedTx)
+			// 	if err := evmante.Preprocess(ctx, msg, app.EvmKeeper.GetParams(ctx)); err != nil {
+			// 		ctx.Logger().Error(fmt.Sprintf("error preprocessing EVM tx due to %s", err))
+			// 		typedTxs = append(typedTxs, nil)
+			// 		continue
+			// 	}
+			// }
+			typedTxs = append(typedTxs, typedTx)
 		}
-
-		// check after every tx if we should abort
-		select {
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		default:
-			// continue
-		}
-
-		txResults = append(txResults, response)
+		txIndices = append(txIndices, i)
 	}
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	txResults, ctx = app.ProcessTxsWithOPE(sdkCtx, req.Txs, typedTxs, txIndices)
+
+	// TODO(dudong2): deferred bank send -> consider it
+	// Finalize all Bank Module Transfers here so that events are included for prioritiezd txs
+	// deferredWriteEvents := app.BankKeeper.WriteDeferredBalances(ctx)
+	// events = append(events, deferredWriteEvents...)
 
 	if app.finalizeBlockState.ms.TracingEnabled() {
 		app.finalizeBlockState.ms = app.finalizeBlockState.ms.SetTracingContext(nil).(storetypes.CacheMultiStore)

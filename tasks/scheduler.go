@@ -2,8 +2,6 @@ package tasks
 
 import (
 	"context"
-	"crypto/sha256"
-	"fmt"
 	"sort"
 	"sync"
 
@@ -12,9 +10,9 @@ import (
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/utils/tracing"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
+	// "github.com/cosmos/cosmos-sdk/utils/tracing"
+	// "go.opentelemetry.io/otel/attribute"
+	// "go.opentelemetry.io/otel/trace"
 )
 
 type status string
@@ -38,11 +36,11 @@ const (
 
 type deliverTxTask struct {
 	Ctx     sdk.Context
-	AbortCh chan storetypes.Abort
+	AbortCh chan sdk.Abort
 
 	Status        status
 	Dependencies  []int
-	Abort         *storetypes.Abort
+	Abort         *sdk.Abort
 	Index         int
 	Incarnation   int
 	Request       abci.RequestFinalizeBlock
@@ -77,7 +75,6 @@ type scheduler struct {
 	deliverTx          func(ctx sdk.Context, req abci.RequestFinalizeBlock, tx sdk.Tx, checksum [32]byte) (res abci.ResponseFinalizeBlock)
 	workers            int
 	multiVersionStores map[storetypes.StoreKey]multiversion.MultiVersionStore
-	tracingInfo        *tracing.Info
 	allTasks           []*deliverTxTask
 	executeCh          chan func()
 	validateCh         chan func()
@@ -85,12 +82,11 @@ type scheduler struct {
 }
 
 // NewScheduler creates a new scheduler
-func NewScheduler(workers int, tracingInfo *tracing.Info, deliverTxFunc func(ctx sdk.Context, req abci.RequestFinalizeBlock, tx sdk.Tx, checksum [32]byte) (res abci.ResponseFinalizeBlock)) Scheduler {
+func NewScheduler(workers int, deliverTxFunc func(ctx sdk.Context, req abci.RequestFinalizeBlock, tx sdk.Tx, checksum [32]byte) (res abci.ResponseFinalizeBlock)) Scheduler {
 	return &scheduler{
-		workers:     workers,
-		deliverTx:   deliverTxFunc,
-		tracingInfo: tracingInfo,
-		metrics:     &schedulerMetrics{},
+		workers:   workers,
+		deliverTx: deliverTxFunc,
+		metrics:   &schedulerMetrics{},
 	}
 }
 
@@ -320,9 +316,6 @@ func (s *scheduler) shouldRerun(task *deliverTxTask) bool {
 }
 
 func (s *scheduler) validateTask(ctx sdk.Context, task *deliverTxTask) bool {
-	_, span := s.traceSpan(ctx, "SchedulerValidate", task)
-	defer span.End()
-
 	if s.shouldRerun(task) {
 		return false
 	}
@@ -339,9 +332,6 @@ func (s *scheduler) findFirstNonValidated() (int, bool) {
 }
 
 func (s *scheduler) validateAll(ctx sdk.Context, tasks []*deliverTxTask) ([]*deliverTxTask, error) {
-	ctx, span := s.traceSpan(ctx, "SchedulerValidateAll", nil)
-	defer span.End()
-
 	var mx sync.Mutex
 	var res []*deliverTxTask
 
@@ -373,9 +363,6 @@ func (s *scheduler) validateAll(ctx sdk.Context, tasks []*deliverTxTask) ([]*del
 
 // ExecuteAll executes all tasks concurrently
 func (s *scheduler) executeAll(ctx sdk.Context, tasks []*deliverTxTask) error {
-	ctx, span := s.traceSpan(ctx, "SchedulerExecuteAll", nil)
-	defer span.End()
-
 	// validationWg waits for all validations to complete
 	// validations happen in separate goroutines in order to wait on previous index
 	validationWg := &sync.WaitGroup{}
@@ -416,10 +403,6 @@ func (s *scheduler) waitOnPreviousAndValidate(wg *sync.WaitGroup, task *deliverT
 }
 
 func (s *scheduler) prepareAndRunTask(wg *sync.WaitGroup, ctx sdk.Context, task *deliverTxTask) {
-	eCtx, eSpan := s.traceSpan(ctx, "SchedulerExecute", task)
-	defer eSpan.End()
-	task.Ctx = eCtx
-
 	s.executeTask(task)
 
 	s.DoValidate(func() {
@@ -427,27 +410,12 @@ func (s *scheduler) prepareAndRunTask(wg *sync.WaitGroup, ctx sdk.Context, task 
 	})
 }
 
-func (s *scheduler) traceSpan(ctx sdk.Context, name string, task *deliverTxTask) (sdk.Context, trace.Span) {
-	spanCtx, span := s.tracingInfo.StartWithContext(name, ctx.TraceSpanContext())
-	if task != nil {
-		span.SetAttributes(attribute.String("txHash", fmt.Sprintf("%X", sha256.Sum256(task.Request.Hash))))
-		span.SetAttributes(attribute.Int("txIndex", task.Index))
-		span.SetAttributes(attribute.Int("absoluteIndex", task.AbsoluteIndex))
-		span.SetAttributes(attribute.Int("txIncarnation", task.Incarnation))
-	}
-	ctx = ctx.WithTraceSpanContext(spanCtx)
-	return ctx, span
-}
-
 // prepareTask initializes the context and version stores for a task
 func (s *scheduler) prepareTask(task *deliverTxTask) {
 	ctx := task.Ctx.WithTxIndex(task.AbsoluteIndex)
 
-	_, span := s.traceSpan(ctx, "SchedulerPrepare", task)
-	defer span.End()
-
 	// initialize the context
-	abortCh := make(chan storetypes.Abort, len(s.multiVersionStores))
+	abortCh := make(chan sdk.Abort, len(s.multiVersionStores))
 
 	// if there are no stores, don't try to wrap, because there's nothing to wrap
 	if len(s.multiVersionStores) > 0 {
@@ -474,10 +442,6 @@ func (s *scheduler) prepareTask(task *deliverTxTask) {
 }
 
 func (s *scheduler) executeTask(task *deliverTxTask) {
-	dCtx, dSpan := s.traceSpan(task.Ctx, "SchedulerExecuteTask", task)
-	defer dSpan.End()
-	task.Ctx = dCtx
-
 	s.prepareTask(task)
 
 	// Channel to signal the completion of deliverTx
@@ -494,7 +458,7 @@ func (s *scheduler) executeTask(task *deliverTxTask) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	var abort *storetypes.Abort
+	var abort *sdk.Abort
 	// Drain the AbortCh in a non-blocking way
 	go func() {
 		defer wg.Done()

@@ -1,0 +1,22 @@
+go 1.21
+
+toolchain go1.21.0
+
+use (
+	.
+	./client/v2
+	./depinject
+	./errors
+	./orm
+	./simapp
+	./tests
+	./store
+	./tools/cosmovisor
+	./tools/confix
+	./tools/hubl
+	./x/nft
+	./x/circuit
+	./x/feegrant
+	./x/evidence
+	./x/upgrade
+)

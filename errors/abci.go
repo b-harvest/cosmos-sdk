@@ -3,6 +3,8 @@ package errors
 import (
 	"fmt"
 	"reflect"
+
+	abci "github.com/cometbft/cometbft/abci/types"
 )
 
 const (
@@ -109,4 +111,22 @@ func errIsNil(err error) bool {
 		return val.IsNil()
 	}
 	return false
+}
+
+// ResponseDeliverTxWithEvents returns an ABCI ResponseDeliverTx object with fields filled in
+// from the given error, gas values and events.
+func ResponseDeliverTxWithEvents(err error, gw, gu uint64, events []abci.Event, debug bool) abci.ResponseFinalizeBlock {
+	space, code, log := ABCIInfo(err, debug)
+	return abci.ResponseFinalizeBlock{
+		TxResults: []*abci.ExecTxResult{
+			{
+				Codespace: space,
+				Code:      code,
+				Log:       log,
+				GasWanted: int64(gw),
+				GasUsed:   int64(gu),
+				Events:    events,
+			},
+		},
+	}
 }

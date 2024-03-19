@@ -8,6 +8,7 @@ import (
 
 	"cosmossdk.io/store/types"
 	dbm "github.com/cosmos/cosmos-db"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // exposes a handler for adding items to readset, useful for iterators
@@ -87,14 +88,14 @@ type VersionIndexedStore struct {
 	transactionIndex int
 	incarnation      int
 	// have abort channel here for aborting transactions
-	abortChannel chan types.Abort
+	abortChannel chan sdk.Abort
 }
 
 var _ types.KVStore = (*VersionIndexedStore)(nil)
 var _ ReadsetHandler = (*VersionIndexedStore)(nil)
 var _ IterateSetHandler = (*VersionIndexedStore)(nil)
 
-func NewVersionIndexedStore(parent types.KVStore, multiVersionStore MultiVersionStore, transactionIndex, incarnation int, abortChannel chan types.Abort) *VersionIndexedStore {
+func NewVersionIndexedStore(parent types.KVStore, multiVersionStore MultiVersionStore, transactionIndex, incarnation int, abortChannel chan sdk.Abort) *VersionIndexedStore {
 	return &VersionIndexedStore{
 		readset:           make(map[string][]byte),
 		writeset:          make(map[string][]byte),
@@ -146,7 +147,7 @@ func (store *VersionIndexedStore) Get(key []byte) []byte {
 	mvsValue := store.multiVersionStore.GetLatestBeforeIndex(store.transactionIndex, key)
 	if mvsValue != nil {
 		if mvsValue.IsEstimate() {
-			store.abortChannel <- types.NewEstimateAbort(mvsValue.Index())
+			store.abortChannel <- sdk.NewEstimateAbort(mvsValue.Index())
 			return nil
 		} else {
 			// This handles both detecting readset conflicts and updating readset if applicable
@@ -191,7 +192,7 @@ func (store *VersionIndexedStore) ValidateReadset() bool {
 		if mvsValue != nil {
 			if mvsValue.IsEstimate() {
 				// if we see an estimate, that means that we need to abort and rerun
-				store.abortChannel <- types.NewEstimateAbort(mvsValue.Index())
+				store.abortChannel <- sdk.NewEstimateAbort(mvsValue.Index())
 				return false
 			} else {
 				if mvsValue.IsDeleted() {

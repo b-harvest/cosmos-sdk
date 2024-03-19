@@ -7,6 +7,7 @@ import (
 
 	"cosmossdk.io/store/types"
 	db "github.com/cosmos/cosmos-db"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type MultiVersionStore interface {
@@ -22,7 +23,7 @@ type MultiVersionStore interface {
 	SetReadset(index int, readset ReadSet)
 	GetReadset(index int) ReadSet
 	ClearReadset(index int)
-	VersionedIndexedStore(index int, incarnation int, abortChannel chan types.Abort) *VersionIndexedStore
+	VersionedIndexedStore(index int, incarnation int, abortChannel chan sdk.Abort) *VersionIndexedStore
 	SetIterateset(index int, iterateset Iterateset)
 	GetIterateset(index int) Iterateset
 	ClearIterateset(index int)
@@ -58,7 +59,7 @@ func NewMultiVersionStore(parentStore types.KVStore) *Store {
 }
 
 // VersionedIndexedStore creates a new versioned index store for a given incarnation and transaction index
-func (s *Store) VersionedIndexedStore(index int, incarnation int, abortChannel chan types.Abort) *VersionIndexedStore {
+func (s *Store) VersionedIndexedStore(index int, incarnation int, abortChannel chan sdk.Abort) *VersionIndexedStore {
 	return NewVersionIndexedStore(s.parentStore, s, index, incarnation, abortChannel)
 }
 
@@ -265,10 +266,10 @@ func (s *Store) validateIterator(index int, tracker iterationTracker) bool {
 		sortedItems.Set([]byte(key), []byte{})
 	}
 	validChannel := make(chan bool, 1)
-	abortChannel := make(chan types.Abort, 1)
+	abortChannel := make(chan sdk.Abort, 1)
 
 	// listen for abort while iterating
-	go func(iterationTracker iterationTracker, items *db.MemDB, returnChan chan bool, abortChan chan types.Abort) {
+	go func(iterationTracker iterationTracker, items *db.MemDB, returnChan chan bool, abortChan chan sdk.Abort) {
 		var parentIter types.Iterator
 		expectedKeys := iterationTracker.iteratedKeys
 		foundKeys := 0
