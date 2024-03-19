@@ -2,7 +2,7 @@ package tasks
 
 import (
 	"context"
-	"sort"
+	// "sort"
 	"sync"
 
 	"cosmossdk.io/store/multiversion"
@@ -123,20 +123,20 @@ func (s *scheduler) DoExecute(work func()) {
 
 func (s *scheduler) findConflicts(task *deliverTxTask) (bool, []int) {
 	var conflicts []int
-	uniq := make(map[int]struct{})
+	// uniq := make(map[int]struct{})
 	valid := true
-	for _, mv := range s.multiVersionStores {
-		ok, mvConflicts := mv.ValidateTransactionState(task.AbsoluteIndex)
-		for _, c := range mvConflicts {
-			if _, ok := uniq[c]; !ok {
-				conflicts = append(conflicts, c)
-				uniq[c] = struct{}{}
-			}
-		}
-		// any non-ok value makes valid false
-		valid = ok && valid
-	}
-	sort.Ints(conflicts)
+	// for _, mv := range s.multiVersionStores {
+	// 	ok, mvConflicts := mv.ValidateTransactionState(task.AbsoluteIndex)
+	// 	for _, c := range mvConflicts {
+	// 		if _, ok := uniq[c]; !ok {
+	// 			conflicts = append(conflicts, c)
+	// 			uniq[c] = struct{}{}
+	// 		}
+	// 	}
+	// 	// any non-ok value makes valid false
+	// 	valid = ok && valid
+	// }
+	// sort.Ints(conflicts)
 	return valid, conflicts
 }
 
