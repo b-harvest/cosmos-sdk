@@ -403,6 +403,7 @@ func (s *scheduler) waitOnPreviousAndValidate(wg *sync.WaitGroup, task *deliverT
 }
 
 func (s *scheduler) prepareAndRunTask(wg *sync.WaitGroup, ctx sdk.Context, task *deliverTxTask) {
+	task.Ctx = ctx
 	s.executeTask(task)
 
 	s.DoValidate(func() {
