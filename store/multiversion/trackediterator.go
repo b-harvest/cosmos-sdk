@@ -58,15 +58,3 @@ func (ti *trackedIterator) Next() {
 	// call next
 	ti.Iterator.Next()
 }
-
-func (*trackedIterator) Domain() ([]byte, []byte) {
-	panic("")
-}
-
-func (*trackedIterator) Error() error {
-	panic("")
-}
-
-func (*trackedIterator) Valid() bool {
-	panic("")
-}
