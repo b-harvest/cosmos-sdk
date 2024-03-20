@@ -987,8 +987,7 @@ func (app *BaseApp) internalFinalizeBlockForOPE(ctx context.Context, req *abci.R
 		}
 		txIndices = append(txIndices, i)
 	}
-	sdkCtx := app.getContextForTx(execModeFinalize, nil)
-	txResults, ctx := app.ProcessTxsWithOPE(sdkCtx, req.Txs, typedTxs, txIndices)
+	txResults, ctx := app.ProcessTxsWithOPE(app.finalizeBlockState.Context(), req.Txs, typedTxs, txIndices)
 
 	// TODO(dudong2): deferred bank send -> consider it
 	// Finalize all Bank Module Transfers here so that events are included for prioritiezd txs

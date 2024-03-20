@@ -1235,6 +1235,8 @@ func (app *BaseApp) DeliverTx(ctx sdk.Context, req abci.RequestFinalizeBlock, tx
 	// 	telemetry.SetGauge(float32(gInfo.GasWanted), "tx", "gas", "wanted")
 	// }()
 
+	app.finalizeBlockState.SetContext(app.finalizeBlockState.Context().WithMultiStore(ctx.MultiStore()))
+
 	txbz, err := app.txEncoder(tx)
 	if err != nil {
 		return errorsmod.ResponseDeliverTxWithEvents(err, gInfo.GasWanted, gInfo.GasUsed, nil, app.trace)
