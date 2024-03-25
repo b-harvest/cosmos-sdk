@@ -1,8 +1,6 @@
 package listenkv
 
 import (
-	"io"
-
 	"cosmossdk.io/store/cachekv"
 	"cosmossdk.io/store/types"
 )
@@ -134,10 +132,4 @@ func (s *Store) GetStoreType() types.StoreType {
 // cannot be cache wrapped.
 func (s *Store) CacheWrap() types.CacheWrap {
 	return cachekv.NewStore(s)
-}
-
-// CacheWrapWithTrace implements the KVStore interface. It panics as a
-// Store cannot be cache wrapped.
-func (s *Store) CacheWrapWithTrace(_ io.Writer, _ types.TraceContext) types.CacheWrap {
-	panic("cannot CacheWrapWithTrace a ListenKVStore")
 }
