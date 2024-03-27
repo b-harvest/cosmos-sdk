@@ -745,7 +745,8 @@ func (app *BaseApp) deliverTx(tx []byte) *abci.ExecTxResult {
 		telemetry.SetGauge(float32(gInfo.GasWanted), "tx", "gas", "wanted")
 	}()
 
-	gInfo, result, anteEvents, err := app.runTx(execModeFinalize, tx)
+	ctx := app.getContextForTx(execModeFinalize, tx)
+	gInfo, result, anteEvents, err := app.runTx(ctx, execModeFinalize, tx)
 	if err != nil {
 		resultStr = "failed"
 		resp = sdkerrors.ResponseExecTxResultWithEvents(
@@ -802,13 +803,13 @@ func (app *BaseApp) endBlock(ctx context.Context) (sdk.EndBlock, error) {
 // Note, gas execution info is always returned. A reference to a Result is
 // returned if the tx does not run out of gas and if all the messages are valid
 // and execute successfully. An error is returned otherwise.
-func (app *BaseApp) runTx(mode execMode, txBytes []byte) (gInfo sdk.GasInfo, result *sdk.Result, anteEvents []abci.Event, err error) {
+func (app *BaseApp) runTx(ctx sdk.Context, mode execMode, txBytes []byte) (gInfo sdk.GasInfo, result *sdk.Result, anteEvents []abci.Event, err error) {
 	// NOTE: GasWanted should be returned by the AnteHandler. GasUsed is
 	// determined by the GasMeter. We need access to the context to get the gas
 	// meter, so we initialize upfront.
 	var gasWanted uint64
 
-	ctx := app.getContextForTx(mode, txBytes)
+	// ctx := app.getContextForTx(mode, txBytes)
 	ms := ctx.MultiStore()
 
 	// only run the tx if there is block gas remaining
@@ -1084,7 +1085,8 @@ func (app *BaseApp) PrepareProposalVerifyTx(tx sdk.Tx) ([]byte, error) {
 		return nil, err
 	}
 
-	_, _, _, err = app.runTx(execModePrepareProposal, bz)
+	ctx := app.getContextForTx(execModePrepareProposal, bz)
+	_, _, _, err = app.runTx(ctx, execModePrepareProposal, bz)
 	if err != nil {
 		return nil, err
 	}
@@ -1103,7 +1105,8 @@ func (app *BaseApp) ProcessProposalVerifyTx(txBz []byte) (sdk.Tx, error) {
 		return nil, err
 	}
 
-	_, _, _, err = app.runTx(execModeProcessProposal, txBz)
+	ctx := app.getContextForTx(execModeProcessProposal, txBz)
+	_, _, _, err = app.runTx(ctx, execModeProcessProposal, txBz)
 	if err != nil {
 		return nil, err
 	}
@@ -1241,7 +1244,7 @@ func (app *BaseApp) DeliverTx(ctx sdk.Context, req abci.RequestFinalizeBlock, tx
 	if err != nil {
 		return errorsmod.ResponseDeliverTxWithEvents(err, gInfo.GasWanted, gInfo.GasUsed, nil, app.trace)
 	}
-	gInfo, result, anteEvents, err := app.runTx(execModeFinalize, txbz)
+	gInfo, result, anteEvents, err := app.runTx(ctx, execModeFinalize, txbz) // ! 아마도... DeliverTx로 넘어온 ctx를 쭉 넘겨줘야 하지 않을까?
 	if err != nil {
 		// resultStr = "failed"
 		// if we have a result, use those events instead of just the anteEvents
