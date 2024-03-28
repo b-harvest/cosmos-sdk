@@ -140,6 +140,9 @@ var (
 	// supplied.
 	ErrInvalidGasLimit = errorsmod.Register(RootCodespace, 41, "invalid gas limit")
 
+	// ErrMempoolIsFull defines an ABCI typed error where the mempool is full.
+	ErrMempoolRateLimitExceeded = errorsmod.Register(RootCodespace, 42, "mempool rate limit exceeded")
+
 	// ErrPanic should only be set when we recovering from a panic
 	ErrPanic = errorsmod.ErrPanic
 )
