@@ -41,7 +41,8 @@ Ref: https://keepachangelog.com/en/1.0.0/
 ### Features
 
 * (baseapp) [#205](https://github.com/crypto-org-chain/cosmos-sdk/pull/205) Add `TxExecutor` baseapp option, add `TxIndex`/`TxCount`/`MsgIndex`/`BlockGasUsed` fields to `Context, to support tx parallel execution.
- 
+* (bank) [#237](https://github.com/crypto-org-chain/cosmos-sdk/pull/237) Support virtual accounts in sending coins.
+
 ## [v0.50.6](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.50.6) - 2024-04-22
 
 ### Features

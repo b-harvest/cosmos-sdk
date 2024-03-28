@@ -9,7 +9,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/log"
 	"cosmossdk.io/math"
-
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -69,6 +69,9 @@ type BaseSendKeeper struct {
 	authority string
 
 	sendRestriction *sendRestriction
+
+	// tVirtualKey is the transient store key for virtual account balances.
+	tVirtualKey storetypes.StoreKey
 }
 
 func NewBaseSendKeeper(
@@ -78,6 +81,7 @@ func NewBaseSendKeeper(
 	blockedAddrs map[string]bool,
 	authority string,
 	logger log.Logger,
+	tkey storetypes.StoreKey,
 ) BaseSendKeeper {
 	if _, err := ak.AddressCodec().StringToBytes(authority); err != nil {
 		panic(fmt.Errorf("invalid bank authority address: %w", err))
@@ -92,6 +96,7 @@ func NewBaseSendKeeper(
 		authority:       authority,
 		logger:          logger,
 		sendRestriction: newSendRestriction(),
+		tVirtualKey:     tkey,
 	}
 }
 
@@ -222,6 +227,12 @@ func (k BaseSendKeeper) SendCoins(ctx context.Context, fromAddr, toAddr sdk.AccA
 		return err
 	}
 
+	k.ensureAccountCreated(ctx, toAddr)
+	k.emitSendCoinsEvents(ctx, fromAddr, toAddr, amt)
+	return nil
+}
+
+func (k BaseSendKeeper) ensureAccountCreated(ctx context.Context, toAddr sdk.AccAddress) {
 	// Create account if recipient does not exist.
 	//
 	// NOTE: This should ultimately be removed in favor a more flexible approach
@@ -231,7 +242,10 @@ func (k BaseSendKeeper) SendCoins(ctx context.Context, fromAddr, toAddr sdk.AccA
 		defer telemetry.IncrCounter(1, "new", "account")
 		k.ak.SetAccount(ctx, k.ak.NewAccountWithAddress(ctx, toAddr))
 	}
+}
 
+// emitSendCoinsEvents emit send coins events.
+func (k BaseSendKeeper) emitSendCoinsEvents(ctx context.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) {
 	// bech32 encoding is expensive! Only do it once for fromAddr
 	fromAddrString := fromAddr.String()
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
@@ -247,8 +261,6 @@ func (k BaseSendKeeper) SendCoins(ctx context.Context, fromAddr, toAddr sdk.AccA
 			sdk.NewAttribute(types.AttributeKeySender, fromAddrString),
 		),
 	})
-
-	return nil
 }
 
 // subUnlockedCoins removes the unlocked amt coins of the given account. An error is
