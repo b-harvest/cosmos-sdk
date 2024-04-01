@@ -163,6 +163,8 @@ type RootMultiStore interface {
 type CacheMultiStore interface {
 	MultiStore
 	Write() // Writes operations to underlying KVStore
+	RunAtomic(func(CacheMultiStore) error) error
+
 	// TODO(dudong2): need to uncomment after re-implementing OPE
 	// Copy() CacheMultiStore // deep copy of CacheMultiStore
 }
