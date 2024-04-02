@@ -346,8 +346,8 @@ type CacheWrap interface {
 	// Write syncs with the underlying store.
 	Write()
 
-	// CacheWrap recursively wraps again.
-	CacheWrap() CacheWrap
+	// Discard the write set
+	Discard()
 }
 
 type CacheWrapper interface {
