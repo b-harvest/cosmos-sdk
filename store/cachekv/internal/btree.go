@@ -28,19 +28,27 @@ type BTree struct {
 
 // NewBTree creates a wrapper around `btree.BTreeG`.
 func NewBTree() BTree {
-	return BTree{
-		tree: btree.NewBTreeGOptions(byKeys, btree.Options{
+	return BTree{}
+}
+
+func (bt *BTree) lazyInit() {
+	if bt.tree == nil {
+		bt.tree = btree.NewBTreeGOptions(byKeys, btree.Options{
 			Degree:  bTreeDegree,
 			NoLocks: false,
-		}),
+		})
 	}
 }
 
-func (bt BTree) Set(key, value []byte) {
+func (bt *BTree) Set(key, value []byte) {
+	bt.lazyInit()
 	bt.tree.Set(newItem(key, value))
 }
 
 func (bt BTree) Get(key []byte) []byte {
+	if bt.tree == nil {
+		return nil
+	}
 	i, found := bt.tree.Get(newItem(key, nil))
 	if !found {
 		return nil
@@ -48,7 +56,8 @@ func (bt BTree) Get(key []byte) []byte {
 	return i.value
 }
 
-func (bt BTree) Delete(key []byte) {
+func (bt *BTree) Delete(key []byte) {
+	bt.lazyInit()
 	bt.tree.Delete(newItem(key, nil))
 }
 
@@ -68,8 +77,11 @@ func (bt BTree) ReverseIterator(start, end []byte) (types.Iterator, error) {
 
 // Copy the tree. This is a copy-on-write operation and is very fast because
 // it only performs a shadowed copy.
-func (bt BTree) Copy() BTree {
-	return BTree{
+func (bt BTree) Copy() *BTree {
+	if bt.tree == nil {
+		return &BTree{}
+	}
+	return &BTree{
 		tree: bt.tree.Copy(),
 	}
 }

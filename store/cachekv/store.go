@@ -30,6 +30,9 @@ type Store struct {
 	unsortedCache map[string]struct{}
 	sortedCache   internal.BTree // always ascending sorted
 	parent        types.KVStore
+
+	// if disableCache is true, only buffers writes but not cache reads
+	disableCache bool
 }
 
 var _ types.CacheKVStore = (*Store)(nil)
@@ -39,9 +42,12 @@ func NewStore(parent types.KVStore) *Store {
 	return &Store{
 		cache:         make(map[string]*cValue),
 		unsortedCache: make(map[string]struct{}),
-		sortedCache:   internal.NewBTree(),
 		parent:        parent,
 	}
+}
+
+func (store *Store) DisableCache() {
+	store.disableCache = true
 }
 
 // GetStoreType implements Store.
@@ -51,19 +57,26 @@ func (store *Store) GetStoreType() types.StoreType {
 
 // Get implements types.KVStore.
 func (store *Store) Get(key []byte) (value []byte) {
-	store.mtx.Lock()
-	defer store.mtx.Unlock()
-
 	types.AssertValidKey(key)
+
+	store.mtx.Lock()
 
 	cacheValue, ok := store.cache[conv.UnsafeBytesToStr(key)]
 	if !ok {
+		store.mtx.Unlock()
+
 		value = store.parent.Get(key)
+		if store.disableCache {
+			return value
+		}
+
+		store.mtx.Lock()
 		store.setCacheValue(key, value, false)
 	} else {
 		value = cacheValue.value
 	}
 
+	store.mtx.Unlock()
 	return value
 }
 
@@ -398,6 +411,12 @@ func (store *Store) clearUnsortedCacheSubset(unsorted []*kv.Pair, sortState sort
 // A `nil` value means a deletion.
 func (store *Store) setCacheValue(key, value []byte, dirty bool) {
 	keyStr := conv.UnsafeBytesToStr(key)
+	if !dirty {
+		// only set if don't exists
+		if _, ok := store.cache[keyStr]; ok {
+			return
+		}
+	}
 	store.cache[keyStr] = &cValue{
 		value: value,
 		dirty: dirty,

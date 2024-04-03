@@ -64,6 +64,15 @@ type Context struct {
 	streamingManager     storetypes.StreamingManager
 	cometInfo            comet.BlockInfo
 	headerInfo           header.Info
+
+	// the index of the current tx in the block, -1 means not in finalize block context
+	txIndex int
+	// the index of the current msg in the tx, -1 means not in finalize block context
+	msgIndex int
+	// the total number of transactions in current block
+	txCount int
+	// sum the gas used by all the transactions in the current block, only accessible by end blocker
+	blockGasUsed uint64
 }
 
 // Proposed rename, not done to avoid API breakage
@@ -201,6 +210,11 @@ func (c Context) WithChainID(chainID string) Context {
 // WithTxBytes returns a Context with an updated txBytes.
 func (c Context) WithTxBytes(txBytes []byte) Context {
 	c.txBytes = txBytes
+	return c
+}
+
+func (c Context) WithTxIndex(txIndex int) Context {
+	c.txIndex = txIndex
 	return c
 }
 
