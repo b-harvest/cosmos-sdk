@@ -75,6 +75,8 @@ type Context struct {
 	txCount int
 	// sum the gas used by all the transactions in the current block, only accessible by end blocker
 	blockGasUsed uint64
+	// sum the gas wanted by all the transactions in the current block, only accessible by end blocker
+	blockGasWanted uint64
 
 	// incarnationCache is shared between multiple incarnations of the same transaction,
 	// it must only cache stateless computation results that only depends on tx body and block level information that don't change during block execution, like the result of tx signature verification.
@@ -111,6 +113,7 @@ func (c Context) TxIndex() int                                  { return c.txInd
 func (c Context) MsgIndex() int                                 { return c.msgIndex }
 func (c Context) TxCount() int                                  { return c.txCount }
 func (c Context) BlockGasUsed() uint64                          { return c.blockGasUsed }
+func (c Context) BlockGasWanted() uint64                        { return c.blockGasWanted }
 func (c Context) IncarnationCache() map[string]any              { return c.incarnationCache }
 
 func (c Context) GetIncarnationCache(key string) (any, bool) {
@@ -378,6 +381,11 @@ func (c Context) WithBlockGasUsed(gasUsed uint64) Context {
 
 func (c Context) WithIncarnationCache(cache map[string]any) Context {
 	c.incarnationCache = cache
+	return c
+}
+
+func (c Context) WithBlockGasWanted(gasWanted uint64) Context {
+	c.blockGasWanted = gasWanted
 	return c
 }
 
