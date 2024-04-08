@@ -38,6 +38,10 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ## [Unreleased]
 
+### Added
+
+* [#269](https://github.com/crypto-org-chain/cosmos-sdk/pull/269) Add `StreamingManager` to baseapp to extend the abci listeners. (Cherry-picked from [crypto-org-chain/cosmos-sdk](https://github.com/crypto-org-chain/cosmos-sdk))
+
 ## [v0.50.8](https://github.com/cosmos/cosmos-sdk/releases/tag/v0.50.8) - 2024-07-15
 
 ## Features
