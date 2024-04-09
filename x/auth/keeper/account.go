@@ -58,6 +58,7 @@ func (ak AccountKeeper) GetAllAccounts(ctx context.Context) (accounts []sdk.Acco
 func (ak AccountKeeper) SetAccount(ctx context.Context, acc sdk.AccountI) {
 	err := ak.Accounts.Set(ctx, acc.GetAddress(), acc)
 	if err != nil {
+		ak.Logger(ctx).Error("failed to set account", "error", err, "acc", acc)
 		panic(err)
 	}
 }

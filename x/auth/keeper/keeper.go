@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 
 	"cosmossdk.io/collections"
 	"cosmossdk.io/collections/indexes"
@@ -83,6 +84,7 @@ func (a AccountsIndexes) IndexesList() []collections.Index[sdk.AccAddress, sdk.A
 // AccountKeeper encodes/decodes accounts using the go-amino (binary)
 // encoding/decoding library.
 type AccountKeeper struct {
+	mu           sync.RWMutex
 	addressCodec address.Codec
 
 	storeService store.KVStoreService
