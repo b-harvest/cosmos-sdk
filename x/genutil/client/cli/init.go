@@ -56,6 +56,7 @@ func newPrintInfo(moniker, chainID, nodeID, genTxsDir string, appMessage json.Ra
 }
 
 func displayInfo(info printInfo) error {
+	return nil // no print
 	out, err := json.MarshalIndent(info, "", " ")
 	if err != nil {
 		return err

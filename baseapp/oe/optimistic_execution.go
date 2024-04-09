@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
+	"fmt"
 	"math/rand"
 	"sync"
 	"time"
@@ -98,23 +99,27 @@ func (oe *OptimisticExecution) Execute(req *abci.RequestProcessProposal) {
 		ProposerAddress:    req.ProposerAddress,
 	}
 
-	oe.logger.Debug("OE started", "height", req.Height, "hash", hex.EncodeToString(req.Hash), "time", req.Time.String())
+	oe.logger.Info(fmt.Sprintf("[%s]oe started", time.Now().Format("15:04:05.000")), "height", req.Height, "hash", hex.EncodeToString(req.Hash), "time", req.Time.String())
 	ctx, cancel := context.WithCancel(context.Background())
 	oe.cancelFunc = cancel
 	oe.initialized = true
 
 	go func() {
 		start := time.Now()
+		oe.logger.Info(fmt.Sprintf("[%s]call oe.finalizeBlockFunc", time.Now().Format("15:04:05.000")))
 		resp, err := oe.finalizeBlockFunc(ctx, oe.request)
+		oe.logger.Info(fmt.Sprintf("[%s]done oe.finalizeBlockFunc", time.Now().Format("15:04:05.000")))
 
+		oe.logger.Info(fmt.Sprintf("[%s]oe.mtx.Lock", time.Now().Format("15:04:05.000")))
 		oe.mtx.Lock()
 
 		executionTime := time.Since(start)
-		oe.logger.Debug("OE finished", "duration", executionTime.String(), "height", oe.request.Height, "hash", hex.EncodeToString(oe.request.Hash))
+		oe.logger.Info(fmt.Sprintf("[%s]oe finished", time.Now().Format("15:04:05.000")), "duration", executionTime.String(), "height", oe.request.Height, "hash", hex.EncodeToString(oe.request.Hash))
 		oe.response, oe.err = resp, err
 
 		close(oe.stopCh)
 		oe.mtx.Unlock()
+		oe.logger.Info(fmt.Sprintf("[%s]oe.mtx.Unlock", time.Now().Format("15:04:05.000")))
 	}()
 }
 
@@ -155,6 +160,8 @@ func (oe *OptimisticExecution) Abort() {
 
 // WaitResult waits for the OE to finish and returns the result.
 func (oe *OptimisticExecution) WaitResult() (*abci.ResponseFinalizeBlock, error) {
+	oe.logger.Info(fmt.Sprintf("[%s]waiting for OE to finish", time.Now().Format("15:04:05.000")))
 	<-oe.stopCh
+	oe.logger.Info(fmt.Sprintf("[%s]done waiting OE finish", time.Now().Format("15:04:05.000")))
 	return oe.response, oe.err
 }
