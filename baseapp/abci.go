@@ -333,32 +333,67 @@ func (app *BaseApp) ApplySnapshotChunk(req *abci.RequestApplySnapshotChunk) (*ab
 // internal CheckTx state if the AnteHandler passes. Otherwise, the ResponseCheckTx
 // will contain relevant error information. Regardless of tx execution outcome,
 // the ResponseCheckTx will contain relevant gas execution context.
-func (app *BaseApp) CheckTx(req *abci.RequestCheckTx) (*abci.ResponseCheckTx, error) {
+func (app *BaseApp) CheckTxSync(req *abci.RequestCheckTx) (*abci.ResponseCheckTx, error) {
+	defer telemetry.MeasureSince(time.Now(), "abci", "check_tx")
+
 	var mode execMode
-
-	switch {
-	case req.Type == abci.CheckTxType_New:
+	if req.Type == abci.CheckTxType_New {
 		mode = execModeCheck
-
-	case req.Type == abci.CheckTxType_Recheck:
+	} else if req.Type == abci.CheckTxType_Recheck {
 		mode = execModeReCheck
-
-	default:
-		return nil, fmt.Errorf("unknown RequestCheckTx type: %s", req.Type)
+	} else {
+		panic(fmt.Sprintf("unknown RequestCheckTx type: %s", req.Type))
 	}
 
-	gInfo, result, anteEvents, err := app.runTx(mode, req.Tx)
+	tx, err := app.preCheckTx(req.Tx)
 	if err != nil {
-		return sdkerrors.ResponseCheckTxWithEvents(err, gInfo.GasWanted, gInfo.GasUsed, anteEvents, app.trace), nil
+		return sdkerrors.ResponseCheckTxWithEvents(err, 0, 0, nil, false), err
 	}
 
+	waits, signals := app.checkAccountWGs.Register(app.cdc, tx)
+
+	app.checkAccountWGs.Wait(waits)
+	defer app.checkAccountWGs.Done(signals)
+
+	gInfo, err := app.checkTx(mode, req.Tx, tx)
+	if err != nil {
+		return sdkerrors.ResponseCheckTxWithEvents(err, gInfo.GasWanted, gInfo.GasUsed, nil, false), err
+	}
 	return &abci.ResponseCheckTx{
 		GasWanted: int64(gInfo.GasWanted), // TODO: Should type accept unsigned ints?
 		GasUsed:   int64(gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
-		Log:       result.Log,
-		Data:      result.Data,
-		Events:    sdk.MarkEventsToIndex(result.Events, app.indexEvents),
+		// Log:       result.Log,
+		// Data:      result.Data,
+		// Events:    sdk.MarkEventsToIndex(result.Events, app.indexEvents),
 	}, nil
+}
+
+func (app *BaseApp) CheckTxAsync(req *abci.RequestCheckTx, callback abci.CheckTxCallback) {
+	if req.Type != abci.CheckTxType_New && req.Type != abci.CheckTxType_Recheck {
+		panic(fmt.Sprintf("unknown RequestCheckTx type: %s", req.Type))
+	}
+
+	reqCheckTx := &RequestCheckTxAsync{
+		txBytes:  req.Tx,
+		txType:   req.Type,
+		callback: callback,
+		prepare:  waitGroup1(),
+	}
+	app.chCheckTx <- reqCheckTx
+
+	go app.prepareCheckTx(reqCheckTx)
+}
+
+// BeginRecheckTx implements the ABCI interface and set the check state based on the given header
+func (app *BaseApp) BeginRecheckTx(req *abci.RequestBeginRecheckTx) (*abci.ResponseBeginRecheckTx, error) {
+	// NOTE: This is safe because Ostracon holds a lock on the mempool for Rechecking.
+	app.setState(execModeCheck, req.Header)
+	return &abci.ResponseBeginRecheckTx{Code: abci.CodeTypeOK}, nil
+}
+
+// EndRecheckTx implements the ABCI interface.
+func (app *BaseApp) EndRecheckTx(req *abci.RequestEndRecheckTx) (*abci.ResponseEndRecheckTx, error) {
+	return &abci.ResponseEndRecheckTx{Code: abci.CodeTypeOK}, nil
 }
 
 // PrepareProposal implements the PrepareProposal ABCI method and returns a
@@ -947,7 +982,7 @@ func (app *BaseApp) Commit() (*abci.ResponseCommit, error) {
 	//
 	// NOTE: This is safe because CometBFT holds a lock on the mempool for
 	// Commit. Use the header from this latest block.
-	app.setState(execModeCheck, header)
+	// app.setState(execModeCheck, header) // ! 이건 왜 주석처리?
 
 	app.finalizeBlockState = nil
 

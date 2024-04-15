@@ -577,7 +577,7 @@ func TestABCI_CheckTx(t *testing.T) {
 		txBytes, err := suite.txConfig.TxEncoder()(tx)
 		require.NoError(t, err)
 
-		r, err := suite.baseApp.CheckTx(&abci.RequestCheckTx{Tx: txBytes})
+		r, err := suite.baseApp.CheckTxSync(&abci.RequestCheckTx{Tx: txBytes})
 		require.NoError(t, err)
 		require.True(t, r.IsOK(), fmt.Sprintf("%v", r))
 		require.Empty(t, r.GetEvents())
@@ -1413,7 +1413,7 @@ func TestABCI_Proposal_HappyPath(t *testing.T) {
 		Tx:   txBytes,
 		Type: abci.CheckTxType_New,
 	}
-	_, err = suite.baseApp.CheckTx(&reqCheckTx)
+	_, err = suite.baseApp.CheckTxSync(&reqCheckTx)
 	require.NoError(t, err)
 
 	tx2 := newTxCounter(t, suite.txConfig, 1, 1)
@@ -1726,7 +1726,7 @@ func TestABCI_PrepareProposal_Failures(t *testing.T) {
 		Tx:   txBytes,
 		Type: abci.CheckTxType_New,
 	}
-	checkTxRes, err := suite.baseApp.CheckTx(&reqCheckTx)
+	checkTxRes, err := suite.baseApp.CheckTxSync(&reqCheckTx)
 	require.NoError(t, err)
 	require.True(t, checkTxRes.IsOK())
 
