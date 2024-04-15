@@ -6,6 +6,7 @@ import (
 	"math"
 	"sort"
 	"strconv"
+	"sync"
 
 	"github.com/cockroachdb/errors"
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -195,6 +196,10 @@ type BaseApp struct {
 	disableBlockGasMeter bool
 
 	txExecutor TxExecutor
+
+	checkStateMtx   sync.RWMutex
+	checkAccountWGs *AccountWGs
+	chCheckTx       chan *RequestCheckTxAsync
 }
 
 // NewBaseApp returns a reference to an initialized BaseApp. It accepts a
@@ -214,6 +219,8 @@ func NewBaseApp(
 		txDecoder:        txDecoder,
 		fauxMerkleMode:   false,
 		queryGasLimit:    math.MaxUint64,
+		checkAccountWGs:  NewAccountWGs(),
+		chCheckTx:        make(chan *RequestCheckTxAsync, 10000), // TODO config channel buffer size. It might be good to set it tendermint mempool.size
 	}
 
 	for _, option := range options {
@@ -247,6 +254,8 @@ func NewBaseApp(
 	// Initialize with an empty interface registry to avoid nil pointer dereference.
 	// Unless SetInterfaceRegistry is called with an interface registry with proper address codecs baseapp will panic.
 	app.cdc = codec.NewProtoCodec(codectypes.NewInterfaceRegistry())
+
+	app.startReactors()
 
 	return app
 }
@@ -495,6 +504,8 @@ func (app *BaseApp) setState(mode execMode, h cmtproto.Header) {
 
 	switch mode {
 	case execModeCheck:
+		app.checkStateMtx.Lock()
+		defer app.checkStateMtx.Unlock() // ! NewContext는 lock의 범위에 들지 않아도 되는가?
 		baseState.SetContext(baseState.Context().WithIsCheckTx(true).WithMinGasPrices(app.minGasPrices))
 		app.checkState = baseState
 
@@ -662,6 +673,11 @@ func (app *BaseApp) getBlockGasMeter(ctx sdk.Context) storetypes.GasMeter {
 
 // retrieve the context for the tx w/ txBytes and other memoized values.
 func (app *BaseApp) getContextForTx(mode execMode, txBytes []byte, txIndex int) sdk.Context {
+	if mode == execModeCheck || mode == execModeReCheck {
+		app.checkStateMtx.Lock()
+		defer app.checkStateMtx.Unlock()
+	}
+
 	modeState := app.getState(mode)
 	if modeState == nil {
 		panic(fmt.Sprintf("state is nil for mode %v", mode))
@@ -701,6 +717,78 @@ func (app *BaseApp) cacheTxContext(ctx sdk.Context, txBytes []byte) (sdk.Context
 	}
 
 	return ctx.WithMultiStore(msCache), msCache
+}
+
+// stateless checkTx
+func (app *BaseApp) preCheckTx(txBytes []byte) (tx sdk.Tx, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			recoveryMW := newDefaultRecoveryMiddleware()
+			err = processRecovery(r, recoveryMW)
+		}
+	}()
+
+	tx, err = app.txDecoder(txBytes)
+	if err != nil {
+		return tx, err
+	}
+
+	msgs := tx.GetMsgs()
+	err = validateBasicTxMsgs(msgs)
+
+	return tx, err
+}
+
+func (app *BaseApp) checkTx(mode execMode, txBytes []byte, tx sdk.Tx) (gInfo sdk.GasInfo, err error) {
+	ctx := app.getContextForTx(mode, txBytes, -1)
+	gasCtx := &ctx
+
+	defer func() {
+		if r := recover(); r != nil {
+			recoveryMW := newDefaultRecoveryMiddleware()
+			err = processRecovery(r, recoveryMW)
+		}
+		gInfo = sdk.GasInfo{GasWanted: gasCtx.GasMeter().Limit(), GasUsed: gasCtx.GasMeter().GasConsumed()}
+	}()
+
+	var anteCtx sdk.Context
+	anteCtx, err = app.anteTx(ctx, txBytes, tx, false)
+	if !anteCtx.IsZero() {
+		gasCtx = &anteCtx
+	}
+
+	if mode == execModeCheck {
+		err = app.mempool.Insert(ctx, tx)
+		if err != nil {
+			return gInfo, err
+		}
+	}
+
+	return gInfo, err
+}
+
+func (app *BaseApp) anteTx(ctx sdk.Context, txBytes []byte, tx sdk.Tx, simulate bool) (sdk.Context, error) {
+	if app.anteHandler == nil {
+		return ctx, nil
+	}
+
+	// Branch context before AnteHandler call in case it aborts.
+	// This is required for both CheckTx and DeliverTx.
+	// Ref: https://github.com/cosmos/cosmos-sdk/issues/2772
+	//
+	// NOTE: Alternatively, we could require that AnteHandler ensures that
+	// writes do not happen if aborted/failed.  This may have some
+	// performance benefits, but it'll be more difficult to get right.
+	anteCtx, msCache := app.cacheTxContext(ctx, txBytes)
+	anteCtx = anteCtx.WithEventManager(sdk.NewEventManager())
+	newCtx, err := app.anteHandler(anteCtx, tx, simulate)
+
+	if err != nil {
+		return newCtx, err
+	}
+
+	msCache.Write()
+	return newCtx, err
 }
 
 func (app *BaseApp) preBlock(req *abci.RequestFinalizeBlock) error {
@@ -858,52 +946,30 @@ func (app *BaseApp) runTxWithMultiStore(mode execMode, txBytes []byte, txIndex i
 		}
 	}
 
-	if app.anteHandler != nil {
-		var (
-			anteCtx sdk.Context
-			msCache storetypes.CacheMultiStore
-		)
-
-		// Branch context before AnteHandler call in case it aborts.
-		// This is required for both CheckTx and DeliverTx.
-		// Ref: https://github.com/cosmos/cosmos-sdk/issues/2772
+	var newCtx sdk.Context
+	newCtx, err = app.anteTx(ctx, txBytes, tx, mode == execModeSimulate)
+	if !newCtx.IsZero() {
+		// At this point, newCtx.MultiStore() is a store branch, or something else
+		// replaced by the AnteHandler. We want the original multistore.
 		//
-		// NOTE: Alternatively, we could require that AnteHandler ensures that
-		// writes do not happen if aborted/failed.  This may have some
-		// performance benefits, but it'll be more difficult to get right.
-		anteCtx, msCache = app.cacheTxContext(ctx, txBytes)
-		anteCtx = anteCtx.WithEventManager(sdk.NewEventManager())
-		newCtx, err := app.anteHandler(anteCtx, tx, mode == execModeSimulate)
-
-		if !newCtx.IsZero() {
-			// At this point, newCtx.MultiStore() is a store branch, or something else
-			// replaced by the AnteHandler. We want the original multistore.
-			//
-			// Also, in the case of the tx aborting, we need to track gas consumed via
-			// the instantiated gas meter in the AnteHandler, so we update the context
-			// prior to returning.
-			ctx = newCtx.WithMultiStore(ms)
-		}
-
-		events := ctx.EventManager().Events()
-
-		// GasMeter expected to be set in AnteHandler
-		gasWanted = ctx.GasMeter().Limit()
-
-		if err != nil {
-			return gInfo, nil, nil, err
-		}
-
-		msCache.Write()
-		anteEvents = events.ToABCIEvents()
+		// Also, in the case of the tx aborting, we need to track gas consumed via
+		// the instantiated gas meter in the AnteHandler, so we update the context
+		// prior to returning.
+		ctx = newCtx.WithMultiStore(ms)
 	}
 
-	if mode == execModeCheck {
-		err = app.mempool.Insert(ctx, tx)
-		if err != nil {
-			return gInfo, nil, anteEvents, err
-		}
-	} else if mode == execModeFinalize {
+	events := ctx.EventManager().Events()
+
+	// GasMeter expected to be set in AnteHandler
+	gasWanted = ctx.GasMeter().Limit()
+
+	if err != nil {
+		return gInfo, nil, nil, err
+	}
+
+	anteEvents = events.ToABCIEvents()
+
+	if mode == execModeFinalize {
 		err = app.mempool.Remove(tx)
 		if err != nil && !errors.Is(err, mempool.ErrTxNotFound) {
 			return gInfo, nil, anteEvents,
