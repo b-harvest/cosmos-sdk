@@ -453,6 +453,7 @@ func (app *BaseApp) PrepareProposal(req *abci.RequestPrepareProposal) (resp *abc
 // Ref: https://github.com/cosmos/cosmos-sdk/blob/main/docs/architecture/adr-060-abci-1.0.md
 // Ref: https://github.com/cometbft/cometbft/blob/main/spec/abci/abci%2B%2B_basic_concepts.md
 func (app *BaseApp) ProcessProposal(req *abci.RequestProcessProposal) (resp *abci.ResponseProcessProposal, err error) {
+	tFormat := "15:04:05.000"
 	if app.processProposal == nil {
 		return nil, errors.New("ProcessProposal handler not set")
 	}
@@ -533,9 +534,14 @@ func (app *BaseApp) ProcessProposal(req *abci.RequestProcessProposal) (resp *abc
 	if resp.Status == abci.ResponseProcessProposal_ACCEPT &&
 		app.optimisticExec.Enabled() &&
 		req.Height > app.initialHeight {
+		app.logger.Info(
+			fmt.Sprintf("[%s]call app.optimisticEexc.Execute (go-routine)", time.Now().Format(tFormat)),
+			"height", req.Height, "hash", fmt.Sprintf("%X", req.Hash),
+		)
 		app.optimisticExec.Execute(req)
 	}
 
+	app.logger.Info(fmt.Sprintf("[%s]finished: app.ProcessProposal", time.Now().Format("15:04:05.000")), "height", req.Height, "hash", fmt.Sprintf("%X", req.Hash))
 	return resp, nil
 }
 
@@ -927,7 +933,14 @@ func (app *BaseApp) Commit() (*abci.ResponseCommit, error) {
 		rms.SetCommitHeader(header)
 	}
 
+	fName, tFormat := "app.Commit", "15:04:05.000"
+	app.logger.Info(
+		fmt.Sprintf("[%s]%s:: call app.cms.Commit", time.Now().Format(tFormat)), fName,
+	)
 	app.cms.Commit()
+	app.logger.Info(
+		fmt.Sprintf("[%s]%s:: call app.cms.Commit", time.Now().Format(tFormat)), fName,
+	)
 
 	resp := &abci.ResponseCommit{
 		RetainHeight: retainHeight,
@@ -973,7 +986,14 @@ func (app *BaseApp) workingHash() []byte {
 	// Write the FinalizeBlock state into branched storage and commit the MultiStore.
 	// The write to the FinalizeBlock state writes all state transitions to the root
 	// MultiStore (app.cms) so when Commit() is called it persists those values.
+	fName, tFormat := "app.workingHash", "15:04:05.000"
+	app.logger.Info(
+		fmt.Sprintf("[%s]%s:: call app.finalizeBlockState.ms.Write", time.Now().Format(tFormat), fName),
+	)
 	app.finalizeBlockState.ms.Write()
+	app.logger.Info(
+		fmt.Sprintf("[%s]%s:: done app.finalizeBlockState.ms.Write", time.Now().Format(tFormat), fName),
+	)
 
 	// Get the hash of all writes in order to return the apphash to the comet in finalizeBlock.
 	commitHash := app.cms.WorkingHash()

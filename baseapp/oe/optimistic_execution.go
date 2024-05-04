@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/hex"
+	"fmt"
 	"math/rand"
 	"sync"
 	"time"
@@ -156,5 +157,6 @@ func (oe *OptimisticExecution) Abort() {
 // WaitResult waits for the OE to finish and returns the result.
 func (oe *OptimisticExecution) WaitResult() (*abci.ResponseFinalizeBlock, error) {
 	<-oe.stopCh
+	oe.logger.Info(fmt.Sprintf("[%s]done waiting OE finish", time.Now().Format("15:04:05.000")))
 	return oe.response, oe.err
 }
