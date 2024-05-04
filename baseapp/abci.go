@@ -967,11 +967,11 @@ func (app *BaseApp) Commit() (*abci.ResponseCommit, error) {
 
 	fName, tFormat := "app.Commit", "15:04:05.000"
 	app.logger.Info(
-		fmt.Sprintf("[%s]%s:: call app.cms.Commit", time.Now().Format(tFormat)), fName,
+		fmt.Sprintf("[%s]%s:: call app.cms.Commit", time.Now().Format(tFormat), fName),
 	)
 	app.cms.Commit()
 	app.logger.Info(
-		fmt.Sprintf("[%s]%s:: call app.cms.Commit", time.Now().Format(tFormat)), fName,
+		fmt.Sprintf("[%s]%s:: call app.cms.Commit", time.Now().Format(tFormat), fName),
 	)
 
 	resp := &abci.ResponseCommit{
