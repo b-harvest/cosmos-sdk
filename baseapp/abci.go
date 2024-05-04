@@ -939,7 +939,7 @@ func (app *BaseApp) Commit() (*abci.ResponseCommit, error) {
 	)
 	app.cms.Commit()
 	app.logger.Info(
-		fmt.Sprintf("[%s]%s:: call app.cms.Commit", time.Now().Format(tFormat), fName),
+		fmt.Sprintf("[%s]%s:: done app.cms.Commit", time.Now().Format(tFormat), fName),
 	)
 
 	resp := &abci.ResponseCommit{
