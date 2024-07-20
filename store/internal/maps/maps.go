@@ -2,6 +2,10 @@ package maps
 
 import (
 	"encoding/binary"
+	"encoding/hex"
+	"fmt"
+	"log"
+	"log/syslog"
 
 	"github.com/cometbft/cometbft/crypto/merkle"
 	"github.com/cometbft/cometbft/crypto/tmhash"
@@ -185,6 +189,9 @@ func HashFromMap(m map[string][]byte) []byte {
 // in the underlying key-value pairs.
 // The keys are sorted before the proofs are computed.
 func ProofsFromMap(m map[string][]byte) ([]byte, map[string]*cmtprotocrypto.Proof, []string) {
+	logger, _ := syslog.New(syslog.LOG_INFO, "working_hash")
+	log.SetOutput(logger)
+
 	sm := newSimpleMap()
 	for k, v := range m {
 		sm.Set(k, v)
@@ -193,7 +200,11 @@ func ProofsFromMap(m map[string][]byte) ([]byte, map[string]*cmtprotocrypto.Proo
 	sm.Sort()
 	kvs := sm.Kvs
 	kvsBytes := make([][]byte, len(kvs.Pairs))
+	log.Println("\t --------------------------------------------------------------------------------------------------------------")
 	for i, kvp := range kvs.Pairs {
+		log.Println("\t", string(kvp.Key), "\t", hex.EncodeToString(kvp.Value))
+		fmt.Println("\t", string(kvp.Key), "\t", hex.EncodeToString(kvp.Value))
+
 		kvsBytes[i] = KVPair(kvp).Bytes()
 	}
 
@@ -205,6 +216,8 @@ func ProofsFromMap(m map[string][]byte) ([]byte, map[string]*cmtprotocrypto.Proo
 		proofs[string(kvp.Key)] = proofList[i].ToProto()
 		keys[i] = string(kvp.Key)
 	}
+	log.Println("\t ------------- Root ---------------", hex.EncodeToString(rootHash), "----------")
+	fmt.Println("\t ------------- Root ---------------", hex.EncodeToString(rootHash), "----------")
 
 	return rootHash, proofs, keys
 }
