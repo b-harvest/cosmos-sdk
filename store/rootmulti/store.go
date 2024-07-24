@@ -2,6 +2,7 @@ package rootmulti
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -521,6 +522,15 @@ func (rs *Store) WorkingHash() []byte {
 			continue
 		}
 
+		fmt.Printf("workingHash: %s\n", key.Name())
+		if key.Name() == "crisis" {
+			iter := store.Iterator(nil, nil)
+			for ; iter.Valid(); iter.Next() {
+				k := iter.Key()
+				v := iter.Value()
+				fmt.Printf("key: %s, value: %s\n", hex.EncodeToString(k), hex.EncodeToString(v))
+			}
+		}
 		if !rs.removalMap[key] {
 			si := types.StoreInfo{
 				Name: key.Name(),
@@ -528,6 +538,7 @@ func (rs *Store) WorkingHash() []byte {
 					Hash: store.WorkingHash(),
 				},
 			}
+			fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \t key:", key.Name(), "\t value:", hex.EncodeToString(si.CommitId.Hash))
 			storeInfos = append(storeInfos, si)
 		}
 	}
