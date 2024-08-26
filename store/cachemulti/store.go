@@ -163,3 +163,22 @@ func (cms Store) GetKVStore(key types.StoreKey) types.KVStore {
 	}
 	return store.(types.KVStore)
 }
+
+// Copy returns an deep copy of CacheMultiStore
+func (cms Store) Copy() types.CacheMultiStore {
+	// deep copy of CacheKVStore underlying CacheMultiStore
+	stores2 := make(map[types.StoreKey]types.CacheWrap, len(cms.stores))
+	for key, store := range cms.stores {
+		if store, ok := store.(*cachekv.Store); ok {
+			stores2[key] = store.Copy()
+		}
+	}
+
+	return Store{
+		db:           cms.db.Copy(),
+		stores:       stores2,
+		keys:         cms.keys,
+		traceWriter:  cms.traceWriter,
+		traceContext: cms.traceContext,
+	}
+}

@@ -165,6 +165,37 @@ func (store *Store) CacheWrapWithTrace(w io.Writer, tc types.TraceContext) types
 	return NewStore(tracekv.NewStore(store, w, tc))
 }
 
+// Copy implements deep copy of CacheKVStore
+func (store *Store) Copy() types.CacheKVStore {
+	store.mtx.Lock()
+	defer store.mtx.Unlock()
+
+	// deep copy of cValue
+	// TODO(dudong2): deep copy? or shallow copy?
+	cache2 := make(map[string]*cValue, len(store.cache))
+	for key, val := range store.cache {
+		value2 := make([]byte, len(val.value))
+		copy(value2, val.value)
+		cache2[key] = &cValue{
+			value: value2,
+			dirty: val.dirty,
+		}
+	}
+
+	// unsortedCache only track the key
+	unsortedCache2 := make(map[string]struct{}, len(store.unsortedCache))
+	for key := range store.unsortedCache {
+		unsortedCache2[key] = struct{}{}
+	}
+
+	return &Store{
+		cache:         cache2,
+		unsortedCache: unsortedCache2,
+		sortedCache:   store.sortedCache.Copy(),
+		parent:        store.parent,
+	}
+}
+
 //----------------------------------------
 // Iteration
 
