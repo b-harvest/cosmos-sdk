@@ -40,18 +40,28 @@ type BaseSendKeeper struct {
 
 	// list of addresses that are restricted from receiving transactions
 	blockedAddrs map[string]bool
+
+	sendCoinsRestrictionFn SendRestrictionFn
 }
 
 func NewBaseSendKeeper(
 	cdc codec.BinaryCodec, storeKey sdk.StoreKey, ak types.AccountKeeper, paramSpace paramtypes.Subspace, blockedAddrs map[string]bool,
 ) BaseSendKeeper {
 	return BaseSendKeeper{
-		BaseViewKeeper: NewBaseViewKeeper(cdc, storeKey, ak),
-		cdc:            cdc,
-		ak:             ak,
-		storeKey:       storeKey,
-		paramSpace:     paramSpace,
-		blockedAddrs:   blockedAddrs,
+		BaseViewKeeper:         NewBaseViewKeeper(cdc, storeKey, ak),
+		cdc:                    cdc,
+		ak:                     ak,
+		storeKey:               storeKey,
+		paramSpace:             paramSpace,
+		blockedAddrs:           blockedAddrs,
+		sendCoinsRestrictionFn: NewSendRestrictionFn(),
+	}
+}
+
+// newSendRestriction creates a new sendRestriction with nil send restriction.
+func NewSendRestrictionFn() SendRestrictionFn {
+	return func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (newToAddr sdk.AccAddress, err error) {
+		return toAddr, nil
 	}
 }
 
@@ -105,6 +115,15 @@ func (k BaseSendKeeper) InputOutputCoins(ctx sdk.Context, inputs []types.Input, 
 			return err
 		}
 
+		for _, in := range inputs {
+			inAddress, _ := sdk.AccAddressFromBech32(in.Address)
+
+			outAddress, err = k.sendCoinsRestrictionFn(ctx, inAddress, outAddress, out.Coins)
+			if err != nil {
+				return err
+			}
+		}
+
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
 				types.EventTypeTransfer,
@@ -131,6 +150,11 @@ func (k BaseSendKeeper) InputOutputCoins(ctx sdk.Context, inputs []types.Input, 
 // An error is returned upon failure.
 func (k BaseSendKeeper) SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error {
 	err := k.subUnlockedCoins(ctx, fromAddr, amt)
+	if err != nil {
+		return err
+	}
+
+	toAddr, err = k.sendCoinsRestrictionFn(ctx, fromAddr, toAddr, amt)
 	if err != nil {
 		return err
 	}

@@ -59,6 +59,8 @@ type BaseKeeper struct {
 
 type MintingRestrictionFn func(ctx sdk.Context, coins sdk.Coins) error
 
+type SendRestrictionFn func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (newToAddr sdk.AccAddress, err error)
+
 // GetPaginatedTotalSupply queries for the supply, ignoring 0 coins, with a given pagination
 func (k BaseKeeper) GetPaginatedTotalSupply(ctx sdk.Context, pagination *query.PageRequest) (sdk.Coins, *query.PageResponse, error) {
 	store := ctx.KVStore(k.storeKey)
@@ -129,6 +131,23 @@ func (k BaseKeeper) WithMintCoinsRestriction(check MintingRestrictionFn) BaseKee
 			return err
 		}
 		return nil
+	}
+	return k
+}
+
+// WithSendCoinsRestriction restricts the bank Keeper used within a specific module to
+// have restricted permissions on sending via function passed in parameter.
+// Previous restriction functions can be nested as such:
+//
+//	bankKeeper.WithSendCoinsRestriction(restriction1).WithSendCoinsRestriction(restriction2)
+func (k BaseKeeper) WithSendCoinsRestriction(check SendRestrictionFn) BaseKeeper {
+	oldRestrictionFn := k.sendCoinsRestrictionFn
+	k.sendCoinsRestrictionFn = func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (newToAddr sdk.AccAddress, err error) {
+		toAddr, err = check(ctx, fromAddr, toAddr, amt)
+		if err != nil {
+			return toAddr, err
+		}
+		return oldRestrictionFn(ctx, fromAddr, toAddr, amt)
 	}
 	return k
 }
