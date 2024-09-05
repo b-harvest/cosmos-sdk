@@ -1392,6 +1392,196 @@ func (suite *IntegrationTestSuite) TestSendRestrictions() {
 	}
 }
 
+func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
+	// Initial setup
+	app, ctx := suite.app, suite.ctx
+
+	// Set block time
+	now := tmtime.Now()
+	ctx = ctx.WithBlockHeader(tmproto.Header{Time: now})
+	endTime := now.Add(24 * time.Hour)
+
+	// Set coin amounts
+	origCoins := sdk.NewCoins(sdk.NewInt64Coin("stake", 100))
+	delCoins := sdk.NewCoins(sdk.NewInt64Coin("stake", 50))
+
+	// Set account addresses
+	addr1 := sdk.AccAddress([]byte("addr1_______________")) // vesting account
+	addr2 := sdk.AccAddress([]byte("addr2_______________")) // non-vesting account
+	addrModule := sdk.AccAddress([]byte("moduleAcc___________"))
+
+	// Create base and module accounts
+	bacc1 := authtypes.NewBaseAccountWithAddress(addr1)
+	bacc2 := authtypes.NewBaseAccountWithAddress(addr2)
+	macc := app.AccountKeeper.NewAccountWithAddress(ctx, addrModule)
+
+	// Create continuous vesting account for addr1 (vesting account)
+	vacc := vesting.NewContinuousVestingAccount(bacc1, origCoins, ctx.BlockHeader().Time.Unix(), endTime.Unix())
+
+	// Set accounts in the AccountKeeper
+	app.AccountKeeper.SetAccount(ctx, vacc)
+	app.AccountKeeper.SetAccount(ctx, bacc2)
+	app.AccountKeeper.SetAccount(ctx, macc)
+
+	// Fund both accounts
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, addr1, origCoins))
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, addr2, origCoins))
+
+	// Define test cases
+	testCases := []struct {
+		name          string
+		restrictionFn func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error)
+		delegatorAddr sdk.AccAddress
+		moduleAccAddr sdk.AccAddress
+		amt           sdk.Coins
+		expectError   bool
+		action        string // "delegate" or "undelegate"
+		accountType   string // "vesting" or "non-vesting"
+	}{
+		// Vesting account test cases
+		{
+			name: "Vesting account: Delegate blocked when delegator is restricted",
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+				if fromAddr.Equals(addr1) {
+					return toAddr, fmt.Errorf("vesting delegatorAddr is restricted")
+				}
+				return toAddr, nil
+			},
+			delegatorAddr: addr1,
+			moduleAccAddr: addrModule,
+			amt:           delCoins,
+			expectError:   true,
+			action:        "delegate",
+			accountType:   "vesting",
+		},
+		{
+			name: "Vesting account: Delegate succeeds when neither is restricted",
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+				return toAddr, nil
+			},
+			delegatorAddr: addr1,
+			moduleAccAddr: addrModule,
+			amt:           delCoins,
+			expectError:   false,
+			action:        "delegate",
+			accountType:   "vesting",
+		},
+		{
+			name: "Vesting account: Undelegate blocked when delegator is restricted",
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+				if fromAddr.Equals(addrModule) && toAddr.Equals(addr1) {
+					return toAddr, fmt.Errorf("vesting delegatorAddr is restricted")
+				}
+				return toAddr, nil
+			},
+			delegatorAddr: addr1,
+			moduleAccAddr: addrModule,
+			amt:           delCoins,
+			expectError:   true,
+			action:        "undelegate",
+			accountType:   "vesting",
+		},
+		{
+			name: "Vesting account: Undelegate succeeds when neither is restricted",
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+				return toAddr, nil
+			},
+			delegatorAddr: addr1,
+			moduleAccAddr: addrModule,
+			amt:           delCoins,
+			expectError:   false,
+			action:        "undelegate",
+			accountType:   "vesting",
+		},
+		// Non-vesting account test cases
+		{
+			name: "Non-vesting account: Delegate blocked when delegator is restricted",
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+				if fromAddr.Equals(addr2) {
+					return toAddr, fmt.Errorf("non-vesting delegatorAddr is restricted")
+				}
+				return toAddr, nil
+			},
+			delegatorAddr: addr2,
+			moduleAccAddr: addrModule,
+			amt:           delCoins,
+			expectError:   true,
+			action:        "delegate",
+			accountType:   "non-vesting",
+		},
+		{
+			name: "Non-vesting account: Delegate succeeds when neither is restricted",
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+				return toAddr, nil
+			},
+			delegatorAddr: addr2,
+			moduleAccAddr: addrModule,
+			amt:           delCoins,
+			expectError:   false,
+			action:        "delegate",
+			accountType:   "non-vesting",
+		},
+		{
+			name: "Non-vesting account: Undelegate blocked when delegator is restricted",
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+				if fromAddr.Equals(addrModule) && toAddr.Equals(addr2) {
+					return toAddr, fmt.Errorf("non-vesting delegatorAddr is restricted")
+				}
+				return toAddr, nil
+			},
+			delegatorAddr: addr2,
+			moduleAccAddr: addrModule,
+			amt:           delCoins,
+			expectError:   true,
+			action:        "undelegate",
+			accountType:   "non-vesting",
+		},
+		{
+			name: "Non-vesting account: Undelegate succeeds when neither is restricted",
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+				return toAddr, nil
+			},
+			delegatorAddr: addr2,
+			moduleAccAddr: addrModule,
+			amt:           delCoins,
+			expectError:   false,
+			action:        "undelegate",
+			accountType:   "non-vesting",
+		},
+	}
+
+	// Iterate over each test case
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			// Set up the BankKeeper with the restriction function
+			suite.app.BankKeeper = keeper.NewBaseKeeper(
+				suite.app.AppCodec(),
+				suite.app.GetKey(types.StoreKey),
+				suite.app.AccountKeeper,
+				suite.app.GetSubspace(types.ModuleName),
+				nil, // Module account is not needed for this test
+			).WithSendCoinsRestriction(keeper.SendRestrictionFn(tc.restrictionFn))
+
+			var err error
+
+			// Execute the appropriate action (delegate or undelegate)
+			switch tc.action {
+			case "delegate":
+				err = suite.app.BankKeeper.DelegateCoins(suite.ctx, tc.delegatorAddr, tc.moduleAccAddr, tc.amt)
+			case "undelegate":
+				err = suite.app.BankKeeper.UndelegateCoins(suite.ctx, tc.moduleAccAddr, tc.delegatorAddr, tc.amt)
+			}
+
+			// Check for expected error or success
+			if tc.expectError {
+				suite.Require().Error(err, "expected error but got none")
+			} else {
+				suite.Require().NoError(err, "expected no error but got: %v", err)
+			}
+		})
+	}
+}
+
 func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, new(IntegrationTestSuite))
 }
