@@ -1269,104 +1269,107 @@ func (suite *IntegrationTestSuite) TestSendRestrictions() {
 	suite.Require().NoError(simapp.FundAccount(suite.app.BankKeeper, suite.ctx, normalAddr1, sdk.NewCoins(coin)))
 	suite.Require().NoError(simapp.FundAccount(suite.app.BankKeeper, suite.ctx, normalAddr2, sdk.NewCoins(coin)))
 
-	suite.Require().NoError(
-		suite.app.BankKeeper.MintCoins(
-			suite.ctx,
-			"newbankmodule",
-			sdk.NewCoins(coin)),
-	)
 	// Test cases
 	type testCase struct {
-		fromAddr   sdk.AccAddress
-		toAddr     sdk.AccAddress
-		coinsToTry sdk.Coins
-		expectPass bool
+		fromAddr      sdk.AccAddress
+		toAddr        sdk.AccAddress
+		coinsToTry    sdk.Coins
+		expectedError error
 	}
 
 	tests := []struct {
 		name          string
+		setup         func(ctx sdk.Context)
 		restrictionFn BankSendRestrictionFn
 		testCases     []testCase
 	}{
 		{
-			"normal transfer",
-			func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+			name: "normal transfer",
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
 				return toAddr, nil
 			},
-			[]testCase{
+			testCases: []testCase{
 				{
-					fromAddr:   normalAddr1,
-					toAddr:     normalAddr2,
-					coinsToTry: sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(100))),
-					expectPass: true,
+					fromAddr:      normalAddr1,
+					toAddr:        normalAddr2,
+					coinsToTry:    sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(100))),
+					expectedError: nil,
 				},
 			},
 		},
 		{
-			"blocked sender",
-			func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+			name: "blocked sender",
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
 				if fromAddr.Equals(blockedAddr) {
 					return toAddr, fmt.Errorf("%s is blocked from sending %s", fromAddr, coin.Denom)
 				}
 				return toAddr, nil
 			},
-			[]testCase{
+			testCases: []testCase{
 				{
-					fromAddr:   blockedAddr,
-					toAddr:     normalAddr2,
-					coinsToTry: sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(100))),
-					expectPass: false,
+					fromAddr:      blockedAddr,
+					toAddr:        normalAddr2,
+					coinsToTry:    sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(100))),
+					expectedError: fmt.Errorf("%s is blocked from sending %s", blockedAddr, coin.Denom),
 				},
 			},
 		},
 		{
-			"blocked receiver",
-			func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+			name: "blocked receiver",
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
 				if toAddr.Equals(blockedAddr) {
 					return toAddr, fmt.Errorf("%s is blocked from receiving %s", toAddr, coin.Denom)
 				}
 				return toAddr, nil
 			},
-			[]testCase{
+			testCases: []testCase{
 				{
-					fromAddr:   normalAddr1,
-					toAddr:     blockedAddr,
-					coinsToTry: sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(100))),
-					expectPass: false,
+					fromAddr:      normalAddr1,
+					toAddr:        blockedAddr,
+					coinsToTry:    sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(100))),
+					expectedError: fmt.Errorf("%s is blocked from receiving %s", blockedAddr, coin.Denom),
 				},
 			},
 		},
 		{
-			"burning coins",
-			func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+			name: "send coins to module account",
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
 				if !toAddr.Equals(newModuleAcc.GetAddress()) {
 					return toAddr, fmt.Errorf("only module account can receive coins for burning")
 				}
 				return toAddr, nil
 			},
-			[]testCase{
+			testCases: []testCase{
 				{
-					fromAddr:   normalAddr1,
-					toAddr:     newModuleAcc.GetAddress(),
-					coinsToTry: sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(100))),
-					expectPass: true,
+					fromAddr:      normalAddr1,
+					toAddr:        newModuleAcc.GetAddress(),
+					coinsToTry:    sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(100))),
+					expectedError: nil,
 				},
 			},
 		},
 		{
-			"minting coins",
-			func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+			name: "receive coins from module account",
+			setup: func(ctx sdk.Context) {
+				suite.Require().NoError(
+					suite.app.BankKeeper.MintCoins(
+						ctx,
+						"newbankmodule",
+						sdk.NewCoins(coin)),
+				)
+			},
+			restrictionFn: func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
 				if !fromAddr.Equals(newModuleAcc.GetAddress()) {
 					return toAddr, fmt.Errorf("only module account can mint coins")
 				}
 				return toAddr, nil
 			},
-			[]testCase{
+			testCases: []testCase{
 				{
-					fromAddr:   newModuleAcc.GetAddress(),
-					toAddr:     normalAddr1,
-					coinsToTry: sdk.NewCoins(coin),
-					expectPass: true,
+					fromAddr:      newModuleAcc.GetAddress(),
+					toAddr:        normalAddr1,
+					coinsToTry:    sdk.NewCoins(coin),
+					expectedError: nil,
 				},
 			},
 		},
@@ -1381,12 +1384,15 @@ func (suite *IntegrationTestSuite) TestSendRestrictions() {
 
 		// Execute each test case within the current test
 		for _, testCase := range test.testCases {
-			if testCase.expectPass {
+			if test.setup != nil {
+				test.setup(suite.ctx)
+			}
+			if testCase.expectedError == nil {
 				err := suite.app.BankKeeper.SendCoins(suite.ctx, testCase.fromAddr, testCase.toAddr, testCase.coinsToTry)
 				suite.Require().NoError(err, "Test case failed: %v", testCase)
 			} else {
 				err := suite.app.BankKeeper.SendCoins(suite.ctx, testCase.fromAddr, testCase.toAddr, testCase.coinsToTry)
-				suite.Require().Error(err, "Test case should have failed: %v", testCase)
+				suite.Require().EqualError(err, testCase.expectedError.Error(), "expected error: %v but got: %v", testCase.expectedError, err)
 			}
 		}
 	}
@@ -1430,18 +1436,12 @@ func (suite *IntegrationTestSuite) TestNestedSendRestrictions() {
 	suite.Require().NoError(simapp.FundAccount(suite.app.BankKeeper, suite.ctx, normalAddr1, sdk.NewCoins(coin)))
 	suite.Require().NoError(simapp.FundAccount(suite.app.BankKeeper, suite.ctx, normalAddr2, sdk.NewCoins(coin)))
 
-	suite.Require().NoError(
-		suite.app.BankKeeper.MintCoins(
-			suite.ctx,
-			"newbankmodule",
-			sdk.NewCoins(coin)),
-	)
 	// Test cases
 	type testCase struct {
-		fromAddr   sdk.AccAddress
-		toAddr     sdk.AccAddress
-		coinsToTry sdk.Coins
-		expectPass bool
+		fromAddr      sdk.AccAddress
+		toAddr        sdk.AccAddress
+		coinsToTry    sdk.Coins
+		expectedError error
 	}
 
 	tests := []struct {
@@ -1469,22 +1469,22 @@ func (suite *IntegrationTestSuite) TestNestedSendRestrictions() {
 			},
 			[]testCase{
 				{
-					fromAddr:   blockedAddr,
-					toAddr:     normalAddr1,
-					coinsToTry: sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(100))),
-					expectPass: false,
+					fromAddr:      blockedAddr,
+					toAddr:        normalAddr1,
+					coinsToTry:    sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(100))),
+					expectedError: fmt.Errorf("%s is blocked from sending %s", blockedAddr, coin.Denom),
 				},
 				{
-					fromAddr:   normalAddr1,
-					toAddr:     normalAddr2,
-					coinsToTry: sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(600))),
-					expectPass: false,
+					fromAddr:      normalAddr1,
+					toAddr:        normalAddr2,
+					coinsToTry:    sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(600))),
+					expectedError: fmt.Errorf("cannot send more than 500 %s", coin.Denom),
 				},
 				{
-					fromAddr:   normalAddr1,
-					toAddr:     normalAddr2,
-					coinsToTry: sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(400))),
-					expectPass: true,
+					fromAddr:      normalAddr1,
+					toAddr:        normalAddr2,
+					coinsToTry:    sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(400))),
+					expectedError: nil,
 				},
 			},
 		},
@@ -1499,12 +1499,12 @@ func (suite *IntegrationTestSuite) TestNestedSendRestrictions() {
 
 		// Execute each test case within the current test
 		for _, testCase := range test.testCases {
-			if testCase.expectPass {
+			if testCase.expectedError == nil {
 				err := suite.app.BankKeeper.SendCoins(suite.ctx, testCase.fromAddr, testCase.toAddr, testCase.coinsToTry)
 				suite.Require().NoError(err, "Test case failed: %v", testCase)
 			} else {
 				err := suite.app.BankKeeper.SendCoins(suite.ctx, testCase.fromAddr, testCase.toAddr, testCase.coinsToTry)
-				suite.Require().Error(err, "Test case should have failed: %v", testCase)
+				suite.Require().EqualError(err, testCase.expectedError.Error(), "expected error: %v but got: %v", testCase.expectedError, err)
 			}
 		}
 	}
@@ -1552,7 +1552,7 @@ func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
 		delegatorAddr sdk.AccAddress
 		moduleAccAddr sdk.AccAddress
 		amt           sdk.Coins
-		expectError   bool
+		expectError   error
 		action        string // "delegate" or "undelegate"
 		accountType   string // "vesting" or "non-vesting"
 	}{
@@ -1568,7 +1568,7 @@ func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
 			delegatorAddr: addr1,
 			moduleAccAddr: addrModule,
 			amt:           delCoins,
-			expectError:   true,
+			expectError:   fmt.Errorf("vesting delegatorAddr is restricted"),
 			action:        "delegate",
 			accountType:   "vesting",
 		},
@@ -1580,7 +1580,7 @@ func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
 			delegatorAddr: addr1,
 			moduleAccAddr: addrModule,
 			amt:           delCoins,
-			expectError:   false,
+			expectError:   nil,
 			action:        "delegate",
 			accountType:   "vesting",
 		},
@@ -1595,7 +1595,7 @@ func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
 			delegatorAddr: addr1,
 			moduleAccAddr: addrModule,
 			amt:           delCoins,
-			expectError:   true,
+			expectError:   fmt.Errorf("vesting delegatorAddr is restricted"),
 			action:        "undelegate",
 			accountType:   "vesting",
 		},
@@ -1607,7 +1607,7 @@ func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
 			delegatorAddr: addr1,
 			moduleAccAddr: addrModule,
 			amt:           delCoins,
-			expectError:   false,
+			expectError:   nil,
 			action:        "undelegate",
 			accountType:   "vesting",
 		},
@@ -1623,7 +1623,7 @@ func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
 			delegatorAddr: addr2,
 			moduleAccAddr: addrModule,
 			amt:           delCoins,
-			expectError:   true,
+			expectError:   fmt.Errorf("non-vesting delegatorAddr is restricted"),
 			action:        "delegate",
 			accountType:   "non-vesting",
 		},
@@ -1635,7 +1635,7 @@ func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
 			delegatorAddr: addr2,
 			moduleAccAddr: addrModule,
 			amt:           delCoins,
-			expectError:   false,
+			expectError:   nil,
 			action:        "delegate",
 			accountType:   "non-vesting",
 		},
@@ -1650,7 +1650,7 @@ func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
 			delegatorAddr: addr2,
 			moduleAccAddr: addrModule,
 			amt:           delCoins,
-			expectError:   true,
+			expectError:   fmt.Errorf("non-vesting delegatorAddr is restricted"),
 			action:        "undelegate",
 			accountType:   "non-vesting",
 		},
@@ -1662,7 +1662,7 @@ func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
 			delegatorAddr: addr2,
 			moduleAccAddr: addrModule,
 			amt:           delCoins,
-			expectError:   false,
+			expectError:   nil,
 			action:        "undelegate",
 			accountType:   "non-vesting",
 		},
@@ -1691,10 +1691,10 @@ func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
 			}
 
 			// Check for expected error or success
-			if tc.expectError {
-				suite.Require().Error(err, "expected error but got none")
-			} else {
+			if tc.expectError == nil {
 				suite.Require().NoError(err, "expected no error but got: %v", err)
+			} else {
+				suite.Require().EqualError(err, tc.expectError.Error(), "expected error: %v but got: %v", tc.expectError, err)
 			}
 		})
 	}
