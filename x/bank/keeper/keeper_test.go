@@ -1255,9 +1255,9 @@ func (suite *IntegrationTestSuite) TestSendRestrictions() {
 	)
 
 	// Define normal addresses
-	normalAddr1 := sdk.AccAddress([]byte("addr1---------------"))
-	normalAddr2 := sdk.AccAddress([]byte("addr2---------------"))
-	blockedAddr := sdk.AccAddress([]byte("blockedaddr---------"))
+	normalAddr1 := sdk.AccAddress("addr1---------------")
+	normalAddr2 := sdk.AccAddress("addr2---------------")
+	blockedAddr := sdk.AccAddress("blockedaddr---------")
 	coin := sdk.NewCoin("testcoin", sdk.NewInt(1000))
 
 	acc1 := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, normalAddr1)
@@ -1416,9 +1416,9 @@ func (suite *IntegrationTestSuite) TestNestedSendRestrictions() {
 	)
 
 	// Define normal addresses
-	normalAddr1 := sdk.AccAddress([]byte("addr1---------------"))
-	normalAddr2 := sdk.AccAddress([]byte("addr2---------------"))
-	blockedAddr := sdk.AccAddress([]byte("blockedaddr---------"))
+	normalAddr1 := sdk.AccAddress("addr1---------------")
+	normalAddr2 := sdk.AccAddress("addr2---------------")
+	blockedAddr := sdk.AccAddress("blockedaddr---------")
 	coin := sdk.NewCoin("testcoin", sdk.NewInt(1000))
 
 	acc1 := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, normalAddr1)
@@ -1524,9 +1524,9 @@ func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
 	delCoins := sdk.NewCoins(sdk.NewInt64Coin("stake", 50))
 
 	// Set account addresses
-	addr1 := sdk.AccAddress([]byte("addr1_______________")) // vesting account
-	addr2 := sdk.AccAddress([]byte("addr2_______________")) // non-vesting account
-	addrModule := sdk.AccAddress([]byte("moduleAcc___________"))
+	addr1 := sdk.AccAddress("addr1_______________") // vesting account
+	addr2 := sdk.AccAddress("addr2_______________") // non-vesting account
+	addrModule := sdk.AccAddress("moduleAcc___________")
 
 	// Create base and module accounts
 	bacc1 := authtypes.NewBaseAccountWithAddress(addr1)
