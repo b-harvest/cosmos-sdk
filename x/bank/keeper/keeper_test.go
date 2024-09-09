@@ -1392,6 +1392,124 @@ func (suite *IntegrationTestSuite) TestSendRestrictions() {
 	}
 }
 
+func (suite *IntegrationTestSuite) TestNestedSendRestrictions() {
+	type BankSendRestrictionFn func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error)
+
+	// Define a new module account for the test
+	newModuleAcc := authtypes.NewEmptyModuleAccount("newbankmodule", authtypes.Minter, authtypes.Burner)
+
+	// Setup the permissions for the module account
+	maccPerms := simapp.GetMaccPerms()
+	maccPerms[newModuleAcc.Name] = []string{authtypes.Burner, authtypes.Minter, authtypes.Staking}
+
+	// Update the AccountKeeper with the new module account
+	suite.app.AccountKeeper = authkeeper.NewAccountKeeper(
+		suite.app.AppCodec(), suite.app.GetKey(authtypes.StoreKey), suite.app.GetSubspace(authtypes.ModuleName),
+		authtypes.ProtoBaseAccount, maccPerms,
+	)
+	suite.app.AccountKeeper.SetModuleAccount(suite.ctx, newModuleAcc)
+
+	// Initialize the BankKeeper
+	suite.app.BankKeeper = keeper.NewBaseKeeper(
+		suite.app.AppCodec(), suite.app.GetKey(types.StoreKey),
+		suite.app.AccountKeeper, suite.app.GetSubspace(types.ModuleName), nil,
+	)
+
+	// Define normal addresses
+	normalAddr1 := sdk.AccAddress([]byte("addr1---------------"))
+	normalAddr2 := sdk.AccAddress([]byte("addr2---------------"))
+	blockedAddr := sdk.AccAddress([]byte("blockedaddr---------"))
+	coin := sdk.NewCoin("testcoin", sdk.NewInt(1000))
+
+	acc1 := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, normalAddr1)
+	suite.app.AccountKeeper.SetAccount(suite.ctx, acc1)
+
+	acc2 := suite.app.AccountKeeper.NewAccountWithAddress(suite.ctx, normalAddr2)
+	suite.app.AccountKeeper.SetAccount(suite.ctx, acc2)
+
+	suite.Require().NoError(simapp.FundAccount(suite.app.BankKeeper, suite.ctx, normalAddr1, sdk.NewCoins(coin)))
+	suite.Require().NoError(simapp.FundAccount(suite.app.BankKeeper, suite.ctx, normalAddr2, sdk.NewCoins(coin)))
+
+	suite.Require().NoError(
+		suite.app.BankKeeper.MintCoins(
+			suite.ctx,
+			"newbankmodule",
+			sdk.NewCoins(coin)),
+	)
+	// Test cases
+	type testCase struct {
+		fromAddr   sdk.AccAddress
+		toAddr     sdk.AccAddress
+		coinsToTry sdk.Coins
+		expectPass bool
+	}
+
+	tests := []struct {
+		name           string
+		restrictionFns []BankSendRestrictionFn // List of multiple restrictions to apply
+		testCases      []testCase
+	}{
+		{
+			"nested restrictions - sender blocked then amount restricted",
+			[]BankSendRestrictionFn{
+				// First restriction: Block the sender if it's blockedAddr
+				func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+					if fromAddr.Equals(blockedAddr) {
+						return toAddr, fmt.Errorf("%s is blocked from sending %s", fromAddr, coin.Denom)
+					}
+					return toAddr, nil
+				},
+				// Second restriction: Restrict the amount from being sent if it's greater than 500
+				func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (sdk.AccAddress, error) {
+					if amt.AmountOf(coin.Denom).GT(sdk.NewInt(500)) {
+						return toAddr, fmt.Errorf("cannot send more than 500 %s", coin.Denom)
+					}
+					return toAddr, nil
+				},
+			},
+			[]testCase{
+				{
+					fromAddr:   blockedAddr,
+					toAddr:     normalAddr1,
+					coinsToTry: sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(100))),
+					expectPass: false,
+				},
+				{
+					fromAddr:   normalAddr1,
+					toAddr:     normalAddr2,
+					coinsToTry: sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(600))),
+					expectPass: false,
+				},
+				{
+					fromAddr:   normalAddr1,
+					toAddr:     normalAddr2,
+					coinsToTry: sdk.NewCoins(sdk.NewCoin("testcoin", sdk.NewInt(400))),
+					expectPass: true,
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		// Set up the nested restrictions by applying each restriction function sequentially
+		suite.app.BankKeeper = keeper.NewBaseKeeper(
+			suite.app.AppCodec(), suite.app.GetKey(types.StoreKey),
+			suite.app.AccountKeeper, suite.app.GetSubspace(types.ModuleName), nil,
+		).WithSendCoinsRestriction(keeper.SendRestrictionFn(test.restrictionFns[0])).WithSendCoinsRestriction(keeper.SendRestrictionFn(test.restrictionFns[1]))
+
+		// Execute each test case within the current test
+		for _, testCase := range test.testCases {
+			if testCase.expectPass {
+				err := suite.app.BankKeeper.SendCoins(suite.ctx, testCase.fromAddr, testCase.toAddr, testCase.coinsToTry)
+				suite.Require().NoError(err, "Test case failed: %v", testCase)
+			} else {
+				err := suite.app.BankKeeper.SendCoins(suite.ctx, testCase.fromAddr, testCase.toAddr, testCase.coinsToTry)
+				suite.Require().Error(err, "Test case should have failed: %v", testCase)
+			}
+		}
+	}
+}
+
 func (suite *IntegrationTestSuite) TestDelegateUndelegateRestrictions() {
 	// Initial setup
 	app, ctx := suite.app, suite.ctx
