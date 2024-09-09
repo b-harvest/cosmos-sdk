@@ -92,6 +92,20 @@ func (k BaseSendKeeper) InputOutputCoins(ctx sdk.Context, inputs []types.Input, 
 			return err
 		}
 
+		// Apply restriction check between input and all outputs before subtracting coins
+		for _, out := range outputs {
+			outAddress, err := sdk.AccAddressFromBech32(out.Address)
+			if err != nil {
+				return err
+			}
+
+			// Check restrictions between the input address and the output address
+			outAddress, err = k.sendCoinsRestrictionFn(ctx, inAddress, outAddress, out.Coins)
+			if err != nil {
+				return err
+			}
+		}
+
 		err = k.subUnlockedCoins(ctx, inAddress, in.Coins)
 		if err != nil {
 			return err
@@ -110,18 +124,10 @@ func (k BaseSendKeeper) InputOutputCoins(ctx sdk.Context, inputs []types.Input, 
 		if err != nil {
 			return err
 		}
+
 		err = k.addCoins(ctx, outAddress, out.Coins)
 		if err != nil {
 			return err
-		}
-
-		for _, in := range inputs {
-			inAddress, _ := sdk.AccAddressFromBech32(in.Address)
-
-			outAddress, err = k.sendCoinsRestrictionFn(ctx, inAddress, outAddress, out.Coins)
-			if err != nil {
-				return err
-			}
 		}
 
 		ctx.EventManager().EmitEvent(
