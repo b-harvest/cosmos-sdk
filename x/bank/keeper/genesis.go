@@ -36,6 +36,7 @@ func (k BaseKeeper) InitGenesis(ctx sdk.Context, genState *types.GenesisState) {
 	for _, meta := range genState.DenomMetadata {
 		k.SetDenomMetaData(ctx, meta)
 	}
+
 }
 
 // ExportGenesis returns the bank module's genesis state.
