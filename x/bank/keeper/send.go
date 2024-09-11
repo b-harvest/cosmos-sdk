@@ -99,6 +99,7 @@ func (k BaseSendKeeper) InputOutputCoins(ctx sdk.Context, inputs []types.Input, 
 				return err
 			}
 
+			// TODO: applying restriction check based on input and output coin amount
 			// Check restrictions between the input address and the output address
 			outAddress, err = k.sendCoinsRestrictionFn(ctx, inAddress, outAddress, out.Coins)
 			if err != nil {
