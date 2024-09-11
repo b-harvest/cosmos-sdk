@@ -165,6 +165,37 @@ func (store *Store) CacheWrapWithTrace(w io.Writer, tc types.TraceContext) types
 	return NewStore(tracekv.NewStore(store, w, tc))
 }
 
+// Copy implements deep copy of CacheKVStore
+// TODO(dudong2): frequent calls to deep copy are a big bottleneck for performance, so need to benchmark
+func (store *Store) Copy() types.CacheKVStore {
+	store.mtx.Lock()
+	defer store.mtx.Unlock()
+
+	// deep copy of cValue
+	cacheCopied := make(map[string]*cValue, len(store.cache))
+	for key, val := range store.cache {
+		valueCopied := make([]byte, len(val.value))
+		copy(valueCopied, val.value)
+		cacheCopied[key] = &cValue{
+			value: valueCopied,
+			dirty: val.dirty,
+		}
+	}
+
+	// unsortedCache only track the key
+	unsortedCacheCopied := make(map[string]struct{}, len(store.unsortedCache))
+	for key := range store.unsortedCache {
+		unsortedCacheCopied[key] = struct{}{}
+	}
+
+	return &Store{
+		cache:         cacheCopied,
+		unsortedCache: unsortedCacheCopied,
+		sortedCache:   store.sortedCache.Copy(),
+		parent:        store.parent,
+	}
+}
+
 //----------------------------------------
 // Iteration
 
