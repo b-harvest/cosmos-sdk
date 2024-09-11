@@ -40,18 +40,28 @@ type BaseSendKeeper struct {
 
 	// list of addresses that are restricted from receiving transactions
 	blockedAddrs map[string]bool
+
+	sendCoinsRestrictionFn SendRestrictionFn
 }
 
 func NewBaseSendKeeper(
 	cdc codec.BinaryCodec, storeKey sdk.StoreKey, ak types.AccountKeeper, paramSpace paramtypes.Subspace, blockedAddrs map[string]bool,
 ) BaseSendKeeper {
 	return BaseSendKeeper{
-		BaseViewKeeper: NewBaseViewKeeper(cdc, storeKey, ak),
-		cdc:            cdc,
-		ak:             ak,
-		storeKey:       storeKey,
-		paramSpace:     paramSpace,
-		blockedAddrs:   blockedAddrs,
+		BaseViewKeeper:         NewBaseViewKeeper(cdc, storeKey, ak),
+		cdc:                    cdc,
+		ak:                     ak,
+		storeKey:               storeKey,
+		paramSpace:             paramSpace,
+		blockedAddrs:           blockedAddrs,
+		sendCoinsRestrictionFn: NewSendRestrictionFn(),
+	}
+}
+
+// newSendRestriction creates a new sendRestriction with nil send restriction.
+func NewSendRestrictionFn() SendRestrictionFn {
+	return func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (newToAddr sdk.AccAddress, err error) {
+		return toAddr, nil
 	}
 }
 
@@ -82,6 +92,21 @@ func (k BaseSendKeeper) InputOutputCoins(ctx sdk.Context, inputs []types.Input, 
 			return err
 		}
 
+		// Apply restriction check between input and all outputs before subtracting coins
+		for _, out := range outputs {
+			outAddress, err := sdk.AccAddressFromBech32(out.Address)
+			if err != nil {
+				return err
+			}
+
+			// TODO: applying restriction check based on input and output coin amount
+			// Check restrictions between the input address and the output address
+			outAddress, err = k.sendCoinsRestrictionFn(ctx, inAddress, outAddress, out.Coins)
+			if err != nil {
+				return err
+			}
+		}
+
 		err = k.subUnlockedCoins(ctx, inAddress, in.Coins)
 		if err != nil {
 			return err
@@ -100,6 +125,7 @@ func (k BaseSendKeeper) InputOutputCoins(ctx sdk.Context, inputs []types.Input, 
 		if err != nil {
 			return err
 		}
+
 		err = k.addCoins(ctx, outAddress, out.Coins)
 		if err != nil {
 			return err
@@ -130,7 +156,12 @@ func (k BaseSendKeeper) InputOutputCoins(ctx sdk.Context, inputs []types.Input, 
 // SendCoins transfers amt coins from a sending account to a receiving account.
 // An error is returned upon failure.
 func (k BaseSendKeeper) SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error {
-	err := k.subUnlockedCoins(ctx, fromAddr, amt)
+	toAddr, err := k.sendCoinsRestrictionFn(ctx, fromAddr, toAddr, amt)
+	if err != nil {
+		return err
+	}
+
+	err = k.subUnlockedCoins(ctx, fromAddr, amt)
 	if err != nil {
 		return err
 	}

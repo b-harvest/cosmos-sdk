@@ -59,6 +59,8 @@ type BaseKeeper struct {
 
 type MintingRestrictionFn func(ctx sdk.Context, coins sdk.Coins) error
 
+type SendRestrictionFn func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (newToAddr sdk.AccAddress, err error)
+
 // GetPaginatedTotalSupply queries for the supply, ignoring 0 coins, with a given pagination
 func (k BaseKeeper) GetPaginatedTotalSupply(ctx sdk.Context, pagination *query.PageRequest) (sdk.Coins, *query.PageResponse, error) {
 	store := ctx.KVStore(k.storeKey)
@@ -133,6 +135,23 @@ func (k BaseKeeper) WithMintCoinsRestriction(check MintingRestrictionFn) BaseKee
 	return k
 }
 
+// WithSendCoinsRestriction restricts the bank Keeper used within a specific module to
+// have restricted permissions on sending via function passed in parameter.
+// Previous restriction functions can be nested as such:
+//
+//	bankKeeper.WithSendCoinsRestriction(restriction1).WithSendCoinsRestriction(restriction2)
+func (k BaseKeeper) WithSendCoinsRestriction(check SendRestrictionFn) BaseKeeper {
+	oldRestrictionFn := k.sendCoinsRestrictionFn
+	k.sendCoinsRestrictionFn = func(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) (newToAddr sdk.AccAddress, err error) {
+		toAddr, err = check(ctx, fromAddr, toAddr, amt)
+		if err != nil {
+			return toAddr, err
+		}
+		return oldRestrictionFn(ctx, fromAddr, toAddr, amt)
+	}
+	return k
+}
+
 // DelegateCoins performs delegation by deducting amt coins from an account with
 // address addr. For vesting accounts, delegations amounts are tracked for both
 // vesting and vested coins. The coins are then transferred from the delegator
@@ -146,6 +165,11 @@ func (k BaseKeeper) DelegateCoins(ctx sdk.Context, delegatorAddr, moduleAccAddr 
 
 	if !amt.IsValid() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, amt.String())
+	}
+
+	moduleAccAddr, err := k.sendCoinsRestrictionFn(ctx, delegatorAddr, moduleAccAddr, amt)
+	if err != nil {
+		return err
 	}
 
 	balances := sdk.NewCoins()
@@ -173,7 +197,7 @@ func (k BaseKeeper) DelegateCoins(ctx sdk.Context, delegatorAddr, moduleAccAddr 
 		types.NewCoinSpentEvent(delegatorAddr, amt),
 	)
 
-	err := k.addCoins(ctx, moduleAccAddr, amt)
+	err = k.addCoins(ctx, moduleAccAddr, amt)
 	if err != nil {
 		return err
 	}
@@ -196,7 +220,12 @@ func (k BaseKeeper) UndelegateCoins(ctx sdk.Context, moduleAccAddr, delegatorAdd
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, amt.String())
 	}
 
-	err := k.subUnlockedCoins(ctx, moduleAccAddr, amt)
+	delegatorAddr, err := k.sendCoinsRestrictionFn(ctx, moduleAccAddr, delegatorAddr, amt)
+	if err != nil {
+		return err
+	}
+
+	err = k.subUnlockedCoins(ctx, moduleAccAddr, amt)
 	if err != nil {
 		return err
 	}
