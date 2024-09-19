@@ -7,7 +7,7 @@ require (
 	github.com/99designs/keyring v1.2.1
 	github.com/armon/go-metrics v0.4.1
 	github.com/bgentry/speakeasy v0.1.1-0.20220910012023-760eaf8b6816
-	github.com/btcsuite/btcd/btcec/v2 v2.3.2
+	github.com/btcsuite/btcd/btcec/v2 v2.3.4
 	github.com/coinbase/rosetta-sdk-go v0.7.9
 	github.com/confio/ics23/go v0.9.0
 	github.com/cosmos/btcutil v1.0.4
