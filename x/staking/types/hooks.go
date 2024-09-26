@@ -4,6 +4,7 @@ import (
 	context "context"
 
 	sdkmath "cosmossdk.io/math"
+	abci "github.com/cometbft/cometbft/abci/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -111,6 +112,26 @@ func (h MultiStakingHooks) BeforeValidatorSlashed(ctx context.Context, valAddr s
 func (h MultiStakingHooks) AfterUnbondingInitiated(ctx context.Context, id uint64) error {
 	for i := range h {
 		if err := h[i].AfterUnbondingInitiated(ctx, id); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (h MultiStakingHooks) ValidatorUpdates(ctx context.Context) ([]abci.ValidatorUpdate, error) {
+	var validatorUpdates []abci.ValidatorUpdate
+	var err error
+	for i := range h {
+		if validatorUpdates, err = h[i].ValidatorUpdates(ctx); err != nil {
+			return []abci.ValidatorUpdate{}, err
+		}
+	}
+	return validatorUpdates, nil
+}
+
+func (h MultiStakingHooks) RemoveValidator(ctx context.Context, valAddr sdk.ValAddress) error {
+	for i := range h {
+		if err := h[i].RemoveValidator(ctx, valAddr); err != nil {
 			return err
 		}
 	}

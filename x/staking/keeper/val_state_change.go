@@ -28,7 +28,12 @@ func (k Keeper) BlockValidatorUpdates(ctx context.Context) ([]abci.ValidatorUpda
 	// unbonded after the Endblocker (go from Bonded -> Unbonding during
 	// ApplyAndReturnValidatorSetUpdates and then Unbonding -> Unbonded during
 	// UnbondAllMatureValidatorQueue).
-	validatorUpdates, err := k.ApplyAndReturnValidatorSetUpdates(ctx)
+
+	//validatorUpdates, err := k.ApplyAndReturnValidatorSetUpdates(ctx)
+	//if err != nil {
+	//	return nil, err
+	//}
+	validatorUpdates, err := k.hooks.ValidatorUpdates(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +145,7 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx context.Context) (updates 
 	// Retrieve the last validator set.
 	// The persistent set is updated later in this function.
 	// (see LastValidatorPowerKey).
-	last, err := k.getLastValidatorsByAddr(ctx)
+	last, err := k.GetLastValidatorsByAddr(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -151,6 +156,8 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx context.Context) (updates 
 		return nil, err
 	}
 	defer iterator.Close()
+
+	//multistakingValidators := hooks.MultiStakingHooks{}
 
 	for count := 0; iterator.Valid() && count < int(maxValidators); iterator.Next() {
 		// everything that is iterated in this loop is becoming or already a
@@ -171,13 +178,13 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx context.Context) (updates 
 		// apply the appropriate state change if necessary
 		switch {
 		case validator.IsUnbonded():
-			validator, err = k.unbondedToBonded(ctx, validator)
+			validator, err = k.UnbondedToBonded(ctx, validator)
 			if err != nil {
 				return
 			}
 			amtFromNotBondedToBonded = amtFromNotBondedToBonded.Add(validator.GetTokens())
 		case validator.IsUnbonding():
-			validator, err = k.unbondingToBonded(ctx, validator)
+			validator, err = k.UnbondingToBonded(ctx, validator)
 			if err != nil {
 				return
 			}
@@ -219,7 +226,7 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx context.Context) (updates 
 
 	for _, valAddrBytes := range noLongerBonded {
 		validator := k.mustGetValidator(ctx, sdk.ValAddress(valAddrBytes))
-		validator, err = k.bondedToUnbonding(ctx, validator)
+		validator, err = k.BondedToUnbonding(ctx, validator)
 		if err != nil {
 			return nil, err
 		}
@@ -244,11 +251,11 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx context.Context) (updates 
 	// Compare and subtract the respective amounts to only perform one transfer.
 	// This is done in order to avoid doing multiple updates inside each iterator/loop.
 	case amtFromNotBondedToBonded.GT(amtFromBondedToNotBonded):
-		if err = k.notBondedTokensToBonded(ctx, amtFromNotBondedToBonded.Sub(amtFromBondedToNotBonded)); err != nil {
+		if err = k.NotBondedTokensToBonded(ctx, amtFromNotBondedToBonded.Sub(amtFromBondedToNotBonded)); err != nil {
 			return nil, err
 		}
 	case amtFromNotBondedToBonded.LT(amtFromBondedToNotBonded):
-		if err = k.bondedTokensToNotBonded(ctx, amtFromBondedToNotBonded.Sub(amtFromNotBondedToBonded)); err != nil {
+		if err = k.BondedTokensToNotBonded(ctx, amtFromBondedToNotBonded.Sub(amtFromNotBondedToBonded)); err != nil {
 			return nil, err
 		}
 	default: // equal amounts of tokens; no update required
@@ -271,25 +278,25 @@ func (k Keeper) ApplyAndReturnValidatorSetUpdates(ctx context.Context) (updates 
 
 // Validator state transitions
 
-func (k Keeper) bondedToUnbonding(ctx context.Context, validator types.Validator) (types.Validator, error) {
+func (k Keeper) BondedToUnbonding(ctx context.Context, validator types.Validator) (types.Validator, error) {
 	if !validator.IsBonded() {
-		panic(fmt.Sprintf("bad state transition bondedToUnbonding, validator: %v\n", validator))
+		panic(fmt.Sprintf("bad state transition BondedToUnbonding, validator: %v\n", validator))
 	}
 
 	return k.BeginUnbondingValidator(ctx, validator)
 }
 
-func (k Keeper) unbondingToBonded(ctx context.Context, validator types.Validator) (types.Validator, error) {
+func (k Keeper) UnbondingToBonded(ctx context.Context, validator types.Validator) (types.Validator, error) {
 	if !validator.IsUnbonding() {
-		panic(fmt.Sprintf("bad state transition unbondingToBonded, validator: %v\n", validator))
+		panic(fmt.Sprintf("bad state transition UnbondingToBonded, validator: %v\n", validator))
 	}
 
 	return k.bondValidator(ctx, validator)
 }
 
-func (k Keeper) unbondedToBonded(ctx context.Context, validator types.Validator) (types.Validator, error) {
+func (k Keeper) UnbondedToBonded(ctx context.Context, validator types.Validator) (types.Validator, error) {
 	if !validator.IsUnbonded() {
-		panic(fmt.Sprintf("bad state transition unbondedToBonded, validator: %v\n", validator))
+		panic(fmt.Sprintf("bad state transition UnbondedToBonded, validator: %v\n", validator))
 	}
 
 	return k.bondValidator(ctx, validator)
@@ -298,7 +305,7 @@ func (k Keeper) unbondedToBonded(ctx context.Context, validator types.Validator)
 // UnbondingToUnbonded switches a validator from unbonding state to unbonded state
 func (k Keeper) UnbondingToUnbonded(ctx context.Context, validator types.Validator) (types.Validator, error) {
 	if !validator.IsUnbonding() {
-		return types.Validator{}, fmt.Errorf("bad state transition unbondingToUnbonded, validator: %v", validator)
+		return types.Validator{}, fmt.Errorf("bad state transition UnbondingToUnbonded, validator: %v", validator)
 	}
 
 	return k.completeUnbondingValidator(ctx, validator)
@@ -456,11 +463,11 @@ func (k Keeper) completeUnbondingValidator(ctx context.Context, validator types.
 
 // map of operator bech32-addresses to serialized power
 // We use bech32 strings here, because we can't have slices as keys: map[[]byte][]byte
-type validatorsByAddr map[string][]byte
+type ValidatorsByAddr map[string][]byte
 
 // get the last validator set
-func (k Keeper) getLastValidatorsByAddr(ctx context.Context) (validatorsByAddr, error) {
-	last := make(validatorsByAddr)
+func (k Keeper) GetLastValidatorsByAddr(ctx context.Context) (ValidatorsByAddr, error) {
+	last := make(ValidatorsByAddr)
 
 	iterator, err := k.LastValidatorsIterator(ctx)
 	if err != nil {
@@ -486,7 +493,7 @@ func (k Keeper) getLastValidatorsByAddr(ctx context.Context) (validatorsByAddr, 
 
 // given a map of remaining validators to previous bonded power
 // returns the list of validators to be unbonded, sorted by operator address
-func sortNoLongerBonded(last validatorsByAddr, ac address.Codec) ([][]byte, error) {
+func sortNoLongerBonded(last ValidatorsByAddr, ac address.Codec) ([][]byte, error) {
 	// sort the map keys for determinism
 	noLongerBonded := make([][]byte, len(last))
 	index := 0

@@ -19,8 +19,8 @@ func (k Keeper) GetNotBondedPool(ctx context.Context) (notBondedPool sdk.ModuleA
 	return k.authKeeper.GetModuleAccount(ctx, types.NotBondedPoolName)
 }
 
-// bondedTokensToNotBonded transfers coins from the bonded to the not bonded pool within staking
-func (k Keeper) bondedTokensToNotBonded(ctx context.Context, tokens math.Int) error {
+// BondedTokensToNotBonded transfers coins from the bonded to the not bonded pool within staking
+func (k Keeper) BondedTokensToNotBonded(ctx context.Context, tokens math.Int) error {
 	bondDenom, err := k.BondDenom(ctx)
 	if err != nil {
 		return err
@@ -30,8 +30,8 @@ func (k Keeper) bondedTokensToNotBonded(ctx context.Context, tokens math.Int) er
 	return k.bankKeeper.SendCoinsFromModuleToModule(ctx, types.BondedPoolName, types.NotBondedPoolName, coins)
 }
 
-// notBondedTokensToBonded transfers coins from the not bonded to the bonded pool within staking
-func (k Keeper) notBondedTokensToBonded(ctx context.Context, tokens math.Int) error {
+// NotBondedTokensToBonded transfers coins from the not bonded to the bonded pool within staking
+func (k Keeper) NotBondedTokensToBonded(ctx context.Context, tokens math.Int) error {
 	bondDenom, err := k.BondDenom(ctx)
 	if err != nil {
 		return err

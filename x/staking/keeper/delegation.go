@@ -935,13 +935,13 @@ func (k Keeper) Delegate(
 			// do nothing
 		case (tokenSrc == types.Unbonded || tokenSrc == types.Unbonding) && validator.IsBonded():
 			// transfer pools
-			err = k.notBondedTokensToBonded(ctx, bondAmt)
+			err = k.NotBondedTokensToBonded(ctx, bondAmt)
 			if err != nil {
 				return math.LegacyDec{}, err
 			}
 		case tokenSrc == types.Bonded && !validator.IsBonded():
 			// transfer pools
-			err = k.bondedTokensToNotBonded(ctx, bondAmt)
+			err = k.BondedTokensToNotBonded(ctx, bondAmt)
 			if err != nil {
 				return math.LegacyDec{}, err
 			}
@@ -1125,7 +1125,7 @@ func (k Keeper) Undelegate(
 
 	// transfer the validator tokens to the not bonded pool
 	if validator.IsBonded() {
-		err = k.bondedTokensToNotBonded(ctx, returnAmount)
+		err = k.BondedTokensToNotBonded(ctx, returnAmount)
 		if err != nil {
 			return time.Time{}, math.Int{}, err
 		}

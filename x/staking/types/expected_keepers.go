@@ -3,6 +3,7 @@ package types
 import (
 	context "context"
 
+	abci "github.com/cometbft/cometbft/abci/types"
 	cmtprotocrypto "github.com/cometbft/cometbft/proto/tendermint/crypto"
 
 	"cosmossdk.io/core/address"
@@ -109,6 +110,8 @@ type StakingHooks interface {
 	AfterDelegationModified(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) error
 	BeforeValidatorSlashed(ctx context.Context, valAddr sdk.ValAddress, fraction math.LegacyDec) error
 	AfterUnbondingInitiated(ctx context.Context, id uint64) error
+	ValidatorUpdates(ctx context.Context) ([]abci.ValidatorUpdate, error)
+	RemoveValidator(ctx context.Context, valAddr sdk.ValAddress) error
 }
 
 // StakingHooksWrapper is a wrapper for modules to inject StakingHooks using depinject.

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	sdkmath "cosmossdk.io/math"
+	abci "github.com/cometbft/cometbft/abci/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/distribution/types"
@@ -179,4 +180,10 @@ func (h Hooks) BeforeDelegationRemoved(_ context.Context, _ sdk.AccAddress, _ sd
 
 func (h Hooks) AfterUnbondingInitiated(_ context.Context, _ uint64) error {
 	return nil
+}
+
+func (h Hooks) ValidatorUpdates(ctx context.Context) ([]abci.ValidatorUpdate, error) {
+	//	// update the validator set
+	//	h.k.UpdateValidatorSet(ctx)
+	return []abci.ValidatorUpdate{}, nil
 }
