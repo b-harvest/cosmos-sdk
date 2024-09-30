@@ -187,3 +187,7 @@ func (h Hooks) ValidatorUpdates(ctx context.Context) ([]abci.ValidatorUpdate, er
 	//	h.k.UpdateValidatorSet(ctx)
 	return []abci.ValidatorUpdate{}, nil
 }
+
+func (h Hooks) RemoveValidator(ctx context.Context, valAddr sdk.ValAddress) error {
+	return nil
+}

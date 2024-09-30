@@ -12,15 +12,41 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
+const (
+	nativePower = iota
+	multiAsserPower
+)
+
 // AllocateTokens performs reward and fee distribution to all validators based
 // on the F1 fee distribution specification.
 func (k Keeper) AllocateTokens(ctx context.Context, totalPreviousPower int64, bondedVotes []abci.VoteInfo) error {
 	// fetch and clear the collected fees for distribution, since this is
 	// called in BeginBlock, collected fees will be from the previous block
 	// (and distributed to the previous proposer)
+
+	nativeTotalPower := int64(0)
+	multiAssetTotalPower := int64(0)
+
+	powerPerAsset, _ := k.hooks.ValidatorVotingPowersPerAsset(ctx)
+	for _, validator := range powerPerAsset {
+		nativeTotalPower += validator[nativePower]
+		multiAssetTotalPower += validator[multiAsserPower]
+	}
+
+	powerMultiplier := math.LegacyNewDec(nativeTotalPower).QuoTruncate(math.LegacyNewDec(totalPreviousPower))
+
 	feeCollector := k.authKeeper.GetModuleAccount(ctx, k.feeCollectorName)
 	feesCollectedInt := k.bankKeeper.GetAllBalances(ctx, feeCollector.GetAddress())
 	feesCollected := sdk.NewDecCoinsFromCoins(feesCollectedInt...)
+
+	// feesCollected * powerMultiplier
+	recalculatedFees := sdk.DecCoins{}
+	for _, fee := range feesCollected {
+		recalculatedFeeAmount := fee.Amount.Mul(powerMultiplier)
+		recalculatedFees = append(recalculatedFees, sdk.NewDecCoinFromDec(fee.Denom, recalculatedFeeAmount))
+	}
+
+	feesCollected = recalculatedFees
 
 	// transfer collected fees to the distribution module account
 	err := k.bankKeeper.SendCoinsFromModuleToModule(ctx, k.feeCollectorName, types.ModuleName, feesCollectedInt)
@@ -64,7 +90,7 @@ func (k Keeper) AllocateTokens(ctx context.Context, totalPreviousPower int64, bo
 		// TODO: Consider micro-slashing for missing votes.
 		//
 		// Ref: https://github.com/cosmos/cosmos-sdk/issues/2525#issuecomment-430838701
-		powerFraction := math.LegacyNewDec(vote.Validator.Power).QuoTruncate(math.LegacyNewDec(totalPreviousPower))
+		powerFraction := math.LegacyNewDec(powerPerAsset[validator.GetOperator()][nativeTotalPower]).QuoTruncate(math.LegacyNewDec(totalPreviousPower))
 		reward := feeMultiplier.MulDecTruncate(powerFraction)
 
 		err = k.AllocateTokensToValidator(ctx, validator, reward)

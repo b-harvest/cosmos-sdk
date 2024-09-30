@@ -101,3 +101,7 @@ func (h Hooks) AfterUnbondingInitiated(_ context.Context, _ uint64) error {
 func (h Hooks) ValidatorUpdates(ctx context.Context) ([]abci.ValidatorUpdate, error) {
 	return nil, nil
 }
+
+func (h Hooks) RemoveValidator(ctx context.Context, valAddr sdk.ValAddress) error {
+	return nil
+}

@@ -22,6 +22,7 @@ type Keeper struct {
 	authKeeper    types.AccountKeeper
 	bankKeeper    types.BankKeeper
 	stakingKeeper types.StakingKeeper
+	hooks         types.DistributionHooks
 	// the address capable of executing a MsgUpdateParams message. Typically, this
 	// should be the x/gov module account.
 	authority string
@@ -52,6 +53,7 @@ func NewKeeper(
 		bankKeeper:       bk,
 		stakingKeeper:    sk,
 		feeCollectorName: feeCollectorName,
+		hooks:            nil,
 		authority:        authority,
 		Params:           collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.Params](cdc)),
 		FeePool:          collections.NewItem(sb, types.FeePoolKey, "fee_pool", codec.CollValue[types.FeePool](cdc)),
@@ -63,6 +65,16 @@ func NewKeeper(
 	}
 	k.Schema = schema
 	return k
+}
+
+// SetHooks sets the validator hooks.  In contrast to other receivers, this method must take a pointer due to nature
+// of the hooks interface and SDK start up sequence.
+func (k *Keeper) SetHooks(dh types.DistributionHooks) {
+	if k.hooks != nil {
+		panic("cannot set validator hooks twice")
+	}
+
+	k.hooks = dh
 }
 
 // GetAuthority returns the x/distribution module's authority.
