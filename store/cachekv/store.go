@@ -11,7 +11,6 @@ import (
 	"cosmossdk.io/store/cachekv/internal"
 	"cosmossdk.io/store/internal/btree"
 	"cosmossdk.io/store/internal/conv"
-	"cosmossdk.io/store/internal/kv"
 	"cosmossdk.io/store/types"
 )
 
@@ -198,34 +197,35 @@ func (store *GStore[V]) CacheWrap() types.CacheWrap {
 
 // Copy implements deep copy of CacheKVStore
 // TODO(dudong2): frequent calls to deep copy are a big bottleneck for performance, so need to benchmark
-func (store *Store) Copy() types.CacheKVStore {
-	store.mtx.Lock()
-	defer store.mtx.Unlock()
+// TODO(dudong2): need to re-implement this based on OPE
+// func (store *Store) Copy() types.CacheKVStore {
+// 	store.mtx.Lock()
+// 	defer store.mtx.Unlock()
 
-	// deep copy of cValue
-	cacheCopied := make(map[string]*cValue, len(store.cache))
-	for key, val := range store.cache {
-		valueCopied := make([]byte, len(val.value))
-		copy(valueCopied, val.value)
-		cacheCopied[key] = &cValue{
-			value: valueCopied,
-			dirty: val.dirty,
-		}
-	}
+// 	// deep copy of cValue
+// 	cacheCopied := make(map[string]*cValue, len(store.cache))
+// 	for key, val := range store.cache {
+// 		valueCopied := make([]byte, len(val.value))
+// 		copy(valueCopied, val.value)
+// 		cacheCopied[key] = &cValue{
+// 			value: valueCopied,
+// 			dirty: val.dirty,
+// 		}
+// 	}
 
-	// unsortedCache only track the key
-	unsortedCacheCopied := make(map[string]struct{}, len(store.unsortedCache))
-	for key := range store.unsortedCache {
-		unsortedCacheCopied[key] = struct{}{}
-	}
+// 	// unsortedCache only track the key
+// 	unsortedCacheCopied := make(map[string]struct{}, len(store.unsortedCache))
+// 	for key := range store.unsortedCache {
+// 		unsortedCacheCopied[key] = struct{}{}
+// 	}
 
-	return &Store{
-		cache:         cacheCopied,
-		unsortedCache: unsortedCacheCopied,
-		sortedCache:   store.sortedCache.Copy(),
-		parent:        store.parent,
-	}
-}
+// 	return &Store{
+// 		cache:         cacheCopied,
+// 		unsortedCache: unsortedCacheCopied,
+// 		sortedCache:   store.sortedCache.Copy(),
+// 		parent:        store.parent,
+// 	}
+// }
 
 //----------------------------------------
 // Iteration

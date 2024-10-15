@@ -185,20 +185,21 @@ func (cms Store) GetObjKVStore(key types.StoreKey) types.ObjKVStore {
 
 // Copy returns an deep copy of CacheMultiStore
 // TODO(dudong2): frequent calls to deep copy are a big bottleneck for performance, so need to benchmark
-func (cms Store) Copy() types.CacheMultiStore {
-	// deep copy of CacheKVStore underlying CacheMultiStore
-	storesCopied := make(map[types.StoreKey]types.CacheWrap, len(cms.stores))
-	for key, store := range cms.stores {
-		if store, ok := store.(*cachekv.Store); ok {
-			storesCopied[key] = store.Copy()
-		}
-	}
+// TODO(dudong2): need to re-implement this based on OPE
+// func (cms Store) Copy() types.CacheMultiStore {
+// 	// deep copy of CacheKVStore underlying CacheMultiStore
+// 	storesCopied := make(map[types.StoreKey]types.CacheWrap, len(cms.stores))
+// 	for key, store := range cms.stores {
+// 		if store, ok := store.(*cachekv.GStore[V]); ok {
+// 			storesCopied[key] = store.Copy()
+// 		}
+// 	}
 
-	return Store{
-		db:           cms.db.Copy(),
-		stores:       storesCopied,
-		keys:         cms.keys,
-		traceWriter:  cms.traceWriter,
-		traceContext: cms.traceContext,
-	}
-}
+// 	return Store{
+// 		db:           cms.db.Copy(),
+// 		stores:       storesCopied,
+// 		keys:         cms.keys,
+// 		traceWriter:  cms.traceWriter,
+// 		traceContext: cms.traceContext,
+// 	}
+// }
