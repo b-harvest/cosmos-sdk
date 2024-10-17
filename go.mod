@@ -170,7 +170,7 @@ require (
 
 // Below are the long-lived replace of the Cosmos SDK
 replace (
-	cosmossdk.io/store => /Users/dudong2/workspace/github.com/b-harvest/cosmos-sdk2/store
+	cosmossdk.io/store => github.com/b-harvest/cosmos-sdk/store v0.0.0-20241015155842-364149db166b
 	// use cosmos fork of keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
