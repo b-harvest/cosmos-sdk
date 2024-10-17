@@ -59,8 +59,8 @@ github.com/aryann/difflib v0.0.0-20170710044230-e206f873d14a/go.mod h1:DAHtR1m6l
 github.com/aws/aws-lambda-go v1.13.3/go.mod h1:4UKl9IzQMoD+QF79YdCuzCwp8VbmG4VAQwij/eHl5CU=
 github.com/aws/aws-sdk-go v1.27.0/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
 github.com/aws/aws-sdk-go-v2 v0.18.0/go.mod h1:JWVYvqSMppoMJC0x5wdwiImzgXTI9FuZwxzkQq9wy+g=
-github.com/b-harvest/cosmos-sdk/store v0.0.0-20241015155842-364149db166b h1:V8FGjyQqNZ4qTWGEFJQsInCWORqevhSs9oAENzuLEEE=
-github.com/b-harvest/cosmos-sdk/store v0.0.0-20241015155842-364149db166b/go.mod h1:oZfW/4Fc/zYqu3JmQcQdUJ3fqu5vnYTn3LZFFy8P8ng=
+github.com/b-harvest/cosmos-sdk/store v0.0.0-20241017105340-69898beab95b h1:dH+/cSndSZBWO+HQ2XF29F+p0lvaWV9zko3nunB6gxY=
+github.com/b-harvest/cosmos-sdk/store v0.0.0-20241017105340-69898beab95b/go.mod h1:oZfW/4Fc/zYqu3JmQcQdUJ3fqu5vnYTn3LZFFy8P8ng=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
