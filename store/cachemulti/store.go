@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 
+	dbm "github.com/cosmos/cosmos-db"
+
 	"cosmossdk.io/store/tracekv"
 	"cosmossdk.io/store/types"
 )
@@ -54,6 +56,15 @@ func NewFromKVStore(
 // NewStore creates a new Store object from a mapping of store keys to
 // CacheWrapper objects. Each CacheWrapper store is a branched store.
 func NewStore(
+	_ dbm.DB, stores map[types.StoreKey]types.CacheWrapper, _ map[string]types.StoreKey,
+	traceWriter io.Writer, traceContext types.TraceContext,
+) Store {
+	return newStore(stores, traceWriter, traceContext)
+}
+
+// NewStore creates a new Store object from a mapping of store keys to
+// CacheWrapper objects. Each CacheWrapper store is a branched store.
+func newStore(
 	stores map[types.StoreKey]types.CacheWrapper,
 	traceWriter io.Writer, traceContext types.TraceContext,
 ) Store {
