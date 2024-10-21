@@ -333,32 +333,67 @@ func (app *BaseApp) ApplySnapshotChunk(req *abci.RequestApplySnapshotChunk) (*ab
 // internal CheckTx state if the AnteHandler passes. Otherwise, the ResponseCheckTx
 // will contain relevant error information. Regardless of tx execution outcome,
 // the ResponseCheckTx will contain relevant gas execution context.
-func (app *BaseApp) CheckTx(req *abci.RequestCheckTx) (*abci.ResponseCheckTx, error) {
+func (app *BaseApp) CheckTxSync(req *abci.RequestCheckTx) (*abci.ResponseCheckTx, error) {
+	defer telemetry.MeasureSince(time.Now(), "abci", "check_tx")
+
 	var mode execMode
-
-	switch {
-	case req.Type == abci.CheckTxType_New:
+	if req.Type == abci.CheckTxType_New {
 		mode = execModeCheck
-
-	case req.Type == abci.CheckTxType_Recheck:
+	} else if req.Type == abci.CheckTxType_Recheck {
 		mode = execModeReCheck
-
-	default:
-		return nil, fmt.Errorf("unknown RequestCheckTx type: %s", req.Type)
+	} else {
+		panic(fmt.Sprintf("unknown RequestCheckTx type: %s", req.Type))
 	}
 
-	gInfo, result, anteEvents, err := app.runTx(mode, req.Tx)
+	tx, err := app.preCheckTx(req.Tx)
 	if err != nil {
-		return sdkerrors.ResponseCheckTxWithEvents(err, gInfo.GasWanted, gInfo.GasUsed, anteEvents, app.trace), nil
+		return sdkerrors.ResponseCheckTxWithEvents(err, 0, 0, nil, false), err
 	}
 
+	waits, signals := app.checkAccountWGs.Register(app.cdc, tx)
+
+	app.checkAccountWGs.Wait(waits)
+	defer app.checkAccountWGs.Done(signals)
+
+	gInfo, err := app.checkTx(mode, req.Tx, tx)
+	if err != nil {
+		return sdkerrors.ResponseCheckTxWithEvents(err, gInfo.GasWanted, gInfo.GasUsed, nil, false), err
+	}
 	return &abci.ResponseCheckTx{
 		GasWanted: int64(gInfo.GasWanted), // TODO: Should type accept unsigned ints?
 		GasUsed:   int64(gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
-		Log:       result.Log,
-		Data:      result.Data,
-		Events:    sdk.MarkEventsToIndex(result.Events, app.indexEvents),
+		// Log:       result.Log,
+		// Data:      result.Data,
+		// Events:    sdk.MarkEventsToIndex(result.Events, app.indexEvents),
 	}, nil
+}
+
+func (app *BaseApp) CheckTxAsync(req *abci.RequestCheckTx, callback abci.CheckTxCallback) {
+	if req.Type != abci.CheckTxType_New && req.Type != abci.CheckTxType_Recheck {
+		panic(fmt.Sprintf("unknown RequestCheckTx type: %s", req.Type))
+	}
+
+	reqCheckTx := &RequestCheckTxAsync{
+		txBytes:  req.Tx,
+		txType:   req.Type,
+		callback: callback,
+		prepare:  waitGroup1(),
+	}
+	app.chCheckTx <- reqCheckTx
+
+	go app.prepareCheckTx(reqCheckTx)
+}
+
+// BeginRecheckTx implements the ABCI interface and set the check state based on the given header
+func (app *BaseApp) BeginRecheckTx(req *abci.RequestBeginRecheckTx) (*abci.ResponseBeginRecheckTx, error) {
+	// NOTE: This is safe because Cometbft holds a lock on the mempool for Rechecking.
+	app.setState(execModeCheck, req.Header)
+	return &abci.ResponseBeginRecheckTx{Code: abci.CodeTypeOK}, nil
+}
+
+// EndRecheckTx implements the ABCI interface.
+func (app *BaseApp) EndRecheckTx(req *abci.RequestEndRecheckTx) (*abci.ResponseEndRecheckTx, error) {
+	return &abci.ResponseEndRecheckTx{Code: abci.CodeTypeOK}, nil
 }
 
 // PrepareProposal implements the PrepareProposal ABCI method and returns a
@@ -775,19 +810,84 @@ func (app *BaseApp) internalFinalizeBlock(ctx context.Context, req *abci.Request
 
 	// Reset the gas meter so that the AnteHandlers aren't required to
 	gasMeter = app.getBlockGasMeter(app.finalizeBlockState.Context())
-	app.finalizeBlockState.SetContext(app.finalizeBlockState.Context().WithBlockGasMeter(gasMeter))
+	app.finalizeBlockState.SetContext(
+		app.finalizeBlockState.Context().
+			WithBlockGasMeter(gasMeter).
+			WithTxCount(len(req.Txs)),
+	)
 
 	// Iterate over all raw transactions in the proposal and attempt to execute
 	// them, gathering the execution results.
 	//
 	// NOTE: Not all raw transactions may adhere to the sdk.Tx interface, e.g.
 	// vote extensions, so skip those.
-	txResults := make([]*abci.ExecTxResult, 0, len(req.Txs))
-	for _, rawTx := range req.Txs {
+	txResults, err := app.executeTxs(ctx, req.Txs)
+	if err != nil {
+		// usually due to canceled
+		return nil, err
+	}
+
+	if app.finalizeBlockState.ms.TracingEnabled() {
+		app.finalizeBlockState.ms = app.finalizeBlockState.ms.SetTracingContext(nil).(storetypes.CacheMultiStore)
+	}
+
+	var (
+		blockGasUsed   uint64
+		blockGasWanted uint64
+	)
+	for _, res := range txResults {
+		// GasUsed should not be -1 but just in case
+		if res.GasUsed > 0 {
+			blockGasUsed += uint64(res.GasUsed)
+		}
+		// GasWanted could be -1 if the tx is invalid
+		if res.GasWanted > 0 {
+			blockGasWanted += uint64(res.GasWanted)
+		}
+	}
+	app.finalizeBlockState.SetContext(
+		app.finalizeBlockState.Context().
+			WithBlockGasUsed(blockGasUsed).
+			WithBlockGasWanted(blockGasWanted),
+	)
+
+	endBlock, err := app.endBlock(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// check after endBlock if we should abort, to avoid propagating the result
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+		// continue
+	}
+
+	events = append(events, endBlock.Events...)
+	cp := app.GetConsensusParams(app.finalizeBlockState.Context())
+
+	return &abci.ResponseFinalizeBlock{
+		Events:                events,
+		TxResults:             txResults,
+		ValidatorUpdates:      endBlock.ValidatorUpdates,
+		ConsensusParamUpdates: &cp,
+	}, nil
+}
+
+func (app *BaseApp) executeTxs(ctx context.Context, txs [][]byte) ([]*abci.ExecTxResult, error) {
+	if app.txExecutor != nil {
+		return app.txExecutor(ctx, txs, app.finalizeBlockState.ms, func(i int, memTx sdk.Tx, ms storetypes.MultiStore, incarnationCache map[string]any) *abci.ExecTxResult {
+			return app.deliverTxWithMultiStore(txs[i], memTx, i, ms, incarnationCache)
+		})
+	}
+
+	txResults := make([]*abci.ExecTxResult, 0, len(txs))
+	for i, rawTx := range txs {
 		var response *abci.ExecTxResult
 
-		if _, err := app.txDecoder(rawTx); err == nil {
-			response = app.deliverTx(rawTx)
+		if memTx, err := app.txDecoder(rawTx); err == nil {
+			response = app.deliverTx(rawTx, memTx, i)
 		} else {
 			// In the case where a transaction included in a block proposal is malformed,
 			// we still want to return a default response to comet. This is because comet
@@ -811,33 +911,7 @@ func (app *BaseApp) internalFinalizeBlock(ctx context.Context, req *abci.Request
 
 		txResults = append(txResults, response)
 	}
-
-	if app.finalizeBlockState.ms.TracingEnabled() {
-		app.finalizeBlockState.ms = app.finalizeBlockState.ms.SetTracingContext(nil).(storetypes.CacheMultiStore)
-	}
-
-	endBlock, err := app.endBlock(app.finalizeBlockState.Context())
-	if err != nil {
-		return nil, err
-	}
-
-	// check after endBlock if we should abort, to avoid propagating the result
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	default:
-		// continue
-	}
-
-	events = append(events, endBlock.Events...)
-	cp := app.GetConsensusParams(app.finalizeBlockState.Context())
-
-	return &abci.ResponseFinalizeBlock{
-		Events:                events,
-		TxResults:             txResults,
-		ValidatorUpdates:      endBlock.ValidatorUpdates,
-		ConsensusParamUpdates: &cp,
-	}, nil
+	return txResults, nil
 }
 
 // FinalizeBlock will execute the block proposal provided by RequestFinalizeBlock.
@@ -950,7 +1024,7 @@ func (app *BaseApp) Commit() (*abci.ResponseCommit, error) {
 	//
 	// NOTE: This is safe because CometBFT holds a lock on the mempool for
 	// Commit. Use the header from this latest block.
-	app.setState(execModeCheck, header)
+	// app.setState(execModeCheck, header) // ! 이건 왜 주석처리?
 
 	app.finalizeBlockState = nil
 
@@ -1188,7 +1262,7 @@ func (app *BaseApp) CreateQueryContext(height int64, prove bool) (sdk.Context, e
 	// use custom query multi-store if provided
 	qms := app.qms
 	if qms == nil {
-		qms = app.cms.(storetypes.MultiStore)
+		qms = storetypes.RootMultiStore(app.cms)
 	}
 
 	lastBlockHeight := qms.LatestVersion()
