@@ -453,6 +453,7 @@ func (app *BaseApp) PrepareProposal(req *abci.RequestPrepareProposal) (resp *abc
 // Ref: https://github.com/cosmos/cosmos-sdk/blob/main/docs/architecture/adr-060-abci-1.0.md
 // Ref: https://github.com/cometbft/cometbft/blob/main/spec/abci/abci%2B%2B_basic_concepts.md
 func (app *BaseApp) ProcessProposal(req *abci.RequestProcessProposal) (resp *abci.ResponseProcessProposal, err error) {
+	app.logger.Info(fmt.Sprintf("[%s]start: app.ProcessProposal", time.Now().Format("15:04:05.000")), "height", req.Height, "hash", fmt.Sprintf("%X", req.Hash))
 	if app.processProposal == nil {
 		return nil, errors.New("ProcessProposal handler not set")
 	}
@@ -533,9 +534,11 @@ func (app *BaseApp) ProcessProposal(req *abci.RequestProcessProposal) (resp *abc
 	if resp.Status == abci.ResponseProcessProposal_ACCEPT &&
 		app.optimisticExec.Enabled() &&
 		req.Height > app.initialHeight {
+		app.logger.Info(fmt.Sprintf("[%s]call app.optimisticEexc.Execute (go-routine)", time.Now().Format("15:04:05.000")), "height", req.Height, "hash", fmt.Sprintf("%X", req.Hash))
 		app.optimisticExec.Execute(req)
 	}
 
+	app.logger.Info(fmt.Sprintf("[%s]finished: app.ProcessProposal", time.Now().Format("15:04:05.000")), "height", req.Height, "hash", fmt.Sprintf("%X", req.Hash))
 	return resp, nil
 }
 
@@ -782,6 +785,7 @@ func (app *BaseApp) internalFinalizeBlock(ctx context.Context, req *abci.Request
 	//
 	// NOTE: Not all raw transactions may adhere to the sdk.Tx interface, e.g.
 	// vote extensions, so skip those.
+	app.logger.Info(fmt.Sprintf("[%s]app.interalFinalizeBlock:: call app.executeTxs", time.Now().Format("15:04:05.000")), "txs", len(req.Txs))
 	txResults := make([]*abci.ExecTxResult, 0, len(req.Txs))
 	for _, rawTx := range req.Txs {
 		var response *abci.ExecTxResult
@@ -811,6 +815,7 @@ func (app *BaseApp) internalFinalizeBlock(ctx context.Context, req *abci.Request
 
 		txResults = append(txResults, response)
 	}
+	app.logger.Info(fmt.Sprintf("[%s]app.internalFinalizeBlock:: done app.executeTxs", time.Now().Format("15:04:05.000")))
 
 	if app.finalizeBlockState.ms.TracingEnabled() {
 		app.finalizeBlockState.ms = app.finalizeBlockState.ms.SetTracingContext(nil).(storetypes.CacheMultiStore)
@@ -820,6 +825,7 @@ func (app *BaseApp) internalFinalizeBlock(ctx context.Context, req *abci.Request
 	if err != nil {
 		return nil, err
 	}
+	app.logger.Info(fmt.Sprintf("[%s]app.interalFinalizeBlock:: done app.endBlock", time.Now().Format("15:04:05.000")))
 
 	// check after endBlock if we should abort, to avoid propagating the result
 	select {
@@ -861,6 +867,7 @@ func (app *BaseApp) FinalizeBlock(req *abci.RequestFinalizeBlock) (res *abci.Res
 	}()
 
 	if app.optimisticExec.Initialized() {
+		app.logger.Info(fmt.Sprintf("[%s]app.FinalizeBlock:: optimistic execution is running", time.Now().Format("15:04:05.000")), "height", req.Height, "hash", fmt.Sprintf("%X", req.Hash))
 		// check if the hash we got is the same as the one we are executing
 		aborted := app.optimisticExec.AbortIfNeeded(req.Hash)
 		// Wait for the OE to finish, regardless of whether it was aborted or not
@@ -869,9 +876,12 @@ func (app *BaseApp) FinalizeBlock(req *abci.RequestFinalizeBlock) (res *abci.Res
 		// only return if we are not aborting
 		if !aborted {
 			if res != nil {
+				app.logger.Info(fmt.Sprintf("[%s]app.FinalizeBlock:: call app.workingHash", time.Now().Format("15:04:05.000")))
 				res.AppHash = app.workingHash()
+				app.logger.Info(fmt.Sprintf("[%s]app.FinalizeBlock:: done app.workingHash", time.Now().Format("15:04:05.000")))
 			}
 
+			app.logger.Info(fmt.Sprintf("[%s]app.FinalizeBlock:: done optimistic execution", time.Now().Format("15:04:05.000")))
 			return res, err
 		}
 
@@ -881,7 +891,9 @@ func (app *BaseApp) FinalizeBlock(req *abci.RequestFinalizeBlock) (res *abci.Res
 	}
 
 	// if no OE is running, just run the block (this is either a block replay or a OE that got aborted)
+	app.logger.Info(fmt.Sprintf("[%s]app.FinalizeBlock:: no optimistic execution running, so call interanlFinalizeBlock", time.Now().Format("15:04:05.000")))
 	res, err = app.internalFinalizeBlock(context.Background(), req)
+	app.logger.Info(fmt.Sprintf("[%s]app.FinalizeBlock:: done interanlFinalizeBlock", time.Now().Format("15:04:05.000")))
 	if res != nil {
 		res.AppHash = app.workingHash()
 	}
@@ -927,7 +939,9 @@ func (app *BaseApp) Commit() (*abci.ResponseCommit, error) {
 		rms.SetCommitHeader(header)
 	}
 
+	app.logger.Info(fmt.Sprintf("[%s]app.Commit:: call app.cms.Commit", time.Now().Format("15:04:05.000")))
 	app.cms.Commit()
+	app.logger.Info(fmt.Sprintf("[%s]app.Commit:: done app.cms.Commit", time.Now().Format("15:04:05.000")))
 
 	resp := &abci.ResponseCommit{
 		RetainHeight: retainHeight,
@@ -973,10 +987,14 @@ func (app *BaseApp) workingHash() []byte {
 	// Write the FinalizeBlock state into branched storage and commit the MultiStore.
 	// The write to the FinalizeBlock state writes all state transitions to the root
 	// MultiStore (app.cms) so when Commit() is called it persists those values.
+	app.logger.Info(fmt.Sprintf("[%s]app.workingHash:: call app.finalizeBlockState.ms.Write", time.Now().Format("15:04:05.000")))
 	app.finalizeBlockState.ms.Write()
+	app.logger.Info(fmt.Sprintf("[%s]app.workingHash:: done app.finalizeBlockState.ms.Write", time.Now().Format("15:04:05.000")))
 
 	// Get the hash of all writes in order to return the apphash to the comet in finalizeBlock.
+	app.logger.Info(fmt.Sprintf("[%s]app.workingHash:: call app.cms.WorkingHash", time.Now().Format("15:04:05.000")))
 	commitHash := app.cms.WorkingHash()
+	app.logger.Info(fmt.Sprintf("[%s]app.workingHash:: done app.cms.WorkingHash", time.Now().Format("15:04:05.000")))
 	app.logger.Debug("hash of all writes", "workingHash", fmt.Sprintf("%X", commitHash))
 
 	return commitHash
