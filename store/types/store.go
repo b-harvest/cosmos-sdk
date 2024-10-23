@@ -163,10 +163,8 @@ type RootMultiStore interface {
 type CacheMultiStore interface {
 	MultiStore
 	Write() // Writes operations to underlying KVStore
-	RunAtomic(func(CacheMultiStore) error) error
 
-	// TODO(dudong2): need to uncomment after re-implementing OPE
-	// Copy() CacheMultiStore // deep copy of CacheMultiStore
+	RunAtomic(func(CacheMultiStore) error) error
 }
 
 // CommitMultiStore is an interface for a MultiStore without cache capabilities.
@@ -321,10 +319,6 @@ type CacheKVStore interface {
 
 	// Writes operations to underlying KVStore
 	Write()
-
-	// deep copy of CacheKVStore
-	// TODO(dudong2): need to uncomment after re-implementing OPE
-	// Copy() CacheKVStore
 }
 
 // CommitKVStore is an interface for MultiStore.
