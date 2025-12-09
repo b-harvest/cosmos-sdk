@@ -10,7 +10,7 @@ require (
 	cosmossdk.io/log v1.6.1
 	cosmossdk.io/math v1.5.3
 	cosmossdk.io/simapp v0.0.0-20230620040119-e078f1a49e8b
-	cosmossdk.io/store v1.3.0-beta.0
+	cosmossdk.io/store v1.10.0-rc.2
 	cosmossdk.io/x/tx v0.14.0
 	github.com/cometbft/cometbft v0.39.0-beta.2
 	github.com/cosmos/cosmos-db v1.1.3
@@ -86,7 +86,9 @@ require (
 	github.com/cockroachdb/pebble v1.1.5 // indirect
 	github.com/cockroachdb/redact v1.1.6 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20250429170803-42689b6311bb // indirect
-	github.com/cometbft/cometbft-db v0.14.1 // indirect
+	github.com/cometbft/cometbft-db v1.0.4 // indirect
+	github.com/cometbft/cometbft/api v1.1.0-rc1 // indirect
+	github.com/cometbft/cometbft/v2 v2.0.0-rc1 // indirect
 	github.com/cosmos/btcutil v1.0.5 // indirect
 	github.com/cosmos/gogogateway v1.2.0 // indirect
 	github.com/cosmos/iavl v1.2.6 // indirect
