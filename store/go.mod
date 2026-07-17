@@ -1,6 +1,6 @@
 module cosmossdk.io/store
 
-go 1.24.0
+go 1.25.0
 
 replace github.com/tidwall/btree => github.com/cosmos/btree v0.0.0-20250924232609-2c6195d95951
 
@@ -21,8 +21,8 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/btree v1.8.1
 	go.uber.org/mock v0.6.0
-	google.golang.org/grpc v1.77.0
-	google.golang.org/protobuf v1.36.10
+	google.golang.org/grpc v1.82.1
+	google.golang.org/protobuf v1.36.11
 	gotest.tools/v3 v3.5.2
 )
 
@@ -78,12 +78,12 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	golang.org/x/arch v0.21.0 // indirect
-	golang.org/x/crypto v0.45.0 // indirect
+	golang.org/x/crypto v0.50.0 // indirect
 	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
-	golang.org/x/net v0.47.0 // indirect; indirectg
-	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/text v0.31.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251022142026-3a174f9686a8 // indirect
+	golang.org/x/net v0.53.0 // indirect; indirectg
+	golang.org/x/sys v0.43.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260414002931-afd174a4e478 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
